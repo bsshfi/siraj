@@ -309,7 +309,8 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     <h2 id="joinTitle">ربط جهاز الطفل</h2>
     <p class="muted" id="joinHint"></p>
     <input type="hidden" id="joinRole" value="child">
-    <input class="codein" id="joinCode" maxlength="11" placeholder="XXXXX-XXXXX" autocomplete="off" autocapitalize="characters">
+    <input class="codein" id="joinCode" placeholder="XXXXX-XXXXX" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text" oninput="App.fmtCode()" onpaste="setTimeout(App.fmtCode,0)">
+    <button class="btn alt" id="pasteBtn" style="margin-top:10px" onclick="App.pasteCode()">📋 لصق الرمز</button>
     <button class="btn" id="joinBtn" style="margin-top:14px" onclick="App.doJoin()">ربط</button>
   </div>
 </section>

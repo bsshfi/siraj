@@ -150,6 +150,14 @@ const App = (() => {
     $('joinCode').value = code || '';
     show('join');
   }
+  function fmtCode() {
+    const el = $('joinCode'), v = Sync.pretty(el.value);
+    if (el.value !== v) el.value = v;
+  }
+  async function pasteCode() {
+    try { const t = await navigator.clipboard.readText(); $('joinCode').value = t; fmtCode(); if (Sync.norm(t)) toast('تم اللصق ✓'); else toast('ما لقيت رمز صحيح في المنسوخ'); }
+    catch (e) { $('joinCode').focus(); toast('اضغط مطوّل على الخانة واختر «لصق»'); }
+  }
   async function doJoin() {
     const code = Sync.norm($('joinCode').value);
     if (!code) return toast('الرمز ١٠ حروف وأرقام، مثل K7QPM-4XR2D');
@@ -861,7 +869,7 @@ const App = (() => {
   }
 
   return {
-    ctx, setMode, clearMine, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
+    ctx, setMode, clearMine, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S

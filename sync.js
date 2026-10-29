@@ -12,11 +12,18 @@ const Sync = (() => {
     let s = ''; a.forEach((b) => (s += ALPH[b % ALPH.length]));
     return s.slice(0, 5) + '-' + s.slice(5);
   }
+  // يقبل الرمز بأي شكل: مع مسافات أو حروف مخفية، أو داخل رسالة/رابط الربط كامل، أو بأرقام عربية
+  function clean(c) {
+    c = String(c || '').replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).toUpperCase();
+    const m = c.match(/JOIN=([A-Z0-9]{5}-?[A-Z0-9]{5})/) || c.match(/(?:^|[^A-Z0-9])([A-Z0-9]{5}-[A-Z0-9]{5})(?![A-Z0-9])/);
+    return (m ? m[1] : c).replace(/[^A-Z0-9]/g, '');
+  }
   function norm(c) {
-    c = String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    c = clean(c);
     if (c.length !== 10 || [...c].some((x) => !ALPH.includes(x))) return '';
     return c.slice(0, 5) + '-' + c.slice(5);
   }
+  function pretty(c) { c = clean(c).slice(0, 10); return c.length > 5 ? c.slice(0, 5) + '-' + c.slice(5) : c; }
   const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
   function b64(bytes) { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); }
   const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -54,7 +61,7 @@ const Sync = (() => {
   }
 
   return {
-    newCode, norm, online,
+    newCode, norm, pretty, online,
     async pushFamily(code, fam, rev) { return api('/family', { id: await famId(code), blob: await seal(code, fam), rev }); },
     async pullFamily(code) {
       const r = await api('/family/' + await famId(code));

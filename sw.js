@@ -1,7 +1,7 @@
 /* سِراج | SIRAJ — يشغّل التطبيق بدون إنترنت، ويحدّثه تلقائيًا، ويعرض الإشعارات
    مع كل تحديث: غيّر CACHE هنا و VERSION في config.js */
 importScripts('config.js');
-const CACHE = 'siraj-v2.0';
+const CACHE = 'siraj-v2.1';
 const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'play.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
