@@ -1,13 +1,14 @@
 /* سِراج | SIRAJ — يشغّل التطبيق بدون إنترنت، ويحدّثه تلقائيًا، ويعرض الإشعارات
    مع كل تحديث: غيّر CACHE هنا و VERSION في config.js */
 importScripts('config.js');
-const CACHE = 'siraj-v1.8';
+const CACHE = 'siraj-v1.9';
 const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'play.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
+self.addEventListener('message', (e) => { if (e.data === 'skip') self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE && k !== 'siraj-data').map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });

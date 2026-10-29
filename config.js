@@ -3,7 +3,7 @@
    API: رابط السيرفر بعد ما تنشره على Cloudflare
    VAPID: المفتاح العام للإشعارات (VAPID_PUBLIC) */
 var CONFIG = {
-  VERSION: '1.8',
+  VERSION: '1.9',
   SITE: 'https://siraj.wamdarc.com',
   API: 'https://siraj-api.bsshfi.workers.dev',
   VAPID: 'BGzjgjXykj5m98FjSPzDyMQMzv2YyvvmN8jbi-nC0FVy9f8XFGaMRtSXyMfOnzMj9oqbGMzUGIp9yJ51rEsnVGA'

@@ -195,15 +195,31 @@ const App = (() => {
       }
       save();
       registerSub();
+      loadRemote();
       if (changed && $('home').classList.contains('on')) renderHome();
       if (changed) checkLock();
     } catch (e) {}
     syncing = false;
   }
-  async function loadRemote() {
+  let remoteAt = 0;
+  async function loadRemote(force) {
     if (!S.code || !Sync.online()) return remote;
-    try { remote = await Sync.pullProgress(S.code); } catch (e) {}
+    if (!force && Date.now() - remoteAt < 20000) return remote;
+    try {
+      const before = JSON.stringify(remote.map((p) => [p.dev, p.updated]));
+      remote = await Sync.pullProgress(S.code); remoteAt = Date.now();
+      if (JSON.stringify(remote.map((p) => [p.dev, p.updated])) !== before) refreshPane();
+    } catch (e) {}
     return remote;
+  }
+  // يعيد رسم الصفحة المفتوحة لما توصل بيانات جديدة من الأجهزة الثانية
+  function refreshPane() {
+    if (!$('home').classList.contains('on')) return;
+    const on = (id) => $(id).style.display !== 'none';
+    if (on('paneSky')) Play.renderSky();
+    else if (on('panePlay')) Play.renderPlay();
+    else if (on('paneLib')) renderLib();
+    else if (on('paneTonight')) renderHome();
   }
   function allActs() {
     const seen = new Set(), out = [];
@@ -310,6 +326,7 @@ const App = (() => {
     if (t === 'dash') renderDash();
     if (t === 'sky') Play.renderSky();
     if (t === 'play') Play.renderPlay();
+    if (t !== 'dash') loadRemote(true);
   }
   function renderLib() {
     const hs = heroes().length ? heroes() : S.fam.kids.slice(0, 1);
@@ -749,14 +766,36 @@ const App = (() => {
   }
 
   /* ---------- التحديث التلقائي ---------- */
+  /* نقارن رقم الإصدار المنشور بالإصدار اللي شغال؛ لو فيه جديد نحدّث فورًا (أو بعد ما تخلص القصة) */
+  let swReg = null, lastCheck = 0, updating = false;
+  async function checkVersion() {
+    if (updating || navigator.onLine === false) return;
+    lastCheck = Date.now();
+    try {
+      if (swReg && swReg.update) swReg.update().catch(() => {});
+      const txt = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store' })).text();
+      const m = txt.match(/VERSION:\s*'([^']+)'/);
+      if (m && m[1] !== CONFIG.VERSION) applyUpdate();
+    } catch (e) {}
+  }
+  function applyUpdate() {
+    if (R) { pendingReload = true; return; }             // لا نقاطع قصة شغالة
+    updating = true;
+    try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
+    const go = () => location.reload();
+    if (swReg && swReg.waiting) { swReg.waiting.postMessage('skip'); setTimeout(go, 1500); } else setTimeout(go, 300);
+  }
   function setupSW() {
     if (!('serviceWorker' in navigator)) return;
     const had = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
-      const check = () => { if (reg && reg.update && navigator.onLine !== false) reg.update().catch(() => {}); };
-      setInterval(check, 30 * 60000);
-      document.addEventListener('visibilitychange', () => { if (!document.hidden) { check(); syncNow(); } });
-      addEventListener('online', () => { check(); syncNow(); });
+      swReg = reg;
+      const wake = () => { checkVersion(); syncNow(); };
+      setInterval(wake, 10 * 60000);                       // كل ١٠ دقائق
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+      ['focus', 'pageshow', 'online'].forEach((ev) => addEventListener(ev, wake));
+      document.addEventListener('pointerdown', () => { if (Date.now() - lastCheck > 15 * 60000) checkVersion(); }, { passive: true });
+      checkVersion();
     }).catch(() => {});
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
