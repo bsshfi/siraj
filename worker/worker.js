@@ -186,7 +186,8 @@ async function deliver(env, rows, item) {
           method: 'POST',
           headers: { Authorization: `vapid t=${jwts[aud]}, k=${env.VAPID_PUBLIC}`, TTL: '43200', Urgency: 'high', 'Content-Length': '0' }
         });
-        if (res.status === 404 || res.status === 410) await env.DB.prepare('DELETE FROM subs WHERE eid=?').bind(r.eid).run();
+        // 404/410: الاشتراك انتهى · 401/403: الاشتراك مربوط بمفتاح قديم
+        if ([401, 403, 404, 410].includes(res.status)) await env.DB.prepare('DELETE FROM subs WHERE eid=?').bind(r.eid).run();
       } catch (e) {}
     }));
   }

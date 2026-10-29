@@ -613,18 +613,31 @@ const App = (() => {
     try {
       const p = await Notification.requestPermission();
       if (p !== 'granted') return toast('لم يتم السماح بالإشعارات');
-      const reg = await navigator.serviceWorker.ready;
-      const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidKey() }));
+      const sub = await currentSub(true);
       S.notif = true; save();
       await Sync.sub(S.code, S.dev, S.role, S.fam.remind ? S.fam.bedtime : '', sub);
       toast('تم تفعيل الإشعارات ✓');
       if ($('settings').classList.contains('on')) renderSettings();
     } catch (e) { toast('تعذّر تفعيل الإشعارات'); }
   }
+  /* اشتراك الإشعارات الحالي؛ لو تغيّر مفتاح الخادم (VAPID) نلغي القديم ونشترك من جديد تلقائيًا */
+  async function currentSub(create) {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      const k = sub.options && sub.options.applicationServerKey;
+      const want = vapidKey();
+      const same = k && new Uint8Array(k).length === want.length && new Uint8Array(k).every((b, i) => b === want[i]);
+      if (k && !same) { await sub.unsubscribe().catch(() => {}); sub = null; }
+    }
+    if (!sub && (create || (typeof Notification !== 'undefined' && Notification.permission === 'granted')))
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidKey() });
+    return sub;
+  }
   async function registerSub() {
     if (!S.notif || !CONFIG.VAPID || !('serviceWorker' in navigator)) return;
     try {
-      const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription();
+      const sub = await currentSub(false);
       if (sub) await Sync.sub(S.code, S.dev, S.role, S.fam.remind ? S.fam.bedtime : '', sub);
     } catch (e) {}
   }
