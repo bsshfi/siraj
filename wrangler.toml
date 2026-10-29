@@ -1,0 +1,19 @@
+# سيرفر سِراج (siraj-api) — نشر تلقائي من GitHub عبر Cloudflare Workers Builds
+# هذا الملف في الجذر عشان يشتغل النشر مهما كان Root directory. الموقع نفسه على GitHub Pages، مو هنا.
+# المتغيرات السرية (VAPID_PUBLIC, VAPID_PRIVATE, ADMIN_KEY) تبقى في Cloudflare ولا تنحط هنا
+name = "siraj-api"
+main = "worker/worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+keep_vars = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "siraj"
+database_id = "6f6b4874-c611-4e63-a658-a5ea568af868"
+
+[triggers]
+crons = ["* * * * *"]
+
+[observability]
+enabled = true
