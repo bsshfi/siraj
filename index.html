@@ -125,6 +125,21 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+.timepick{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2B2370,#5B4BDB);border-radius:22px;padding:14px;color:#fff;direction:ltr}
+.timepick .tv{flex:1;text-align:center;direction:rtl}
+.timepick .tv b{display:block;font-size:42px;line-height:1.1;font-family:Poppins,sans-serif;letter-spacing:1px}
+.timepick .tv span{font-size:16px;opacity:.85}
+.tbtn{width:56px;height:56px;border-radius:18px;background:#ffffff26;color:#fff;font-size:30px;font-weight:700;display:grid;place-items:center;flex:none}
+.tbtn:active{background:#ffffff40}
+.tquick{display:flex;gap:8px;margin-top:10px}
+.tquick button{flex:1;padding:8px 0;border-radius:12px;background:#F2EFFC;color:var(--soft);font-weight:700;font-size:15px;font-family:Poppins,sans-serif}
+.tquick button.on{background:var(--bg1);color:#fff}
+label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
+.switch{appearance:none;-webkit-appearance:none;width:54px!important;height:32px!important;border-radius:32px;background:#DCD6F2;position:relative;transition:.2s;flex:none;margin:0}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0003;transition:.2s}
+.switch:checked{background:var(--mint)}
+.switch:checked::after{right:25px}
+
 .inp::placeholder,.codein::placeholder{letter-spacing:normal;font-size:16px;font-family:"Baloo Bhaijaan 2",system-ui,sans-serif}
 .count{display:inline-block;background:var(--bg1);color:#fff;border-radius:12px;font-size:15px;padding:0 10px;vertical-align:middle}
 .libchips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:none}
@@ -204,7 +219,9 @@ label{display:block;font-weight:700;margin:12px 0 6px}
   <div class="card">
     <h2>وقت القصة 🌙</h2>
     <p class="muted">يوصل تذكير لجهاز الأطفال في هذا الوقت.</p>
-    <input class="inp" id="setupBed" type="time" value="20:30" style="direction:ltr;text-align:center">
+    <input type="hidden" id="setupBed" value="20:30">
+    <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('setupBed',-15)" aria-label="أبكر">−</button><div class="tv" id="setupBedView"></div><button type="button" class="tbtn" onclick="App.bumpTime('setupBed',15)" aria-label="أأخر">+</button></div>
+    <div class="tquick" id="setupBedQuick"></div>
   </div>
   <div class="card">
     <h2>رمز وليّ الأمر 🔒</h2>
@@ -290,8 +307,10 @@ label{display:block;font-weight:700;margin:12px 0 6px}
     <h2>وقت القصة والإشعارات 🔔</h2>
     <p class="muted" id="notifState"></p>
     <button class="btn" id="notifBtn" onclick="App.enableNotif()">تفعيل الإشعارات على هذا الجهاز</button>
-    <div class="toggle"><b>تذكير وقت القصة</b><input type="checkbox" id="remindOn"></div>
-    <input class="inp" id="bedTime" type="time" style="direction:ltr;text-align:center">
+    <label class="toggle"><b>تذكير وقت القصة</b><input type="checkbox" class="switch" id="remindOn"></label>
+    <input type="hidden" id="bedTime" value="20:30">
+    <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('bedTime',-15)" aria-label="أبكر">−</button><div class="tv" id="bedTimeView"></div><button type="button" class="tbtn" onclick="App.bumpTime('bedTime',15)" aria-label="أأخر">+</button></div>
+    <div class="tquick" id="bedTimeQuick"></div>
     <p class="muted" id="remindNote" style="margin-top:8px"></p>
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
   </div>

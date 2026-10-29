@@ -115,7 +115,7 @@ const App = (() => {
     S.role = 'parent'; save();
     renderKidList($('setupKids'), false);
     buildCallChips('setupDad', 'dad', DAD); buildCallChips('setupMom', 'mom', MOM);
-    $('setupPin').value = S.fam.pin || ''; $('setupBed').value = S.fam.bedtime || '20:30';
+    $('setupPin').value = S.fam.pin || ''; setTime('setupBed', S.fam.bedtime || '20:30');
     show('setup');
   }
   function buildCallChips(id, key, opts) {
@@ -439,6 +439,25 @@ const App = (() => {
     S.fam.pin = p; $('newPin').value = ''; famChanged(); toast('تم تغيير الرمز ✓');
   }
 
+
+  /* ---------- اختيار وقت القصة ---------- */
+  const AR = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+  function setTime(id, v) {
+    let [h, m] = (v || '20:30').split(':').map(Number);
+    $(id).value = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    const h12 = h % 12 || 12, part = h < 4 ? 'بعد منتصف الليل' : h < 12 ? 'صباحًا' : h < 15 ? 'ظهرًا' : h < 18 ? 'عصرًا' : 'مساءً';
+    $(id + 'View').innerHTML = `<b>${AR(h12)}:${AR(String(m).padStart(2, '0'))}</b><span>${part} 🌙</span>`;
+    $(id + 'Quick').innerHTML = ['19:30', '20:00', '20:30', '21:00'].map((t) => {
+      const [a, b] = t.split(':').map(Number);
+      return `<button type="button" class="${t === $(id).value ? 'on' : ''}" onclick="App.setTime('${id}','${t}')">${AR(a % 12 || 12)}:${AR(String(b).padStart(2, '0'))}</button>`;
+    }).join('');
+  }
+  function bumpTime(id, d) {
+    let [h, m] = $(id).value.split(':').map(Number);
+    let t = (h * 60 + m + d + 1440) % 1440;
+    setTime(id, Math.floor(t / 60) + ':' + (t % 60));
+  }
+
   /* ---------- الإعدادات ---------- */
   function openSettings() { show('settings'); }
   function renderSettings() {
@@ -448,7 +467,7 @@ const App = (() => {
     renderQR();
     renderKidList($('setKids'), true);
     buildCallChips('setDad', 'dad', DAD); buildCallChips('setMom', 'mom', MOM);
-    $('bedTime').value = S.fam.bedtime || '20:30';
+    setTime('bedTime', S.fam.bedtime || '20:30');
     $('remindOn').checked = !!S.fam.remind;
     $('notifState').textContent = !CONFIG.VAPID ? 'الإشعارات تحتاج إعداد السيرفر أولًا'
       : S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'مفعّلة على هذا الجهاز ✓' : 'غير مفعّلة على هذا الجهاز';
@@ -591,7 +610,7 @@ const App = (() => {
 
   return {
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
-    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, preview, filterStories, setLibFilter, moreStories, setBed,
+    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
