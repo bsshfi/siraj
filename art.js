@@ -29,7 +29,34 @@ const ART = (() => {
       <circle cx="41.3" cy="54.6" r="1.2" fill="#fff"/><circle cx="61.3" cy="54.6" r="1.2" fill="#fff"/>
       <path d="M42 66 Q50 73 58 66" fill="none" stroke="#7A3B1F" stroke-width="3" stroke-linecap="round"/>
       <circle cx="33" cy="64" r="5" fill="#FF7A9C" opacity=".45"/><circle cx="67" cy="64" r="5" fill="#FF7A9C" opacity=".45"/>
+      ${acc(av.acc, girl && av.hijab)}
     </g>`;
+  }
+
+  /* إكسسوارات تنفتح من «سماء سِراج» (كل كوكبة = إكسسوار) */
+  const ACC = [
+    { id: 'crown', name: 'تاج', icon: '👑' },
+    { id: 'star', name: 'مشبك نجمة', icon: '⭐' },
+    { id: 'glasses', name: 'نظارة', icon: '👓' },
+    { id: 'cap', name: 'كاب', icon: '🧢' },
+    { id: 'flowers', name: 'إكليل ورد', icon: '🌸' },
+    { id: 'headphones', name: 'سماعات', icon: '🎧' },
+    { id: 'moon', name: 'هلال', icon: '🌙' },
+    { id: 'cape', name: 'عباءة بطل', icon: '🦸' }
+  ];
+  function acc(id, hijab) {
+    const top = hijab ? 14 : 20;
+    switch (id) {
+      case 'crown': return `<path d="M32 ${top + 6} L36 ${top - 10} L44 ${top} L50 ${top - 14} L56 ${top} L64 ${top - 10} L68 ${top + 6}Z" fill="#FFD93D" stroke="#E0A800" stroke-width="1.5"/><circle cx="50" cy="${top - 3}" r="2.6" fill="#FF6B6B"/>`;
+      case 'star': return `<path d="M72 ${top + 4} l3.5 7 7.6 1 -5.5 5.3 1.3 7.6 -6.9 -3.6 -6.9 3.6 1.3 -7.6 -5.5 -5.3 7.6 -1z" fill="#FFD93D" stroke="#E0A800" stroke-width="1"/>`;
+      case 'glasses': return `<g fill="none" stroke="#2B2350" stroke-width="2.4"><circle cx="40" cy="56" r="8"/><circle cx="60" cy="56" r="8"/><path d="M48 56 h4 M32 54 l-8 -3 M68 54 l8 -3"/></g>`;
+      case 'cap': return `<path d="M22 ${top + 22} Q22 ${top - 4} 50 ${top - 4} Q78 ${top - 4} 78 ${top + 22}Z" fill="#4DB8F0"/><path d="M50 ${top + 20} Q78 ${top + 14} 92 ${top + 24} Q72 ${top + 28} 50 ${top + 24}Z" fill="#2E8FCC"/><circle cx="50" cy="${top - 3}" r="3" fill="#2E8FCC"/>`;
+      case 'flowers': return [26, 36, 50, 64, 74].map((x, i) => `<circle cx="${x}" cy="${top + (i % 2 ? 0 : 4)}" r="5" fill="${['#FF7AB6', '#FFD93D', '#FF6B6B', '#9B6BF2', '#FF7AB6'][i]}"/><circle cx="${x}" cy="${top + (i % 2 ? 0 : 4)}" r="1.8" fill="#fff"/>`).join('');
+      case 'headphones': return `<path d="M20 58 Q20 ${top - 6} 50 ${top - 6} Q80 ${top - 6} 80 58" fill="none" stroke="#2B2350" stroke-width="5"/><rect x="14" y="50" width="11" height="18" rx="5" fill="#FF6B6B"/><rect x="75" y="50" width="11" height="18" rx="5" fill="#FF6B6B"/>`;
+      case 'moon': return `<path d="M50 ${top - 16} a9 9 0 1 0 7 15 a7 7 0 1 1 -7 -15z" fill="#FFE27A"/>`;
+      case 'cape': return `<path d="M24 88 Q10 110 14 122 L86 122 Q90 110 76 88 Q50 96 24 88Z" fill="#FF6B6B" opacity=".9"/>`;
+      default: return '';
+    }
   }
 
   function avatarSVG(av, g, size = 80) {
@@ -167,5 +194,5 @@ const ART = (() => {
   }
 
   page.n = 0;
-  return { avatar, avatarSVG, page, SKIN, HAIR, SHIRT };
+  return { avatar, avatarSVG, page, SKIN, HAIR, SHIRT, ACC, SCENES: Object.keys(SCENES) };
 })();

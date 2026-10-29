@@ -125,6 +125,63 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+/* v1.7 */
+.tabs{overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{white-space:nowrap;font-size:15px;padding:9px 10px;min-width:max-content}
+.tabs button.dim{opacity:.6}
+.skycard .skywrap{position:relative;margin-top:12px}
+.skyart{width:100%;height:auto;display:block;border-radius:18px}
+.skylbl{position:absolute;bottom:10px;right:12px;color:#FFE27A;font-weight:800;font-size:15px;background:#120F3399;padding:2px 10px;border-radius:10px}
+.cchips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.cchip{background:#FFF1D6;color:#B4630E;border-radius:10px;padding:2px 10px;font-size:13px;font-weight:700}
+h3.sub{font-size:17px;margin:14px 0 8px}
+.accs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.accb{background:#F6F3FF;border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;border:3px solid transparent;color:var(--ink)}
+.accb span{font-size:26px}.accb small{font-size:11px;font-weight:700;color:var(--soft)}
+.accb.on{border-color:var(--yellow);background:#FFF8D6}
+.accb.lock{opacity:.55}
+.celebrate{background:linear-gradient(135deg,#FFD93D,#FF9F1C);color:#2B2350;border-radius:18px;padding:12px;text-align:center;font-weight:800;font-size:18px;margin:8px 0;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.05)}100%{transform:none;opacity:1}}
+.nightcard{text-align:center}
+.playhead{padding:0;overflow:hidden}.playhead .art{display:block;width:100%;height:auto;aspect-ratio:400/200}.playhead .info{padding:12px 16px 16px}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.game{background:#fff;border-radius:22px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 10px 30px #2b235033;color:var(--ink)}
+.game span{font-size:44px}.game b{font-size:18px}.game small{color:var(--soft);font-size:13px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.gi{display:flex;flex-direction:column;gap:6px}.gi svg{width:100%;height:auto;border-radius:12px;border:2px solid #EEE9FF}
+.gamecard{max-height:94vh;overflow:auto;position:relative;max-width:560px!important}
+.gclose{position:absolute;top:10px;left:10px;background:#F2EFFC;color:var(--ink);width:40px;height:40px}
+.canvas svg{width:100%;height:auto;border-radius:16px;border:2px solid #EEE9FF;touch-action:manipulation}
+.canvas .paintable{cursor:pointer}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;justify-content:center}
+.pal .sw{width:38px;height:38px}
+.puzzle{direction:ltr;display:grid;gap:3px;background:#2B2350;border-radius:14px;padding:3px;aspect-ratio:400/260}
+.tile{border-radius:6px;background-repeat:no-repeat;border:3px solid transparent;padding:0}
+.tile.sel{border-color:var(--yellow);transform:scale(.95)}
+.tile.done{border-radius:0;border-width:0}
+.opts{display:grid;gap:10px;margin:10px 0}
+.opts.big{grid-template-columns:repeat(3,1fr)}.opts.big .opt{font-size:46px;padding:10px}
+.opt{background:#F2EFFC;border-radius:16px;padding:14px;font-size:18px;font-weight:700;color:var(--ink);border:3px solid transparent}
+.opt.ok{background:#E5FBEA;border-color:var(--mint)}.opt.no{background:#FFE5E5;border-color:#FF6B6B}
+.fb{font-weight:800;font-size:18px;text-align:center}
+.recbar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:0 16px;max-width:760px;margin:0 auto;width:100%}
+.recbar .btn{width:auto;flex:1;min-width:140px}
+.btn.rec{background:#FF4D6D;box-shadow:0 6px 0 #C9304D}
+.btn.rec.live{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.7}}
+.recby{color:#FFE27A;font-weight:700;width:100%;text-align:center}
+#recBtn.on{background:#FF4D6D}
+#lock{position:fixed;inset:0;z-index:70;display:none;background:radial-gradient(circle at 50% 20%,#2A2066,#0B0920);color:#F4EFFF;text-align:center;align-items:center;justify-content:center;padding:24px}
+#lock.on{display:flex}
+.lockin{max-width:440px}
+.lmoon{font-size:110px;animation:float 3s ease-in-out infinite}
+#lock h1{font-size:34px;margin:8px 0}
+#lockText{font-size:22px;line-height:1.8;font-weight:600}
+.lsub{color:#ffffff99}
+.zzz{font-size:30px;color:#FFE27A;font-weight:800;letter-spacing:6px;margin:10px 0 24px;animation:float 2.4s ease-in-out infinite}
+.zzz span:nth-child(1){font-size:24px}.zzz span:nth-child(2){font-size:18px}
+#lock .btn.ghost{color:#ffffff88;font-size:15px}
+
 .devbadge{display:block;width:100%;text-align:right;margin-top:10px;padding:8px 12px;border-radius:12px;background:#F2EFFC;color:var(--soft);font-size:14px;font-weight:700;font-family:inherit}
 .devbadge.on{background:#E5FBEA;color:#1E8E4A}
 .dot{width:10px;height:10px;border-radius:50%;background:#CFC8E8;flex:none}
@@ -259,13 +316,15 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
       <button class="iconbtn" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button>
     </div>
   </div>
-  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">قصة الليلة</button><button id="tabLib" onclick="App.tab('lib')">مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">المتابعة</button></div>
+  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">🌙 الليلة</button><button id="tabSky" onclick="App.tab('sky')">⭐ سمائي</button><button id="tabPlay" onclick="App.tab('play')">🎨 ألعاب</button><button id="tabLib" onclick="App.tab('lib')">📚 مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">📊 المتابعة</button></div>
   <div id="paneTonight">
     <p class="hello" id="hello"></p>
     <div class="kids" id="kids"></div>
     <p class="hello" style="font-size:15px;text-align:center;opacity:.85;margin-top:10px">اختر أبطال الليلة، وأول من تختاره هو البطل ⭐</p>
     <div class="card tonight" id="tonightCard"></div>
   </div>
+  <div id="paneSky" style="display:none"><div id="sky"></div></div>
+  <div id="panePlay" style="display:none"><div id="play"></div></div>
   <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
   <div id="paneDash" style="display:none"><div id="dash"></div></div>
   <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
@@ -277,13 +336,30 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     <button class="iconbtn" onclick="App.closeReader()" aria-label="إغلاق">✕</button>
     <div class="row" style="flex:0;gap:8px">
       <button class="iconbtn" id="favBtn" onclick="App.toggleFav()" aria-label="مفضلة">☆</button>
+      <button class="iconbtn" id="recBtn" onclick="App.toggleRec()" aria-label="سجّل بصوتك">🎙️</button>
       <button class="iconbtn" id="voiceBtn" onclick="App.toggleVoice()" aria-label="قراءة بصوت">🔈</button>
     </div>
   </div>
   <div class="stage" id="stage"></div>
+  <div class="recbar" id="recBar" style="display:none"></div>
   <div class="nav" id="nav"></div>
 </section>
 <div id="sleep" onclick="App.wake()"></div>
+
+<!-- قفل وقت النوم (أجهزة الأطفال) -->
+<div id="lock">
+  <div class="lockin">
+    <div class="lmoon">🌙</div>
+    <h1>حان وقت النوم 😴</h1>
+    <p id="lockText"></p>
+    <p class="lsub">سِراج نايم الحين، ويصحى الصبح ☀️</p>
+    <div class="zzz">z<span>z</span><span>z</span></div>
+    <button class="btn ghost" onclick="App.unlockParent()">🔒 وليّ الأمر</button>
+  </div>
+</div>
+
+<!-- نافذة الألعاب -->
+<div class="modal" id="gameModal"><div class="card gamecard"><button class="iconbtn gclose" onclick="Play.closeGame()" aria-label="إغلاق">✕</button><div id="gameBody"></div></div></div>
 
 <!-- الإعدادات -->
 <section id="settings" class="screen">
@@ -321,6 +397,20 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     <div class="tquick" id="bedTimeQuick"></div>
     <p class="muted" id="remindNote" style="margin-top:8px"></p>
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
+  </div>
+  <div class="card">
+    <h2>الليل والنوم 🌙</h2>
+    <label>كم قصة الليلة؟</label>
+    <div class="seg" id="perNight"></div>
+    <p class="muted" style="margin-top:8px">بعد القصة الأولى يظهر لهم زر «القصة التالية» لين يوصلون العدد.</p>
+    <button class="btn alt" onclick="App.giveExtra()">✨ قصة إضافية الليلة بس</button>
+    <p class="muted" id="extraNote" style="margin:6px 0 0"></p>
+    <label class="toggle" style="margin-top:16px"><b>قفل التطبيق وقت النوم</b><input type="checkbox" class="switch" id="lockOn"></label>
+    <input type="hidden" id="lockTime" value="21:30">
+    <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('lockTime',-15)" aria-label="أبكر">−</button><div class="tv" id="lockTimeView"></div><button type="button" class="tbtn" onclick="App.bumpTime('lockTime',15)" aria-label="أأخر">+</button></div>
+    <div class="tquick" id="lockTimeQuick"></div>
+    <p class="muted" style="margin-top:8px">من هذا الوقت لين ٥ الصبح، أجهزة الأطفال تعرض «حان وقت النوم» بس. والألعاب تنام من وقت القصة.</p>
+    <button class="btn alt" onclick="App.setLock()">حفظ</button>
   </div>
   <div class="card">
     <h2>مكتبة القصص <span class="count" id="storyCount"></span></h2>
@@ -404,6 +494,7 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
 <script src="stories.js"></script>
 <script src="stories-2.js"></script>
 <script src="stories-3.js"></script>
+<script src="play.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
