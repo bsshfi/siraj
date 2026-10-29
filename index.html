@@ -125,6 +125,13 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+.devbadge{display:block;width:100%;text-align:right;margin-top:10px;padding:8px 12px;border-radius:12px;background:#F2EFFC;color:var(--soft);font-size:14px;font-weight:700;font-family:inherit}
+.devbadge.on{background:#E5FBEA;color:#1E8E4A}
+.dot{width:10px;height:10px;border-radius:50%;background:#CFC8E8;flex:none}
+.dot.on{background:var(--mint);box-shadow:0 0 0 4px #4CD97B33}
+#whoKids .kid{width:100px}
+#whoOk:disabled{opacity:.5}
+
 .timepick{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2B2370,#5B4BDB);border-radius:22px;padding:14px;color:#fff;direction:ltr}
 .timepick .tv{flex:1;text-align:center;direction:rtl}
 .timepick .tv b{display:block;font-size:42px;line-height:1.1;font-family:Poppins,sans-serif;letter-spacing:1px}
@@ -288,6 +295,7 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     <h2>العائلة والنسخة الاحتياطية 👨‍👩‍👧</h2>
     <p class="muted">هذا الجهاز: <b id="devRole"></b></p>
     <p class="muted" style="margin-bottom:0">رمز العائلة هو نسختك الاحتياطية: به تربط جهاز طفل، وبه يرجع كل شيء لو حذفت التطبيق أو غيّرت الجوال. احفظه في مكانٍ آمن.</p>
+    <button class="btn alt" id="whoRow" style="margin:6px 0 10px" onclick="App.openWho(false)">تغيير صاحب الجهاز 👤</button>
     <div class="code" id="famCode"></div>
     <div class="qr" id="qr"></div>
     <p class="muted" style="text-align:center;font-size:13px">صوّر الرمز من كاميرا التابلت، أو أرسل له الرابط</p>
@@ -367,6 +375,16 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
   <p class="muted" style="font-size:14px">في التابلت: افتح سِراج ← «جهاز طفل» ← أدخل الرمز.</p>
   <div class="row"><button class="btn" onclick="App.shareJoin()">إرسال رابط الربط</button><button class="btn alt" onclick="App.copyCode()">نسخ</button></div>
   <button class="btn ghost" onclick="App.closeModal('codeModal')">تم</button>
+</div></div>
+
+<!-- نافذة: جهاز مين؟ -->
+<div class="modal" id="whoModal"><div class="card" style="text-align:center;max-height:92vh;overflow:auto">
+  <div style="font-size:46px">👋</div>
+  <h2>هذا الجهاز لمين؟</h2>
+  <p class="muted">اختر صاحب الجهاز. ولو الجهاز مشترك، اختر أكثر من واحد.</p>
+  <div class="kids" id="whoKids" style="margin:10px 0 14px"></div>
+  <button class="chip" id="whoAll" onclick="App.whoAll()" style="margin-bottom:14px">👨‍👩‍👧 جهاز مشترك للكل</button>
+  <button class="btn" id="whoOk" onclick="App.whoDone()">تم</button>
 </div></div>
 
 <!-- نافذة: الإشعارات -->

@@ -14,7 +14,7 @@ const App = (() => {
 
   /* ---------- التخزين ---------- */
   function freshFam() { return { kids: [], pin: '', dad: 'بابا', mom: 'ماما', bedtime: '20:30', remind: true }; }
-  function fresh() { return { v: 2, role: '', code: '', dev: uid(), rev: 0, dirty: false, progDirty: false, fam: freshFam(), log: [], fav: [], voice: false, sel: [], notif: false }; }
+  function fresh() { return { v: 2, role: '', code: '', dev: uid(), rev: 0, dirty: false, progDirty: false, fam: freshFam(), log: [], fav: [], voice: false, sel: [], notif: false, devKids: [], beat: 0 }; }
   function load() {
     let s; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     if (!s) return fresh();
@@ -162,8 +162,12 @@ const App = (() => {
       try { localStorage.removeItem('siraj-join'); } catch (e) {}
       remote = await Sync.pullProgress(code).catch(() => []);
       if (role === 'parent') { const mine = remote.filter((x) => x.dev !== S.dev); mine.forEach((p) => (S.fav = [...new Set([...S.fav, ...(p.fav || [])])])); }
+      S.devKids = []; S.progDirty = true;
       save(); toast(role === 'child' ? 'تم ربط الجهاز بالعائلة ✓' : 'تم استرجاع العائلة ✓');
-      show('home'); askNotif();
+      show('home');
+      if (role === 'child' && S.fam.kids.length > 1) openWho(true);
+      else { if (role === 'child') setDevKids(S.fam.kids.map((k) => k.id)); askNotif(); }
+      syncNow();
     } catch (e) { toast('تعذّر الربط، تأكد من الإنترنت'); }
     finally { $('joinBtn').disabled = false; $('joinBtn').textContent = 'ربط'; }
   }
@@ -183,9 +187,10 @@ const App = (() => {
       } else if (r && r.rev > S.rev) {
         S.fam = Object.assign(freshFam(), r.fam); S.rev = r.rev; changed = true;
       }
-      if (S.progDirty) {
-        await Sync.pushProgress(S.code, S.dev, { role: S.role, log: S.log.slice(-500), fav: S.fav });
-        S.progDirty = false;
+      if (S.progDirty || Date.now() - (S.beat || 0) > 6 * 3600000) {
+        const notifOn = !!S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+        await Sync.pushProgress(S.code, S.dev, { role: S.role, log: S.log.slice(-500), fav: S.fav, kids: S.devKids || [], plat: platform(), ver: CONFIG.VERSION, notif: notifOn, seen: Date.now() });
+        S.progDirty = false; S.beat = Date.now();
       }
       save();
       registerSub();
@@ -254,12 +259,19 @@ const App = (() => {
 
   /* ---------- الرئيسية ---------- */
   function heroes() { return sel.map(kidById).filter(Boolean); }
+  function myKids() {
+    const mine = S.role === 'child' ? (S.devKids || []).map(kidById).filter(Boolean) : [];
+    return mine.length ? mine : S.fam.kids;
+  }
   function renderHome() {
-    sel = (S.sel || []).filter((id) => kidById(id));
-    if (!sel.length && S.fam.kids.length) sel = [S.fam.kids[0].id];
+    const shown = myKids();
+    sel = (S.sel || []).filter((id) => shown.some((k) => k.id === id));
+    if (!sel.length && shown.length) sel = [shown[0].id];
     const h = new Date().getHours();
-    $('hello').textContent = (h >= 17 || h < 4 ? 'مساء الخير' : 'أهلًا') + '، جاهزين لحكاية الليلة؟ 🌙';
-    $('kids').innerHTML = S.fam.kids.map((k) => {
+    const greet = h >= 17 || h < 4 ? 'مساء الخير' : 'أهلًا';
+    const own = S.role === 'child' && (S.devKids || []).length && shown.length < S.fam.kids.length;
+    $('hello').textContent = own ? `${greet} يا ${names(shown)}، جاهز${shown.length > 1 ? 'ين' : shown[0].g === 'f' ? 'ة' : ''} لحكاية الليلة؟ 🌙` : greet + '، جاهزين لحكاية الليلة؟ 🌙';
+    $('kids').innerHTML = shown.map((k) => {
       const i = sel.indexOf(k.id);
       return `<button class="kid ${i >= 0 ? 'sel' : ''} ${i === 0 ? 'hero' : ''}" onclick="App.pick('${k.id}')"><span class="badge">البطل ⭐</span>${ART.avatarSVG(k.av, k.g, 78)}<div class="nm">${esc(k.name)}</div></button>`;
     }).join('');
@@ -295,6 +307,45 @@ const App = (() => {
       : '<p class="empty" style="grid-column:1/-1">القصص اللي تقرونها تنحفظ هنا، وتقدرون ترجعون لها متى ما حبيتوا 📚</p>';
   }
 
+  /* ---------- جهاز مين؟ ---------- */
+  let whoSel = [], whoFirst = false;
+  function openWho(first) {
+    whoFirst = !!first;
+    whoSel = (S.devKids || []).filter(kidById);
+    drawWho(); $('whoModal').classList.add('on');
+  }
+  function drawWho() {
+    $('whoKids').innerHTML = S.fam.kids.map((k) => `<button class="kid ${whoSel.includes(k.id) ? 'sel' : ''}" onclick="App.whoPick('${k.id}')">${ART.avatarSVG(k.av, k.g, 70)}<div class="nm">${esc(k.name)}</div></button>`).join('');
+    $('whoAll').classList.toggle('on', whoSel.length === S.fam.kids.length);
+    $('whoOk').disabled = !whoSel.length;
+    $('whoOk').textContent = whoSel.length ? 'هذا جهاز ' + names(whoSel.map(kidById)) + ' ✓' : 'اختر طفلًا واحدًا على الأقل';
+  }
+  function whoPick(id) { const i = whoSel.indexOf(id); if (i >= 0) whoSel.splice(i, 1); else whoSel.push(id); drawWho(); }
+  function whoAll() { whoSel = whoSel.length === S.fam.kids.length ? [] : S.fam.kids.map((k) => k.id); drawWho(); }
+  function whoDone() {
+    if (!whoSel.length) return;
+    setDevKids(whoSel.slice()); closeModal('whoModal');
+    toast('أهلًا ' + names(whoSel.map(kidById)) + ' 🌙');
+    if ($('settings').classList.contains('on')) renderSettings(); else renderHome();
+    if (whoFirst) askNotif();
+  }
+  function setDevKids(ids) { S.devKids = ids; S.sel = ids.slice(0, 1); S.progDirty = true; save(); syncNow(); }
+  function platform() {
+    const u = navigator.userAgent;
+    if (/iPad/.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'آيباد';
+    if (/iPhone/.test(u)) return 'آيفون';
+    if (/Android/.test(u)) return /Mobile/.test(u) ? 'جوال أندرويد' : 'تابلت أندرويد';
+    return 'متصفح';
+  }
+  function devices() {
+    const hidden = S.fam.hiddenDevs || [];
+    return remote.filter((p) => p.dev !== S.dev && !hidden.includes(p.dev)).map((p) => ({ ...p, last: p.seen || p.updated || 0 })).sort((a, b) => b.last - a.last);
+  }
+  function hideDev(dev) {
+    if (!confirm('إزالة هذا الجهاز من القائمة؟ (لو رجع ينفتح، يرجع يظهر)')) return;
+    S.fam.hiddenDevs = [...new Set([...(S.fam.hiddenDevs || []), dev])]; famChanged(); renderDash();
+  }
+
   /* ---------- لوحة المتابعة ---------- */
   function streak(days) {
     let n = 0, d = new Date();
@@ -325,8 +376,21 @@ const App = (() => {
           <div class="stats"><div><b>${new Set(mine.map((e) => e.s)).size}</b><span>قصة</span></div><div><b>${streak(days)} 🔥</b><span>أيام متتالية</span></div><div><b>${mine.length}</b><span>مرة قراءة</span></div></div>
           <div class="week">${week.map((d) => `<i class="${days.has(d) ? 'on' : ''}" title="${d}">${dayNames[new Date(d + 'T12:00').getDay()]}</i>`).join('')}</div>
           ${lastSt ? `<p class="muted" style="margin:8px 0 0">آخر قصة: «${esc(fill(lastSt.title, [k]))}»</p>` : ''}
+          ${(() => {
+            const d = devices().filter((x) => x.role === 'child' && (x.kids || []).includes(k.id));
+            return d.length ? `<div class="devbadge on">📱 سِراج مثبّت على ${esc(d[0].plat || 'جهاز')}${d.length > 1 ? ' و' + (d.length - 1) + ' غيره' : ''} · آخر فتح ${ago(d[0].last)}</div>`
+              : `<button class="devbadge" onclick="App.showFamilyCode(false)">⚪ ما فيه جهاز مربوط ل${k.g === 'f' ? 'ها' : 'ه'}، اربط جهاز${k.g === 'f' ? 'ها' : 'ه'} ←</button>`;
+          })()}
         </div>`;
       }).join('');
+      const devs = devices();
+      const devCard = `<div class="card"><h2>الأجهزة المربوطة 📱</h2>${devs.length ? '<div class="list">' + devs.map((d) => {
+          const ks = (d.kids || []).map(kidById).filter(Boolean);
+          const who = d.role === 'parent' ? 'وليّ أمر' : ks.length ? names(ks) : 'جهاز طفل (ما اختار اسمه بعد)';
+          const fresh = Date.now() - d.last < 3 * 864e5;
+          return `<div class="li"><span class="dot ${fresh ? 'on' : ''}"></span><span class="nm" style="font-size:16px">${esc(who)}<br><span class="muted" style="font-size:13px">${esc(d.plat || 'جهاز')} · آخر فتح ${ago(d.last)}${d.ver ? ' · v' + esc(d.ver) : ''}${d.notif ? ' · 🔔' : ''}</span></span><button class="small del" onclick="App.hideDev('${d.dev}')">إزالة</button></div>`;
+        }).join('') + '</div>' : '<p class="muted">ما فيه أجهزة مربوطة غير هذا الجوال.</p>'}
+        <button class="btn alt" style="margin-top:10px" onclick="App.showFamilyCode(false)">+ ربط جهاز جديد</button></div>`;
       const recent = logs.slice(0, 12).map((e) => {
         const st = STORIES.find((s) => s.id === e.s); const ks = (e.k || []).map(kidById).filter(Boolean);
         if (!st) return '';
@@ -334,7 +398,7 @@ const App = (() => {
         const t = new Date(e.t);
         return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
       }).join('');
-      el.innerHTML = (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards +
+      el.innerHTML = (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
         `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>`;
     };
     draw();
@@ -462,7 +526,9 @@ const App = (() => {
   function openSettings() { show('settings'); }
   function renderSettings() {
     $('famCode').textContent = S.code || '—';
-    $('devRole').textContent = S.role === 'child' ? 'جهاز طفل 🧒' : 'جوال وليّ الأمر 👨‍👩‍👧';
+    const dk = (S.devKids || []).map(kidById).filter(Boolean);
+    $('devRole').textContent = S.role === 'child' ? 'جهاز ' + (dk.length ? names(dk) : 'طفل') + ' 🧒' : 'جوال وليّ الأمر 👨‍👩‍👧';
+    $('whoRow').style.display = S.role === 'child' && S.fam.kids.length > 1 ? '' : 'none';
     $('famBox').style.display = S.code ? '' : 'none';
     renderQR();
     renderKidList($('setKids'), true);
@@ -605,12 +671,17 @@ const App = (() => {
     if (S.role === 'parent' && S.fam.kids.length && S.fam.pin && !S.code) { S.code = Sync.newCode(); S.dirty = true; newCode = true; }
     if (updated) setTimeout(() => toast('تم التحديث ✨ الإصدار ' + CONFIG.VERSION), 500);
     setupSW(); save();
-    syncNow().then(() => { if (newCode && $('home').classList.contains('on')) { showFamilyCode(false); askNotif(); } });
+    syncNow().then(() => {
+      if (newCode && $('home').classList.contains('on')) { showFamilyCode(false); askNotif(); }
+      if (S.role === 'child' && S.code && !(S.devKids || []).filter(kidById).length && $('home').classList.contains('on')) {
+        if (S.fam.kids.length > 1) openWho(false); else if (S.fam.kids.length) setDevKids([S.fam.kids[0].id]);
+      }
+    });
   }
 
   return {
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
-    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
+    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
