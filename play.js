@@ -91,6 +91,7 @@ const Play = (() => {
   function acts() { return C().S().act || []; }
   function logAct(a, st, score) {
     const c = C(), S = c.S();
+    if (!c.counts()) return; // معاينة وليّ الأمر ما تنحسب
     S.act = S.act || []; S.act.push({ a, s: st.id, k: c.heroes().map((k) => k.id), t: Date.now(), sc: score || 0 });
     if (S.act.length > 600) S.act = S.act.slice(-600);
     S.progDirty = true; c.save(); c.syncNow();

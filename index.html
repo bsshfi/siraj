@@ -125,6 +125,13 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+/* v2.0 */
+.modebar{display:flex;gap:6px;background:#ffffff26;border-radius:16px;padding:4px;margin:0 0 4px}
+.modebar button{flex:1;padding:8px;border-radius:12px;background:transparent;color:#fff;font-size:15px;font-weight:700}
+.modebar button.on{background:#fff;color:var(--bg1)}
+.modehint{color:#ffffffcc;font-size:13px;text-align:center;margin:2px 0 6px}
+.modehint:empty{display:none}
+.viewtag{background:#FFD93D;color:#2B2350;border-radius:12px;padding:4px 10px;font-size:13px;font-weight:800;align-self:center}
 /* v1.7 */
 .tabs{overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
 .tabs button{white-space:nowrap;font-size:15px;padding:9px 10px;min-width:max-content}
@@ -317,6 +324,8 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     </div>
   </div>
   <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">🌙 الليلة</button><button id="tabSky" onclick="App.tab('sky')">⭐ سمائي</button><button id="tabPlay" onclick="App.tab('play')">🎨 ألعاب</button><button id="tabLib" onclick="App.tab('lib')">📚 مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">📊 المتابعة</button></div>
+  <div class="modebar" id="modeBar" style="display:none"></div>
+  <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
     <p class="hello" id="hello"></p>
     <div class="kids" id="kids"></div>
@@ -335,6 +344,7 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
   <div class="rtop">
     <button class="iconbtn" onclick="App.closeReader()" aria-label="إغلاق">✕</button>
     <div class="row" style="flex:0;gap:8px">
+      <span class="viewtag" id="viewTag" style="display:none">🔍 معاينة</span>
       <button class="iconbtn" id="favBtn" onclick="App.toggleFav()" aria-label="مفضلة">☆</button>
       <button class="iconbtn" id="voiceBtn" onclick="App.toggleVoice()" aria-label="قراءة بصوت">🔈</button>
     </div>

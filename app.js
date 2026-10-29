@@ -311,6 +311,10 @@ const App = (() => {
     $('tabPlay').classList.toggle('dim', isNight());
     $('ver').textContent = 'v' + CONFIG.VERSION;
     $('tabDash').style.display = S.role === 'parent' ? '' : 'none';
+    const mb = $('modeBar'), kidsMode = S.parentMode === 'kids';
+    mb.style.display = S.role === 'parent' ? '' : 'none';
+    mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">🔍 معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">📖 أقرأ مع العيال</button>`;
+    $('modeHint').textContent = S.role !== 'parent' ? '' : kidsMode ? 'القصص والألعاب تنحسب للأبطال المختارين ⭐' : 'تتصفح بس، وما ينحسب شي على العيال';
     renderLib();
   }
   function pick(id) {
@@ -436,7 +440,8 @@ const App = (() => {
         return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
       }).join('');
       el.innerHTML = (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
-        `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>`;
+        `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>` +
+        ((S.log.length || (S.act || []).length) ? `<div class="card"><h2>قراءات هذا الجوال</h2><p class="muted">قصص وألعاب انحسبت من جوالك (${S.log.length} قصة · ${(S.act || []).length} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.</p><button class="btn alt" onclick="App.clearMine()">مسح قراءات هذا الجوال</button></div>` : '');
     };
     draw();
     await loadRemote(); draw();
@@ -525,6 +530,7 @@ const App = (() => {
     const { st, hs, i, total } = R;
     clearTimeout(sleepTimer); $('sleep').classList.remove('on');
     $('favBtn').textContent = S.fav.includes(st.id) ? '⭐' : '☆';
+    $('viewTag').style.display = counts() ? 'none' : '';
     $('voiceBtn').textContent = S.voice ? '🔊' : '🔈';
     const dots = `<div class="dots">${Array.from({ length: total - 1 }, (_, k) => `<i class="${k === Math.min(i, total - 2) ? 'on' : ''}"></i>`).join('')}</div>`;
     let html = '', nav = '', say = '';
@@ -557,8 +563,21 @@ const App = (() => {
     $('stage').innerHTML = html; $('nav').innerHTML = nav;
     speak(say);
   }
+  // في جوال وليّ الأمر: «معاينة» ما تنحسب، و«أقرأ مع العيال» تنحسب
+  function counts() { return S.role !== 'parent' || S.parentMode === 'kids'; }
+  function setMode(m) {
+    S.parentMode = m; save(); renderHome();
+    toast(m === 'kids' ? 'تنحسب القصص والألعاب للعيال 📖' : 'وضع المعاينة: ما ينحسب شي 🔍');
+    if ($('paneSky').style.display !== 'none') Play.renderSky();
+    if ($('panePlay').style.display !== 'none') Play.renderPlay();
+  }
+  function clearMine() {
+    if (!confirm('مسح القصص والألعاب اللي انحسبت من هذا الجوال؟ (قراءات التابلت تبقى)')) return;
+    S.log = []; S.act = []; S.progDirty = true; save(); syncNow(); toast('تم المسح ✓'); renderDash();
+  }
   function logStory() {
     if (R.logged) return; R.logged = true;
+    if (!counts()) return;
     const e = { s: R.st.id, d: dateKey(), k: R.hs.map((k) => k.id), t: Date.now() };
     S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500);
     S.progDirty = true; save();
@@ -837,12 +856,12 @@ const App = (() => {
   }
 
   function ctx() {
-    return { S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
+    return { counts, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
       renderHomeKids: () => { if ($('home').classList.contains('on')) renderHome(); } };
   }
 
   return {
-    ctx, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
+    ctx, setMode, clearMine, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
