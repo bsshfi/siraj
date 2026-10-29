@@ -12,7 +12,8 @@ const MAX_BLOB = 300000;
 export default {
   async fetch(req, env, ctx) {
     const origin = req.headers.get('Origin') || '';
-    const allow = ORIGINS.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ? origin : ORIGINS[0];
+    // لوحة الإدارة تفتح أحيانًا عبر http أو bsshfi.github.io قبل ما يجهز HTTPS، فنسمح لأي نطاق من wamdarc.com
+    const allow = ORIGINS.includes(origin) || /^https?:\/\/([a-z0-9-]+\.)?wamdarc\.com$/.test(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ? origin : ORIGINS[0];
     const cors = {
       'Access-Control-Allow-Origin': allow,
       'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
