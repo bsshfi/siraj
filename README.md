@@ -14,7 +14,7 @@
 | `art.js` | رسومات الشخصيات و١٥ مشهدًا |
 | `stories.js` `stories-2.js` | مكتبة القصص (٥٠ قصة + ٣ مناسبات) |
 | `sw.js` | العمل بدون إنترنت، والتحديث التلقائي، والإشعارات |
-| `admin.html` | لوحتك: الإحصائيات، ورسالة للكل، وتوليد مفاتيح الإشعارات |
+| — | الإدارة والإشعارات من admin.wamdarc.com |
 | `worker/` | السيرفر (Cloudflare Worker + D1) |
 
 ## ١) نشر التطبيق (GitHub Pages)
@@ -27,8 +27,8 @@
 2. **Worker:** Create Worker باسم `siraj-api` ← Edit code ← الصق `worker/worker.js` ← Deploy.
 3. **الربط:** Worker ← Settings ← Bindings ← Add ← D1 database ← الاسم `DB` ← اختر `siraj`.
 4. **المتغيرات:** Settings ← Variables and Secrets:
-   - `VAPID_PUBLIC` و `VAPID_PRIVATE`: من `admin.html` زر «توليد»، أو نفس مفاتيح push-wamdarc.
-   - `ADMIN_KEY`: كلمة سر من اختيارك لإرسال الرسائل.
+   - `VAPID_PUBLIC` و `VAPID_PRIVATE`: مفاتيح الإشعارات (مضافة).
+   - `ADMIN_KEY`: نفس قيمة ADMIN_KEY في push-wamdarc.
 5. **الجدولة:** Settings ← Trigger Events ← Cron ← `* * * * *`.
 6. في `config.js` ضع `VAPID` = المفتاح العام، وتأكد من رابط `API`.
 
