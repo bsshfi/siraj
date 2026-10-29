@@ -250,27 +250,41 @@ const App = (() => {
       <button class="small" onclick="App.editKid('${k.id}')">تعديل</button>${withDelete ? `<button class="small del" onclick="App.delKid('${k.id}')">حذف</button>` : ''}
       </div>`).join('') : '<p class="muted" style="text-align:center">لا يوجد أطفال بعد</p>';
   }
-  function editKid(id) {
+  let selfEdit = false;
+  function editKid(id, self) {
     const k = kidById(id);
-    editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { skin: 0, hair: 0, shirt: Math.floor(Math.random() * 7), hijab: 0 } };
-    $('kidTitle').textContent = k ? 'تعديل ' + k.name : 'طفل جديد';
+    selfEdit = !!(self && k);
+    editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { skin: 0, hair: 0, shirt: Math.floor(Math.random() * 7), style: 0, head: '', outfit: 'tee' } };
+    if (editing.av.head == null) editing.av.head = editing.av.hijab ? 'hijab' : '';
+    $('kidTitle').textContent = selfEdit ? 'غيّر شكلك يا ' + k.name + ' ✨' : k ? 'تعديل ' + k.name : 'طفل جديد';
+    $('kidBasics').style.display = selfEdit ? 'none' : '';
     $('kidName').value = editing.name;
     buildKidForm(); $('kidModal').classList.add('on');
   }
   function buildKidForm() {
-    const e = editing;
+    const e = editing, a = e.av, G = e.g === 'f' ? 'f' : 'm';
     const seg = (id, val, set) => { $(id).querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b.dataset.v == val); b.onclick = () => { set(b.dataset.v); buildKidForm(); }; }); };
-    seg('kidG', e.g, (v) => { e.g = v; if (v === 'm') e.av.hijab = 0; });
+    const opts = (id, list) => { $(id).innerHTML = list.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join(''); };
+    seg('kidG', e.g, (v) => { e.g = v; a.head = ''; a.style = 0; a.outfit = 'tee'; });
     seg('kidAge', e.age, (v) => (e.age = +v));
-    seg('kidHijab', e.av.hijab ? 1 : 0, (v) => (e.av.hijab = +v));
-    const sw = (id, arr, key) => { $(id).innerHTML = arr.map((c, i) => `<button class="sw ${e.av[key] === i ? 'on' : ''}" style="background:${c}" data-i="${i}" aria-label="لون"></button>`).join(''); $(id).querySelectorAll('.sw').forEach((b) => (b.onclick = () => { e.av[key] = +b.dataset.i; buildKidForm(); })); };
-    sw('kidSkin', ART.SKIN, 'skin'); sw('kidHair', ART.HAIR, 'hair'); sw('kidShirt', ART.SHIRT, 'shirt');
-    $('hijabRow').style.display = e.g === 'f' ? '' : 'none';
-    const hideHair = e.g === 'f' && e.av.hijab;
-    $('kidHair').style.display = $('hairLbl').style.display = hideHair ? 'none' : '';
-    $('kidPreview').innerHTML = ART.avatarSVG(e.av, e.g, 110);
+    opts('kidHead', ART.HEADS[G]); seg('kidHead', ART.headOf(a, G === 'f'), (v) => { a.head = v; a.hijab = v === 'hijab' ? 1 : 0; });
+    opts('kidStyle', ART.STYLES[G].map((t, i) => [i, t])); seg('kidStyle', a.style || 0, (v) => (a.style = +v));
+    opts('kidOutfit', ART.OUTFITS[G]); seg('kidOutfit', a.outfit || 'tee', (v) => (a.outfit = v));
+    const sw = (id, arr, key) => { $(id).innerHTML = arr.map((c, i) => `<button class="sw ${(a[key] || 0) === i ? 'on' : ''}" style="background:${c}" data-i="${i}" aria-label="لون"></button>`).join(''); $(id).querySelectorAll('.sw').forEach((b) => (b.onclick = () => { a[key] = +b.dataset.i; buildKidForm(); })); };
+    sw('kidSkin', ART.SKIN, 'skin'); sw('kidHair', ART.HAIR, 'hair'); sw('kidShirt', ART.SHIRT, 'shirt'); sw('kidHC', ART.HEADC, 'hc');
+    const head = ART.headOf(a, G === 'f');
+    $('hcRow').style.display = head === 'hijab' ? '' : 'none';
+    $('hairRow').style.display = head ? 'none' : '';
+    $('shirtRow').style.display = a.outfit === 'thobe' ? 'none' : '';
+    $('kidPreview').innerHTML = ART.avatarSVG(a, e.g, 110);
   }
   function saveKid() {
+    if (selfEdit) {
+      const k = kidById(editing.id); if (k) k.av = editing.av;
+      closeModal('kidModal'); famChanged(); toast('شكلك الجديد يجنن ✨');
+      renderHome(); if ($('paneSky').style.display !== 'none') Play.renderSky();
+      return;
+    }
     const name = $('kidName').value.trim();
     if (!name) return toast('اكتب اسم الطفل');
     editing.name = name;
@@ -316,7 +330,7 @@ const App = (() => {
       ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا بكرة مع قصة جديدة ✨ تقدرون تعيدون قصة من «مكتبتي».</p><button class="btn alt" style="margin-top:12px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
         : `<button class="btn" style="margin-top:14px" onclick="App.openStory('${st.id}')">ابدأ ${lbl} ✨</button>`}</div>`
       : '<div class="info"><p class="muted">اختر بطلًا واحدًا على الأقل</p></div>';
-    $('tabPlay').classList.toggle('dim', isNight());
+    $('tabPlay').classList.toggle('dim', isNight()); $('tabEng').classList.toggle('dim', isNight());
     $('ver').textContent = 'v' + CONFIG.VERSION;
     $('tabDash').style.display = S.role === 'parent' ? '' : 'none';
     const mb = $('modeBar'), kidsMode = S.parentMode === 'kids';
@@ -331,13 +345,14 @@ const App = (() => {
     S.sel = sel.slice(); save(); renderHome();
   }
   function tab(t) {
-    ['tonight', 'sky', 'play', 'lib', 'dash'].forEach((x) => {
+    ['tonight', 'sky', 'play', 'eng', 'lib', 'dash'].forEach((x) => {
       $('tab' + x[0].toUpperCase() + x.slice(1)).classList.toggle('on', x === t);
       $('pane' + x[0].toUpperCase() + x.slice(1)).style.display = x === t ? '' : 'none';
     });
     if (t === 'dash') renderDash();
     if (t === 'sky') Play.renderSky();
     if (t === 'play') Play.renderPlay();
+    if (t === 'eng') EN.render();
     if (t !== 'dash') loadRemote(true);
   }
   function renderLib() {
@@ -864,7 +879,7 @@ const App = (() => {
   }
 
   function ctx() {
-    return { counts, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
+    return { counts, allActs, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
       renderHomeKids: () => { if ($('home').classList.contains('on')) renderHome(); } };
   }
 

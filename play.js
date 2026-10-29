@@ -38,10 +38,54 @@ const Play = (() => {
       : `<circle cx="${x}" cy="${y}" r="4" fill="#ffffff40"/>`).join('');
     return `<svg viewBox="0 0 300 200" class="skyart"><defs><radialGradient id="sky${idx}" cx=".5" cy=".3" r=".9"><stop offset="0" stop-color="#3B2A7A"/><stop offset="1" stop-color="#120F33"/></radialGradient></defs><rect width="300" height="200" rx="18" fill="url(#sky${idx})"/>${bg}${lines}${dots}</svg>`;
   }
+  /* ---- ملصقات: كل قصة أو لعبة تعطي ملصق (عادي، نادر، أسطوري) ---- */
+  const STICK = {
+    c: ['🐱', '🐶', '🐰', '🐻', '🐼', '🐨', '🐸', '🐥', '🐢', '🐠', '🦋', '🐞', '🌻', '🌈', '🍉', '🍓', '🍩', '🎈', '⚽', '🪁', '🧸', '🚗', '🎨', '📚'],
+    r: ['🦊', '🦒', '🐬', '🦜', '🐙', '🚀', '🏰', '🎡', '🌋'],
+    l: ['🦄', '🐉', '👑']
+  };
+  const ALL_ST = [...STICK.c.map((e) => [e, 'c']), ...STICK.r.map((e) => [e, 'r']), ...STICK.l.map((e) => [e, 'l'])];
+  function stickerFor(ev, kidId) {
+    const h = (str) => { let x = 2166136261; for (const ch of str) { x ^= ch.codePointAt(0); x = Math.imul(x, 16777619); } return x >>> 0; };
+    const v = h(ev.t + ':' + ev.s + ':' + kidId), r = (v % 1000) / 1000, pick = (arr) => arr[(v >>> 10) % arr.length];
+    return r < 0.04 ? [pick(STICK.l), 'l'] : r < 0.24 ? [pick(STICK.r), 'r'] : [pick(STICK.c), 'c'];
+  }
+  function kidEvents(kid) {
+    const c = C(), ev = [];
+    c.allLogs().forEach((e) => { if ((e.k || []).includes(kid.id)) ev.push({ t: e.t, s: e.s, d: e.d, type: 'story' }); });
+    (c.allActs ? c.allActs() : []).forEach((a) => { if ((a.k || []).includes(kid.id)) { const d = new Date(a.t); ev.push({ t: a.t, s: a.s + a.a, d: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'), type: a.a }); } });
+    return ev.sort((a, b) => a.t - b.t).map((e) => ({ ...e, st: stickerFor(e, kid.id) }));
+  }
+  const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  function monthGrid(kid, ev) {
+    const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    const days = new Date(y, m + 1, 0).getDate(), first = new Date(y, m, 1).getDay(); // الأحد = 0
+    const pre = (first + 1) % 7; // الأسبوع يبدأ السبت
+    const key = (d) => y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    const byDay = {}; ev.forEach((e) => { (byDay[e.d] = byDay[e.d] || []).push(e); });
+    let cells = '';
+    for (let i = 0; i < pre; i++) cells += '<i class="md empty"></i>';
+    for (let d = 1; d <= days; d++) {
+      const E = byDay[key(d)] || [], story = E.some((e) => e.type === 'story'), today = d === now.getDate();
+      const st = E.slice(-2).map((e) => e.st[0]).join('');
+      cells += `<i class="md ${story ? 'lit' : ''} ${today ? 'today' : ''} ${d > now.getDate() ? 'future' : ''}"><b>${d}</b><span>${story ? '⭐' : ''}${st}</span></i>`;
+    }
+    const inMonth = ev.filter((e) => e.d.startsWith(y + '-' + String(m + 1).padStart(2, '0')));
+    const nStories = new Set(inMonth.filter((e) => e.type === 'story').map((e) => e.d)).size;
+    return `<div class="month"><div class="mhead"><b>${MONTHS[m]} ${y}</b><span>⭐ ${nStories} ليلة · 🎁 ${inMonth.length} ملصق</span></div>
+      <div class="mdays">${['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map((x) => `<i class="mw">${x}</i>`).join('')}${cells}</div></div>`;
+  }
+  function album(ev) {
+    const have = {}; ev.forEach((e) => { have[e.st[0]] = (have[e.st[0]] || 0) + 1; });
+    const got = ALL_ST.filter(([e]) => have[e]).length;
+    return `<h3 class="sub">ألبوم الملصقات (${got}/${ALL_ST.length}) 📒</h3><div class="album">${ALL_ST.map(([e, t]) => have[e]
+      ? `<span class="stk ${t}">${e}${have[e] > 1 ? `<small>×${have[e]}</small>` : ''}</span>` : `<span class="stk none ${t}">?</span>`).join('')}</div>
+      <p class="muted" style="font-size:13px;margin:6px 0 0">🟣 نادر · 🌟 أسطوري: حظك مع كل قصة ولعبة!</p>`;
+  }
   function renderSky() {
     const c = C(), kids = c.myKids();
     $('sky').innerHTML = kids.map((k) => {
-      const info = skyInfo(k), name = CONST[info.done % CONST.length];
+      const info = skyInfo(k), name = CONST[info.done % CONST.length], ev = kidEvents(k);
       const f = k.g === 'f', left = 7 - info.cur;
       const chips = Array.from({ length: info.done }, (_, i) => `<span class="cchip">✨ ${CONST[i % CONST.length]}</span>`).join('');
       const accs = ART.ACC.map((a, i) => {
@@ -50,13 +94,23 @@ const Play = (() => {
       }).join('');
       return `<div class="card skycard">
         <div class="row" style="align-items:center;gap:12px;flex:none">${ART.avatarSVG(k.av, k.g, 62)}<div style="flex:1"><h2 style="margin:0">سماء ${c.esc(k.name)}</h2>
-        <span class="muted" style="margin:0">⭐ ${info.n} نجمة · ${info.done} كوكبة</span></div></div>
+        <span class="muted" style="margin:0">⭐ ${info.n} نجمة · ✨ ${info.done} كوكبة · 🎁 ${ev.length} ملصق</span></div>
+        <button class="small" onclick="App.editKid('${k.id}', true)">✏️ غيّر شكلي</button></div>
+        ${monthGrid(k, ev)}
         <div class="skywrap">${skySVG(info.done, info.cur)}<div class="skylbl">${name} · ${info.cur}/7</div></div>
         <p class="muted" style="text-align:center;margin:8px 0">${info.cur === 0 && info.n ? 'بدأت كوكبة جديدة! 🌟' : 'باقي ' + left + ' ' + (left === 1 ? 'قصة' : 'قصص') + ' وتكتمل الكوكبة، و' + (f ? 'تفتحين' : 'تفتح') + ' هدية جديدة 🎁'}</p>
         ${chips ? `<div class="cchips">${chips}</div>` : ''}
         <h3 class="sub">هدايا ${c.esc(k.name)} 🎁</h3><div class="accs">${accs}</div>
+        ${album(ev)}
       </div>`;
     }).join('') || '<p class="empty">أضف الأطفال أولًا</p>';
+  }
+  function lastSticker(kids) {
+    const k = kids[0]; if (!k) return '';
+    const ev = kidEvents(k), e = ev[ev.length - 1];
+    if (!e || Date.now() - e.t > 120000) return '';
+    const label = { c: 'ملصق جديد', r: 'ملصق نادر! 🟣', l: 'ملصق أسطوري!! 🌟' }[e.st[1]];
+    return `<div class="newstk ${e.st[1]}"><span>${e.st[0]}</span><b>${label}</b><small>انحفظ في ألبوم ${C().esc(k.name)}</small></div>`;
   }
   function wear(kidId, accId) {
     const c = C(), k = c.kidById(kidId); if (!k) return;
@@ -69,10 +123,10 @@ const Play = (() => {
       const info = skyInfo(k);
       if (info.cur === 0 && info.n > 0) {
         const a = ART.ACC[(info.done - 1) % ART.ACC.length];
-        return `<div class="celebrate">🎉 ${C().esc(k.name)} ${k.g === 'f' ? 'أكملت' : 'أكمل'} ${CONST[(info.done - 1) % CONST.length]}!<br>${k.g === 'f' ? 'فتحت' : 'فتح'} هدية: ${a.icon} ${a.name}</div>`;
+        return `<div class="celebrate">🎉 ${C().esc(k.name)} ${k.g === 'f' ? 'أكملت' : 'أكمل'} ${CONST[(info.done - 1) % CONST.length]}!<br>${k.g === 'f' ? 'فتحت' : 'فتح'} هدية: ${a.icon} ${a.name}</div>` + lastSticker(kids);
       }
     }
-    return '';
+    return lastSticker(kids);
   }
 
   /* ================= الألعاب ================= */
@@ -92,9 +146,11 @@ const Play = (() => {
   function logAct(a, st, score) {
     const c = C(), S = c.S();
     if (!c.counts()) return; // معاينة وليّ الأمر ما تنحسب
-    S.act = S.act || []; S.act.push({ a, s: st.id, k: c.heroes().map((k) => k.id), t: Date.now(), sc: score || 0 });
+    const who = c.heroes().length ? c.heroes() : c.myKids().slice(0, 1);
+    S.act = S.act || []; S.act.push({ a, s: st.id, k: who.map((k) => k.id), t: Date.now(), sc: score || 0 });
     if (S.act.length > 600) S.act = S.act.slice(-600);
     S.progDirty = true; c.save(); c.syncNow();
+    setTimeout(() => { const box = $('gameBody'); if (box && $('gameModal').classList.contains('on')) box.insertAdjacentHTML('beforeend', lastSticker(who)); }, 50);
   }
   function renderPlay() {
     const c = C();
@@ -280,6 +336,6 @@ const Play = (() => {
     return r;
   }
 
-  return { renderSky, wear, celebrate, skyInfo, renderPlay, pickStory, setStory, open, closeGame, setPaint, saveArt, delArt, tile, answer, nextQ,
+  return { renderSky, wear, celebrate, skyInfo, logAct, lastSticker, kidEvents, renderPlay, pickStory, setStory, open, closeGame, setPaint, saveArt, delArt, tile, answer, nextQ,
     getRec, delRec, startRec, stopRec, recording, playRec, stopPlay, canRec, hasStoryRec, acts };
 })();

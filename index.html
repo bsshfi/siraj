@@ -125,6 +125,62 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+/* v2.2 */
+.seg.wrap{flex-wrap:wrap}.seg.wrap button{flex:1 0 28%}
+/* زر التالي ثابت تحت مهما طال الكلام */
+#reader .stage{padding-bottom:130px}
+#reader .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;justify-content:center;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--night) 70%,transparent);max-width:none}
+#reader .nav>*{max-width:364px}
+#reader .recbar{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom));left:0;right:0;z-index:20}
+.viewtag{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+/* حركة خفيفة في الرسومات */
+.art .bob{animation:bob 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.art .b2{animation-delay:-.8s}.art .b3{animation-delay:-1.6s}.art .b4{animation-delay:-2.4s}
+.art .floaty{animation:floaty 3.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.art .scene circle[fill="#fff"]{animation:tw 2.8s ease-in-out infinite}
+.art .scene circle[fill="#fff"]:nth-of-type(3n){animation-delay:-1s}.art .scene circle[fill="#fff"]:nth-of-type(3n+1){animation-delay:-2s}
+.stage .art{animation:artin .6s ease}
+@keyframes bob{50%{transform:translateY(-4px) rotate(-1deg)}}
+@keyframes floaty{50%{transform:translateY(-8px) rotate(4deg)}}
+@keyframes tw{50%{opacity:.25}}
+@keyframes artin{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+.art.color .bob,.art.color .floaty,.art.color circle{animation:none!important}
+@media (prefers-reduced-motion:reduce){.art *,.stage .art{animation:none!important}}
+/* سمائي: الشهر والملصقات */
+.month{background:#F6F3FF;border-radius:18px;padding:10px;margin-top:12px}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.mhead span{font-size:13px;color:var(--soft);font-weight:700}
+.mdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.md,.mw{font-style:normal;text-align:center;border-radius:10px;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px}
+.mw{min-height:auto;color:var(--soft);font-weight:800}
+.md{background:#fff}.md b{font-size:11px;color:var(--soft)}.md span{font-size:13px;line-height:1.1}
+.md.lit{background:#FFF8D6;box-shadow:inset 0 0 0 2px #FFD93D}.md.today{box-shadow:inset 0 0 0 2px var(--bg1)}.md.future{opacity:.45}.md.empty{background:transparent}
+.album{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.stk{position:relative;background:#F6F3FF;border-radius:12px;aspect-ratio:1;display:grid;place-items:center;font-size:24px}
+.stk small{position:absolute;bottom:0;left:2px;font-size:10px;font-weight:800;color:var(--soft)}
+.stk.r{background:#F0E6FF;box-shadow:inset 0 0 0 2px #9B6BF2}.stk.l{background:#FFF4CC;box-shadow:inset 0 0 0 2px #FFB800}
+.stk.none{font-size:16px;color:#CFC8E8;box-shadow:none;background:#F6F3FF}
+.newstk{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;color:var(--ink);border-radius:18px;padding:10px;margin:10px 0;animation:pop .5s ease}
+.newstk span{font-size:54px}.newstk b{font-size:17px}.newstk small{color:var(--soft)}
+.newstk.r{box-shadow:0 0 0 3px #9B6BF2}.newstk.l{box-shadow:0 0 0 3px #FFB800;background:#FFF8D6}
+/* English */
+.enlv{margin-bottom:12px;background:#ffffff26;border-radius:16px;padding:4px}
+.enlv button{display:flex;flex-direction:column;align-items:center;background:transparent;color:#fff}.enlv button small{font-size:11px;opacity:.8}
+.enlv button.on{background:#fff;color:var(--bg1)}
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;direction:ltr}
+.lt{background:#F6F3FF;border-radius:16px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;color:var(--ink)}
+.lt b{font-family:Poppins,sans-serif;font-size:26px;line-height:1}.lt b small{font-size:16px;color:var(--soft);margin-inline-start:3px}.lt span{font-size:22px}
+.words{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.wd{background:#F6F3FF;border-radius:16px;padding:10px;display:flex;flex-direction:column;align-items:center;color:var(--ink)}
+.wd span{font-size:34px}.wd b{font-family:Poppins,sans-serif;font-size:20px;direction:ltr}.wd small{color:var(--soft)}
+.sents{display:flex;flex-direction:column;gap:8px}
+.sn{background:#F6F3FF;border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:center;text-align:right;color:var(--ink)}
+.sn span{font-size:28px}.sn b{display:block;font-family:Poppins,sans-serif;font-size:16px;text-align:left}.sn small{color:var(--soft)}
+.encard{text-align:center}.encard .big{font-family:Poppins,sans-serif;font-size:90px;font-weight:800;color:var(--bg1);line-height:1}.encard .big small{font-size:56px;color:var(--soft)}
+.encard .bige{font-size:90px}.ent{font-family:Poppins,sans-serif;font-size:28px;font-weight:800;margin:6px 0}
+.buildline,.buildpool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;border-radius:14px;margin:8px 0}
+.buildline{background:#F6F3FF;border:2px dashed #D5CCF7}
+.bw{font-family:Poppins,sans-serif;font-size:18px;font-weight:700;padding:8px 12px;border-radius:12px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #D5CCF7}
+.bw.on{background:var(--bg1);color:#fff;box-shadow:none}
 /* v2.0 */
 .modebar{display:flex;gap:6px;background:#ffffff26;border-radius:16px;padding:4px;margin:0 0 4px}
 .modebar button{flex:1;padding:8px;border-radius:12px;background:transparent;color:#fff;font-size:15px;font-weight:700}
@@ -324,7 +380,7 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
       <button class="iconbtn" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button>
     </div>
   </div>
-  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">🌙 الليلة</button><button id="tabSky" onclick="App.tab('sky')">⭐ سمائي</button><button id="tabPlay" onclick="App.tab('play')">🎨 ألعاب</button><button id="tabLib" onclick="App.tab('lib')">📚 مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">📊 المتابعة</button></div>
+  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">🌙 الليلة</button><button id="tabSky" onclick="App.tab('sky')">⭐ سمائي</button><button id="tabPlay" onclick="App.tab('play')">🎨 ألعاب</button><button id="tabEng" onclick="App.tab('eng')">🔤 English</button><button id="tabLib" onclick="App.tab('lib')">📚 مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">📊 المتابعة</button></div>
   <div class="modebar" id="modeBar" style="display:none"></div>
   <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
@@ -335,6 +391,7 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
   </div>
   <div id="paneSky" style="display:none"><div id="sky"></div></div>
   <div id="panePlay" style="display:none"><div id="play"></div></div>
+  <div id="paneEng" style="display:none"><div id="eng"></div></div>
   <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
   <div id="paneDash" style="display:none"><div id="dash"></div></div>
   <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
@@ -448,13 +505,18 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
 <div class="modal" id="kidModal"><div class="card" style="max-height:92vh;overflow:auto">
   <h2 id="kidTitle">طفل جديد</h2>
   <div class="preview" id="kidPreview"></div>
-  <label>الاسم</label><input class="inp" id="kidName" maxlength="20" placeholder="اسم الطفل">
-  <label>ولد أو بنت</label><div class="seg" id="kidG"><button data-v="m">ولد</button><button data-v="f">بنت</button></div>
-  <label>العمر</label><div class="seg" id="kidAge"><button data-v="1">٣-٥</button><button data-v="2">٦-٨</button><button data-v="3">٩-١٢</button></div>
+  <div id="kidBasics">
+    <label>الاسم</label><input class="inp" id="kidName" maxlength="20" placeholder="اسم الطفل">
+    <label>ولد أو بنت</label><div class="seg" id="kidG"><button data-v="m">ولد</button><button data-v="f">بنت</button></div>
+    <label>العمر</label><div class="seg" id="kidAge"><button data-v="1">٣-٥</button><button data-v="2">٦-٨</button><button data-v="3">٩-١٢</button></div>
+  </div>
   <label>لون البشرة</label><div class="swatches" id="kidSkin"></div>
-  <label id="hairLbl">لون الشعر</label><div class="swatches" id="kidHair"></div>
-  <label>اللون المفضل</label><div class="swatches" id="kidShirt"></div>
-  <div id="hijabRow"><label>الحجاب</label><div class="seg" id="kidHijab"><button data-v="0">بدون</button><button data-v="1">مع حجاب</button></div></div>
+  <label>غطاء الرأس</label><div class="seg wrap" id="kidHead"></div>
+  <div id="hcRow"><label>لون الحجاب</label><div class="swatches" id="kidHC"></div></div>
+  <div id="hairRow"><label>تسريحة الشعر</label><div class="seg wrap" id="kidStyle"></div>
+  <label>لون الشعر</label><div class="swatches" id="kidHair"></div></div>
+  <label>اللبس</label><div class="seg wrap" id="kidOutfit"></div>
+  <div id="shirtRow"><label>اللون المفضل</label><div class="swatches" id="kidShirt"></div></div>
   <div class="row" style="margin-top:16px"><button class="btn" onclick="App.saveKid()">حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div>
 </div></div>
 
@@ -505,6 +567,7 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
 <script src="stories-2.js"></script>
 <script src="stories-3.js"></script>
 <script src="play.js"></script>
+<script src="english.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
