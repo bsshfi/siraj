@@ -125,6 +125,19 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+.inp::placeholder,.codein::placeholder{letter-spacing:normal;font-size:16px;font-family:"Baloo Bhaijaan 2",system-ui,sans-serif}
+.count{display:inline-block;background:var(--bg1);color:#fff;border-radius:12px;font-size:15px;padding:0 10px;vertical-align:middle}
+.libchips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:none}
+.libchips::-webkit-scrollbar{display:none}
+.libchips .chip{white-space:nowrap;font-size:15px;padding:6px 12px}
+.slist{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.sitem{background:#F8F6FF;border-radius:16px;overflow:hidden;padding:0;text-align:right;color:var(--ink);border:2px solid #EEE9FF}
+.sitem .art{display:block;width:100%;height:auto;aspect-ratio:400/220}
+.sitem .st{font-weight:800;font-size:15px;padding:6px 10px 0;line-height:1.4}
+.sitem .sv{padding:4px 10px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sitem .tag{font-size:12px;margin:0}
+.sitem .rd{font-size:12px;color:#1E8E4A;font-weight:700}
+
 .choice{display:block;width:100%;text-align:right;background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px #2b235033;font-family:inherit;color:var(--ink)}
 .choice .ic{font-size:40px;float:left}
 .choice b{font-size:22px;display:block}
@@ -255,9 +268,9 @@ label{display:block;font-weight:700;margin:12px 0 6px}
     <button class="iconbtn" onclick="App.show('home')" aria-label="رجوع">→</button>
   </div>
   <div class="card" id="famBox">
-    <h2>العائلة 👨‍👩‍👧</h2>
+    <h2>العائلة والنسخة الاحتياطية 👨‍👩‍👧</h2>
     <p class="muted">هذا الجهاز: <b id="devRole"></b></p>
-    <p class="muted" style="margin-bottom:0">رمز العائلة: لربط جهاز طفل، أو لاسترجاع كل شيء لو حذفت التطبيق.</p>
+    <p class="muted" style="margin-bottom:0">رمز العائلة هو نسختك الاحتياطية: به تربط جهاز طفل، وبه يرجع كل شيء لو حذفت التطبيق أو غيّرت الجوال. احفظه في مكانٍ آمن.</p>
     <div class="code" id="famCode"></div>
     <div class="qr" id="qr"></div>
     <p class="muted" style="text-align:center;font-size:13px">صوّر الرمز من كاميرا التابلت، أو أرسل له الرابط</p>
@@ -283,9 +296,12 @@ label{display:block;font-weight:700;margin:12px 0 6px}
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
   </div>
   <div class="card">
-    <h2>كل القصص (<span id="storyCount"></span>)</h2>
-    <input class="search" id="storySearch" placeholder="ابحث باسم القصة أو القيمة… مثل: الصدق" oninput="App.filterStories()">
-    <div class="list" id="allStories"></div>
+    <h2>مكتبة القصص <span class="count" id="storyCount"></span></h2>
+    <p class="muted">اضغط أي قصة لمعاينتها بأسماء أطفالك.</p>
+    <input class="search" id="storySearch" placeholder="🔍 ابحث باسم القصة أو القيمة" oninput="App.filterStories()">
+    <div class="chips libchips" id="libChips"></div>
+    <div class="slist" id="allStories"></div>
+    <button class="btn alt" id="moreStories" style="margin-top:12px" onclick="App.moreStories()">عرض المزيد</button>
   </div>
   <div class="card">
     <h2>رمز وليّ الأمر</h2>

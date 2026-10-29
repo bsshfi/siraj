@@ -455,14 +455,30 @@ const App = (() => {
     $('notifBtn').style.display = !CONFIG.VAPID || (S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted') ? 'none' : '';
     $('remindNote').textContent = S.role === 'child' ? 'التذكير يوصل لهذا الجهاز في الوقت المحدد.' : 'التذكير يوصل لأجهزة الأطفال المربوطة، وأنت يوصلك إشعار لما يخلصون القصة.';
     $('storyCount').textContent = STORIES.length;
-    filterStories();
+    libShown = 8; filterStories();
     $('ver2').textContent = CONFIG.VERSION;
   }
+  /* مكتبة القصص في الإعدادات: فلاتر + بحث + بطاقات بصور، ٨ في كل دفعة */
+  const LIB_FILTERS = [['الكل', ''], ['الصدق والأمانة', 'الصدق|الأمانة'], ['الرحمة', 'الرحمة|الرفق'], ['المشاركة', 'المشاركة|العطاء|التعاون|الكرم|ضيف'],
+    ['الشجاعة والثقة', 'الشجاعة|الثقة'], ['العادات الجميلة', 'النظافة|الترتيب|النوم|الأكل|الاستعداد|السلامة|الأمان'], ['العائلة', 'الوالدين|العائلة|الكبار|الحب'], ['المناسبات', '#occ']];
+  let libFilter = '', libShown = 8;
+  function setLibFilter(f) { libFilter = f; libShown = 8; filterStories(); }
+  function moreStories() { libShown += 8; filterStories(); }
   function filterStories() {
+    $('libChips').innerHTML = LIB_FILTERS.map(([t, f]) => `<button class="chip ${f === libFilter ? 'on' : ''}" onclick="App.setLibFilter('${f}')">${t}</button>`).join('');
     const q = ($('storySearch').value || '').trim();
-    const list = STORIES.filter((s) => !q || s.title.includes(q) || s.value.includes(q)).slice(0, 25);
-    $('allStories').innerHTML = list.map((s) => `<div class="li"><span class="nm">${esc(s.title.replace(/\{n\}/g, '…'))}<br><span class="tag">${esc(s.value)}</span>${s.occ ? ' <span class="tag" style="background:#E5FBEA;color:#1E8E4A">مناسبة</span>' : ''}</span><button class="small" onclick="App.preview('${s.id}')">معاينة</button></div>`).join('')
-      || '<p class="muted">ما لقينا قصة بهذا الاسم</p>';
+    const re = libFilter && libFilter !== '#occ' ? new RegExp(libFilter) : null;
+    const hero = S.fam.kids.length ? [S.fam.kids[0]] : [{ name: 'البطل', g: 'm', av: {} }];
+    const all = STORIES.filter((s) => (!q || s.title.includes(q) || s.value.includes(q)) &&
+      (libFilter === '#occ' ? !!s.occ : !re || re.test(s.value)));
+    const read = new Set(allLogs().map((e) => e.s));
+    $('allStories').innerHTML = all.slice(0, libShown).map((s) => `<button class="sitem" onclick="App.preview('${s.id}')">
+        ${ART.page(s.scene, s.occ ? '🎉' : '', [])}
+        <div class="st">${esc(fill(s.title, hero))}</div>
+        <div class="sv"><span class="tag">${esc(s.value)}</span>${read.has(s.id) ? '<span class="rd">✓ قُرئت</span>' : ''}</div>
+      </button>`).join('') || '<p class="muted" style="grid-column:1/-1;text-align:center">ما لقينا قصة بهذا الاسم</p>';
+    $('moreStories').style.display = all.length > libShown ? '' : 'none';
+    $('moreStories').textContent = 'عرض المزيد (' + (all.length - libShown) + ')';
   }
   function preview(id) { if (!heroes().length && S.fam.kids.length) sel = [S.fam.kids[0].id]; openStory(id); }
   function setBed() {
@@ -479,7 +495,7 @@ const App = (() => {
   }
   function showFamilyCode(first) {
     $('fcCode').textContent = S.code;
-    $('fcFirst').style.display = first ? '' : 'none';
+    $('fcFirst').textContent = first ? 'تم إنشاء عائلتك!' : 'رمز عائلتك جاهز 🔑';
     $('codeModal').classList.add('on');
   }
   async function shareJoin() {
@@ -565,13 +581,17 @@ const App = (() => {
     let skipped = false, updated = false;
     try { skipped = sessionStorage.getItem('siraj-skip') === '1'; updated = sessionStorage.getItem('siraj-updated') === '1'; sessionStorage.removeItem('siraj-updated'); } catch (e) {}
     if (!standalone() && !skipped && !S.role) { renderWelcome(); show('welcome'); } else start();
+    // عائلة من النسخة 1.0 ما عندها رمز: ننشئ لها رمزًا ونرفعها، ونعرض الرمز مرة وحدة
+    let newCode = false;
+    if (S.role === 'parent' && S.fam.kids.length && S.fam.pin && !S.code) { S.code = Sync.newCode(); S.dirty = true; newCode = true; }
     if (updated) setTimeout(() => toast('تم التحديث ✨ الإصدار ' + CONFIG.VERSION), 500);
-    setupSW(); save(); syncNow();
+    setupSW(); save();
+    syncNow().then(() => { if (newCode && $('home').classList.contains('on')) { showFamilyCode(false); askNotif(); } });
   }
 
   return {
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
-    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, preview, filterStories, setBed,
+    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, preview, filterStories, setLibFilter, moreStories, setBed,
     showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
