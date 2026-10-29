@@ -14,7 +14,7 @@ const App = (() => {
 
   /* ---------- التخزين ---------- */
   function freshFam() { return { kids: [], pin: '', dad: 'بابا', mom: 'ماما', bedtime: '20:30', remind: true, perNight: 1, lockOn: true, lock: '21:30', extra: null }; }
-  function fresh() { return { v: 2, role: '', code: '', dev: uid(), rev: 0, dirty: false, progDirty: false, fam: freshFam(), log: [], fav: [], voice: false, sel: [], notif: false, devKids: [], beat: 0, act: [], unlockUntil: 0 }; }
+  function fresh() { return { v: 2, role: '', code: '', dev: uid(), rev: 0, dirty: false, progDirty: false, fam: freshFam(), log: [], fav: [], voice: true, voiceV: 1, sel: [], notif: false, devKids: [], beat: 0, act: [], unlockUntil: 0 }; }
   function load() {
     let s; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     if (!s) return fresh();
@@ -26,6 +26,7 @@ const App = (() => {
       return n;
     }
     s.fam = Object.assign(freshFam(), s.fam || {});
+    if (!s.voiceV) { s.voice = true; s.voiceV = 1; } // من 1.8: السماعة شغالة افتراضيًا
     return s;
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} writeSWData(); }
@@ -537,14 +538,7 @@ const App = (() => {
       }
     }
     $('stage').innerHTML = html; $('nav').innerHTML = nav;
-    renderRecBar();
-    Play.stopPlay();
-    if (R.rec) { stopSpeak(); return; }
-    const key = recKey();
-    Play.getRec(key).then((r) => {
-      if (R && recKey() === key && r) { stopSpeak(); Play.playRec(key); const by = kidById(r.by); toast('🎙️ ' + (by ? 'بصوت ' + by.name : 'تسجيل العائلة')); }
-      else speak(say);
-    });
+    speak(say);
   }
   function logStory() {
     if (R.logged) return; R.logged = true;
@@ -792,6 +786,7 @@ const App = (() => {
     if (S.role === 'parent' && S.fam.kids.length && S.fam.pin && !S.code) { S.code = Sync.newCode(); S.dirty = true; newCode = true; }
     if (updated) setTimeout(() => toast('تم التحديث ✨ الإصدار ' + CONFIG.VERSION), 500);
     setupSW(); save();
+    try { indexedDB.deleteDatabase('siraj-rec'); } catch (e) {} // تسجيلات تجريبية من 1.7
     checkLock(); setInterval(checkLock, 30000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) checkLock(); });
     syncNow().then(() => {

@@ -107,8 +107,7 @@ const Play = (() => {
     const items = [
       ['color', '🎨', 'لوّن المشهد', 'لوّن رسمة القصة بألوانك'],
       ['puzzle', '🧩', 'أحجية الصورة', 'رتّب قطع الصورة'],
-      ['quiz', '❓', 'سؤال وجواب', '٣ أسئلة عن القصة'],
-      ['rec', '🎙️', 'اقرأ لإخوانك', 'سجّل القصة بصوتك']
+      ['quiz', '❓', 'سؤال وجواب', '٣ أسئلة عن القصة']
     ];
     const gal = gallery();
     $('play').innerHTML = `<div class="card playhead">${ART.page(st.scene, '', hs)}<div class="info"><span class="tag">ألعاب قصة</span><p class="title">«${c.esc(title)}»</p>
