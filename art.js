@@ -91,7 +91,61 @@ const ART = (() => {
       <rect x="250" y="170" width="120" height="14" rx="4" fill="#C47A3A"/><rect x="260" y="184" width="8" height="40" fill="#A0602A"/><rect x="352" y="184" width="8" height="40" fill="#A0602A"/>`,
     night: `<defs><radialGradient id="sn" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="#3B2A7A"/><stop offset="1" stop-color="#120F33"/></radialGradient></defs>
       <rect width="400" height="260" fill="url(#sn)"/>${stars(70, 11, 400, 260)}
-      <path d="M200 40 a55 55 0 1 0 40 95 a44 44 0 1 1 -40 -95z" fill="#FFF3C4"/>`
+      <path d="M200 40 a55 55 0 1 0 40 95 a44 44 0 1 1 -40 -95z" fill="#FFF3C4"/>`,
+    mosque: `<defs><linearGradient id="sm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6E5AD8"/><stop offset="1" stop-color="#FFB37A"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sm)"/>${stars(10, 5, 400, 70)}
+      <rect x="215" y="105" width="150" height="110" fill="#F7EEDC"/>
+      <path d="M240 108 Q240 55 290 52 Q340 55 340 108Z" fill="#2E9E6B"/><circle cx="290" cy="46" r="5" fill="#FFD93D"/>
+      <rect x="360" y="60" width="18" height="155" fill="#F7EEDC"/><path d="M356 60 L369 36 L382 60Z" fill="#2E9E6B"/>
+      <path d="M369 26 a6 6 0 1 0 5 9 a5 5 0 1 1 -5 -9z" fill="#FFD93D"/>
+      <path d="M272 215 V170 Q290 148 308 170 V215Z" fill="#8B5A2B"/>
+      <path d="M232 160 Q232 145 245 145 Q258 145 258 160 V180 H232Z M322 160 Q322 145 335 145 Q348 145 348 160 V180 H322Z" fill="#7FD3F7"/>
+      <rect y="212" width="400" height="48" fill="#E9D3A8"/>`,
+    park: `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FDBFF"/><stop offset="1" stop-color="#E6F9FF"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sk)"/><circle cx="60" cy="50" r="24" fill="#FFD93D"/>
+      <g fill="#fff" opacity=".9"><ellipse cx="190" cy="40" rx="30" ry="10"/><ellipse cx="210" cy="33" rx="18" ry="10"/></g>
+      <path d="M0 190 Q200 165 400 190 V260 H0Z" fill="#7ED957"/>
+      <path d="M240 200 L270 95 L300 200 M270 95 H360 M330 95 L360 200 M360 95 L390 200" fill="none" stroke="#FF6B6B" stroke-width="6" stroke-linecap="round"/>
+      <path d="M300 95 V160 M320 95 V160" stroke="#3B3B5C" stroke-width="2"/><rect x="295" y="158" width="30" height="7" rx="3" fill="#4DB8F0"/>
+      <path d="M20 205 L60 130 H80 L80 205" fill="none" stroke="#9B6BF2" stroke-width="6"/><path d="M80 130 Q120 150 140 205" fill="none" stroke="#FFD93D" stroke-width="10" stroke-linecap="round"/>`,
+    market: `<rect width="400" height="260" fill="#FFF0F5"/>
+      <rect x="20" y="20" width="360" height="22" rx="8" fill="#FF7AB6"/><text x="200" y="37" text-anchor="middle" font-size="15" fill="#fff" font-family="sans-serif">سوق</text>
+      <g>${[60, 110, 160].map((y, i) => `<rect x="30" y="${y}" width="340" height="6" fill="#C47A3A"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map((k) => `<rect x="${40 + k * 41}" y="${y - 26}" width="30" height="26" rx="4" fill="${['#FF6B6B', '#4CD97B', '#FFD93D', '#4DB8F0', '#9B6BF2', '#FF9F1C'][(k + i) % 6]}"/>`).join('')).join('')}</g>
+      <rect y="205" width="400" height="55" fill="#E8DFF5"/>
+      <path d="M300 180 h60 l-8 30 h-44z" fill="none" stroke="#6E668F" stroke-width="5"/><circle cx="312" cy="218" r="6" fill="#6E668F"/><circle cx="346" cy="218" r="6" fill="#6E668F"/>`,
+    road: `<defs><linearGradient id="sr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BD9FF"/><stop offset="1" stop-color="#F2FBFF"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sr)"/><circle cx="340" cy="45" r="22" fill="#FFD93D"/>
+      ${[[20, '#FFB5A7', 90], [110, '#B8E0D2', 70], [190, '#FFE5A5', 100], [290, '#D6C5F0', 80]].map(([x, c, h]) => `<rect x="${x}" y="${180 - h}" width="80" height="${h}" fill="${c}"/><rect x="${x + 30}" y="${150}" width="20" height="30" fill="#8B5A2B"/><rect x="${x + 10}" y="${190 - h}" width="16" height="16" fill="#fff"/><rect x="${x + 54}" y="${190 - h}" width="16" height="16" fill="#fff"/>`).join('')}
+      <rect y="180" width="400" height="22" fill="#D9D3C7"/><rect y="202" width="400" height="58" fill="#5A5A6E"/>
+      <path d="M10 232 H50 M90 232 H130 M170 232 H210 M250 232 H290 M330 232 H370" stroke="#FFD93D" stroke-width="5"/>`,
+    mountain: `<defs><linearGradient id="sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A5E1FF"/><stop offset="1" stop-color="#EAFBFF"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sh)"/>
+      <path d="M0 170 L80 70 L150 150 L230 50 L320 140 L400 80 V260 H0Z" fill="#5CAE6A"/>
+      <path d="M0 200 L100 120 L190 190 L290 110 L400 180 V260 H0Z" fill="#3E9150"/>
+      <path d="M232 52 Q236 120 240 190" stroke="#DFF6FF" stroke-width="6" fill="none"/>
+      <g fill="#fff" opacity=".75"><ellipse cx="120" cy="110" rx="60" ry="12"/><ellipse cx="300" cy="95" rx="70" ry="12"/></g>
+      ${[30, 70, 330, 370].map((x) => `<path d="M${x} 230 l14 -38 l14 38z" fill="#2A6E3A"/>`).join('')}
+      <path d="M40 30 L360 70" stroke="#6E668F" stroke-width="2"/><rect x="180" y="45" width="26" height="20" rx="4" fill="#FF6B6B"/>`,
+    farm: `<defs><linearGradient id="sf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BE1FF"/><stop offset="1" stop-color="#FFF8E1"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sf)"/><circle cx="60" cy="50" r="24" fill="#FFD93D"/>
+      <path d="M0 180 Q200 160 400 180 V260 H0Z" fill="#9BD86A"/>
+      <rect x="250" y="95" width="110" height="90" fill="#E84A4A"/><path d="M240 100 L305 55 L370 100Z" fill="#B83232"/>
+      <rect x="285" y="135" width="40" height="50" fill="#fff"/><path d="M285 135 L325 185 M325 135 L285 185" stroke="#E84A4A" stroke-width="4"/>
+      <g stroke="#C47A3A" stroke-width="5">${[0, 1, 2, 3, 4].map((k) => `<line x1="${20 + k * 40}" y1="185" x2="${20 + k * 40}" y2="215"/>`).join('')}<line x1="10" y1="195" x2="190" y2="195"/><line x1="10" y1="208" x2="190" y2="208"/></g>
+      <ellipse cx="220" cy="215" rx="22" ry="14" fill="#F2C94C"/>`,
+    kitchen: `<rect width="400" height="260" fill="#FFF6E5"/>
+      <g fill="#FFE0B2">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((k) => `<rect x="${k * 40 + 2}" y="120" width="36" height="36"/>`).join('')}</g>
+      <rect x="20" y="20" width="160" height="70" rx="6" fill="#FF9F1C"/><line x1="100" y1="20" x2="100" y2="90" stroke="#E07E00" stroke-width="3"/>
+      <rect x="230" y="20" width="110" height="80" rx="6" fill="#BDEBFF" stroke="#fff" stroke-width="6"/>
+      <rect y="160" width="400" height="20" fill="#C47A3A"/><rect y="180" width="400" height="80" fill="#4DB8F0"/>
+      ${[40, 140, 240, 340].map((x) => `<circle cx="${x}" cy="220" r="4" fill="#fff"/>`).join('')}
+      <path d="M260 160 h50 v-22 a25 8 0 0 0 -50 0z" fill="#6E668F"/><path d="M275 120 q5 -10 0 -18 M295 120 q5 -10 0 -18" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/>`,
+    rain: `<defs><linearGradient id="sw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7C8DB5"/><stop offset="1" stop-color="#C9D6F0"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sw)"/>
+      <g fill="#5E6C92"><ellipse cx="100" cy="45" rx="70" ry="25"/><ellipse cx="150" cy="35" rx="45" ry="22"/><ellipse cx="290" cy="50" rx="80" ry="26"/><ellipse cx="340" cy="38" rx="45" ry="20"/></g>
+      <g stroke="#E6F2FF" stroke-width="2.5" stroke-linecap="round" opacity=".8">${Array.from({ length: 40 }, (_, k) => { const x = (k * 53) % 400, y = 75 + ((k * 37) % 120); return `<line x1="${x}" y1="${y}" x2="${x - 5}" y2="${y + 14}"/>`; }).join('')}</g>
+      <rect y="205" width="400" height="55" fill="#6B7A9E"/><ellipse cx="300" cy="230" rx="50" ry="8" fill="#9FB4E0"/>
+      <rect x="250" y="160" width="100" height="40" rx="10" fill="#FF6B6B"/><circle cx="270" cy="203" r="10" fill="#333"/><circle cx="330" cy="203" r="10" fill="#333"/>`
   };
 
   function page(sceneName, prop, heroes) {

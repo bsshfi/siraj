@@ -106,7 +106,6 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .list .li .nm{flex:1;font-weight:700;font-size:18px}
 .small{padding:8px 12px;border-radius:12px;font-size:15px;font-weight:700;background:#F2EFFC;color:var(--bg1)}
 .small.del{background:#FFE5E5;color:#D33}
-.code{width:100%;min-height:90px;font-family:monospace;font-size:13px;direction:ltr;text-align:left;padding:10px;border-radius:12px;border:2px solid #E3DDF7}
 /* modal */
 .modal{position:fixed;inset:0;background:#120F33cc;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
 .modal.on{display:flex}
@@ -125,11 +124,37 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot{text-align:center;color:#ffffffaa;font-size:13px;margin-top:20px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
+/* v1.1 */
+.choice{display:block;width:100%;text-align:right;background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px #2b235033;font-family:inherit;color:var(--ink)}
+.choice .ic{font-size:40px;float:left}
+.choice b{font-size:22px;display:block}
+.choice span{color:var(--soft);font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:14px;background:#F2EFFC;font-size:17px;font-weight:700;color:var(--soft)}
+.chip.on{background:var(--bg1);color:#fff}
+.chipin{width:110px;padding:8px 12px;border-radius:14px;border:2px solid #E3DDF7;font-size:16px;font-family:inherit}
+.chipin.on{border-color:var(--bg1)}
+.code{font-family:Poppins,monospace;font-size:30px;font-weight:800;letter-spacing:3px;direction:ltr;text-align:center;color:var(--bg1);background:#F2EFFC;border-radius:16px;padding:12px;margin:8px 0}
+.codein{width:100%;font-family:Poppins,monospace;font-size:26px;font-weight:700;letter-spacing:3px;direction:ltr;text-align:center;padding:12px;border-radius:16px;border:3px solid #E3DDF7;text-transform:uppercase}
+.qr{display:grid;place-items:center;margin:8px auto;max-width:200px}
+.qr svg{width:100%;height:auto;background:#fff;border-radius:12px}
+.dk .stats{display:flex;gap:8px;margin:12px 0 8px}
+.dk .stats div{flex:1;background:#F6F3FF;border-radius:14px;text-align:center;padding:8px 4px}
+.dk .stats b{display:block;font-size:22px;color:var(--bg1)}
+.dk .stats span{font-size:13px;color:var(--soft)}
+.week{display:flex;gap:6px}
+.week i{flex:1;font-style:normal;text-align:center;font-size:12px;padding:6px 0;border-radius:10px;background:#F2EFFC;color:var(--soft)}
+.week i.on{background:var(--mint);color:#fff;font-weight:700}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+.toggle input{width:24px;height:24px;accent-color:var(--bg1)}
+#sleep{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 30s ease;z-index:40}
+#sleep.on{opacity:.93;pointer-events:auto}
+.search{width:100%;padding:10px 14px;border-radius:14px;border:2px solid #E3DDF7;font-size:16px;margin-bottom:8px;font-family:inherit}
 </style>
 </head>
 <body>
 
-<!-- شاشة الترحيب وإضافة التطبيق للشاشة الرئيسية -->
+<!-- الترحيب وإضافة التطبيق للشاشة الرئيسية -->
 <section id="welcome" class="screen">
   <img src="icons/icon-512.png" alt="">
   <h1>سِراج</h1>
@@ -139,31 +164,65 @@ label{display:block;font-weight:700;margin:12px 0 6px}
   <button class="btn ghost" style="color:#fff" onclick="App.skipWelcome()">متابعة في المتصفح</button>
 </section>
 
-<!-- الإعداد الأول -->
-<section id="setup" class="screen">
+<!-- من يستخدم هذا الجهاز؟ -->
+<section id="role" class="screen">
   <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">سِراج</div></div>
+  <p class="hello" style="font-size:24px;font-weight:800">أهلًا بك 👋<br><span style="font-size:18px;font-weight:600">من يستخدم هذا الجهاز؟</span></p>
+  <button class="choice" onclick="App.openSetup()"><span class="ic">👨‍👩‍👧</span><b>أنا وليّ الأمر</b><span>أنشئ عائلتك وأضف أطفالك، وتابع قراءتهم من جوالك</span></button>
+  <button class="choice" onclick="App.openJoin('child')"><span class="ic">🧒</span><b>جهاز طفل</b><span>اربطه بعائلتك برمز العائلة من جوال وليّ الأمر</span></button>
+  <button class="btn ghost" style="color:#fff" onclick="App.openJoin('parent')">عندي رمز عائلة وأبي أسترجعها 🔑</button>
+</section>
+
+<!-- إعداد العائلة (وليّ الأمر) -->
+<section id="setup" class="screen">
+  <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">عائلتي</div><button class="iconbtn" onclick="App.show('role')" aria-label="رجوع">→</button></div>
   <div class="card">
-    <h2>أهلًا بك 👋</h2>
-    <p class="muted">أضف أطفالك ليصيروا أبطال القصص. كل البيانات تبقى على هذا الجهاز فقط.</p>
+    <h2>الأطفال 🧒</h2>
+    <p class="muted">أضف أطفالك ليصيروا أبطال القصص.</p>
     <div class="list" id="setupKids"></div>
     <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
+  </div>
+  <div class="card">
+    <h2>وش ينادونكم العيال؟ 💛</h2>
+    <p class="muted">عشان تصير القصص قصة عائلتكم: «قال بابا…»</p>
+    <label>الأب</label><div class="chips" id="setupDad"></div>
+    <label>الأم</label><div class="chips" id="setupMom"></div>
+  </div>
+  <div class="card">
+    <h2>وقت القصة 🌙</h2>
+    <p class="muted">يوصل تذكير لجهاز الأطفال في هذا الوقت.</p>
+    <input class="inp" id="setupBed" type="time" value="20:30" style="direction:ltr;text-align:center">
   </div>
   <div class="card">
     <h2>رمز وليّ الأمر 🔒</h2>
     <p class="muted">٤ أرقام تحمي الإعدادات من الصغار.</p>
     <input class="inp" id="setupPin" type="tel" inputmode="numeric" maxlength="4" placeholder="مثال: 2580" style="direction:ltr;text-align:center;letter-spacing:8px">
   </div>
-  <button class="btn" onclick="App.finishSetup()">ابدأ الحكايات 🌙</button>
-  <button class="btn ghost" style="color:#fff;margin-top:8px" onclick="App.openRestore()">عندي رمز نسخة احتياطية</button>
+  <button class="btn" onclick="App.finishSetup()">أنشئ العائلة 🌙</button>
+</section>
+
+<!-- ربط جهاز بالعائلة -->
+<section id="join" class="screen">
+  <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">سِراج</div><button class="iconbtn" onclick="App.show('role')" aria-label="رجوع">→</button></div>
+  <div class="card">
+    <h2 id="joinTitle">ربط جهاز الطفل</h2>
+    <p class="muted" id="joinHint"></p>
+    <input type="hidden" id="joinRole" value="child">
+    <input class="codein" id="joinCode" maxlength="11" placeholder="XXXXX-XXXXX" autocomplete="off" autocapitalize="characters">
+    <button class="btn" id="joinBtn" style="margin-top:14px" onclick="App.doJoin()">ربط</button>
+  </div>
 </section>
 
 <!-- الرئيسية -->
 <section id="home" class="screen">
   <div class="top">
     <div class="brand"><img src="icons/icon-192.png" alt="">سِراج</div>
-    <button class="iconbtn" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button>
+    <div class="row" style="flex:0;gap:8px">
+      <button class="iconbtn" onclick="App.shareApp()" aria-label="مشاركة التطبيق">📤</button>
+      <button class="iconbtn" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button>
+    </div>
   </div>
-  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">قصة الليلة</button><button id="tabLib" onclick="App.tab('lib')">مكتبتي</button></div>
+  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">قصة الليلة</button><button id="tabLib" onclick="App.tab('lib')">مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">المتابعة</button></div>
   <div id="paneTonight">
     <p class="hello" id="hello"></p>
     <div class="kids" id="kids"></div>
@@ -171,6 +230,7 @@ label{display:block;font-weight:700;margin:12px 0 6px}
     <div class="card tonight" id="tonightCard"></div>
   </div>
   <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
+  <div id="paneDash" style="display:none"><div id="dash"></div></div>
   <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
 </section>
 
@@ -186,6 +246,7 @@ label{display:block;font-weight:700;margin:12px 0 6px}
   <div class="stage" id="stage"></div>
   <div class="nav" id="nav"></div>
 </section>
+<div id="sleep" onclick="App.wake()"></div>
 
 <!-- الإعدادات -->
 <section id="settings" class="screen">
@@ -193,24 +254,38 @@ label{display:block;font-weight:700;margin:12px 0 6px}
     <div class="brand">⚙️ الإعدادات</div>
     <button class="iconbtn" onclick="App.show('home')" aria-label="رجوع">→</button>
   </div>
+  <div class="card" id="famBox">
+    <h2>العائلة 👨‍👩‍👧</h2>
+    <p class="muted">هذا الجهاز: <b id="devRole"></b></p>
+    <p class="muted" style="margin-bottom:0">رمز العائلة: لربط جهاز طفل، أو لاسترجاع كل شيء لو حذفت التطبيق.</p>
+    <div class="code" id="famCode"></div>
+    <div class="qr" id="qr"></div>
+    <p class="muted" style="text-align:center;font-size:13px">صوّر الرمز من كاميرا التابلت، أو أرسل له الرابط</p>
+    <div class="row"><button class="btn" onclick="App.shareJoin()">إرسال رابط الربط</button><button class="btn alt" onclick="App.copyCode()">نسخ الرمز</button></div>
+  </div>
   <div class="card">
     <h2>الأطفال</h2>
     <div class="list" id="setKids"></div>
     <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
   </div>
   <div class="card">
-    <h2>كل القصص</h2>
-    <p class="muted">معاينة أي قصة (لوليّ الأمر فقط).</p>
-    <div class="list" id="allStories"></div>
+    <h2>وش ينادونكم العيال؟</h2>
+    <label>الأب</label><div class="chips" id="setDad"></div>
+    <label>الأم</label><div class="chips" id="setMom"></div>
   </div>
   <div class="card">
-    <h2>النسخة الاحتياطية</h2>
-    <p class="muted">انسخ الرمز واحفظه. لو حذفت التطبيق أو غيّرت الجهاز، أدخله ويرجع كل شيء.</p>
-    <textarea class="code" id="backupCode" readonly></textarea>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" onclick="App.copyBackup()">نسخ / مشاركة</button>
-      <button class="btn alt" onclick="App.openRestore()">استرجاع</button>
-    </div>
+    <h2>وقت القصة والإشعارات 🔔</h2>
+    <p class="muted" id="notifState"></p>
+    <button class="btn" id="notifBtn" onclick="App.enableNotif()">تفعيل الإشعارات على هذا الجهاز</button>
+    <div class="toggle"><b>تذكير وقت القصة</b><input type="checkbox" id="remindOn"></div>
+    <input class="inp" id="bedTime" type="time" style="direction:ltr;text-align:center">
+    <p class="muted" id="remindNote" style="margin-top:8px"></p>
+    <button class="btn alt" onclick="App.setBed()">حفظ</button>
+  </div>
+  <div class="card">
+    <h2>كل القصص (<span id="storyCount"></span>)</h2>
+    <input class="search" id="storySearch" placeholder="ابحث باسم القصة أو القيمة… مثل: الصدق" oninput="App.filterStories()">
+    <div class="list" id="allStories"></div>
   </div>
   <div class="card">
     <h2>رمز وليّ الأمر</h2>
@@ -219,8 +294,10 @@ label{display:block;font-weight:700;margin:12px 0 6px}
   <div class="card" style="text-align:center">
     <img src="icons/icon-192.png" alt="" style="width:64px;border-radius:16px">
     <h2 style="margin-top:6px">سِراج | SIRAJ</h2>
-    <p class="muted">الإصدار <b id="ver2"></b><br>قصص أصلية بأسماء أطفالك، وكل البيانات على جهازك فقط.</p>
-    <a href="https://wamdarc.com" target="_blank" rel="noopener" class="pill" style="text-decoration:none">WAMD ARC</a>
+    <p class="muted">الإصدار <b id="ver2"></b><br>قصص أصلية بأسماء أطفالك. أسماء الأطفال تنشفّر على جهازك قبل أي مزامنة.</p>
+    <button class="btn" onclick="App.shareApp()">شارك سِراج مع غيرك 📤</button>
+    <p style="margin:14px 0 6px"><a href="https://wamdarc.com" target="_blank" rel="noopener" class="pill" style="text-decoration:none">WAMD ARC</a></p>
+    <button class="btn ghost" onclick="App.unlink()" style="color:#D33;font-size:15px">فك ربط هذا الجهاز</button>
   </div>
 </section>
 
@@ -246,18 +323,33 @@ label{display:block;font-weight:700;margin:12px 0 6px}
   <button class="btn ghost" onclick="App.closeModal('pinModal')">إلغاء</button>
 </div></div>
 
-<!-- نافذة: الاسترجاع -->
-<div class="modal" id="restoreModal"><div class="card">
-  <h2>استرجاع النسخة الاحتياطية</h2>
-  <p class="muted">الصق الرمز اللي حفظته.</p>
-  <textarea class="code" id="restoreCode" placeholder="SIRAJ1-..."></textarea>
-  <div class="row" style="margin-top:12px"><button class="btn" onclick="App.doRestore()">استرجاع</button><button class="btn alt" onclick="App.closeModal('restoreModal')">إلغاء</button></div>
+<!-- نافذة: رمز العائلة -->
+<div class="modal" id="codeModal"><div class="card" style="text-align:center">
+  <div style="font-size:50px">🎉</div>
+  <h2 id="fcFirst">تم إنشاء عائلتك!</h2>
+  <p class="muted">هذا رمز عائلتك. احفظه، وبه تربط تابلت الأطفال.</p>
+  <div class="code" id="fcCode"></div>
+  <p class="muted" style="font-size:14px">في التابلت: افتح سِراج ← «جهاز طفل» ← أدخل الرمز.</p>
+  <div class="row"><button class="btn" onclick="App.shareJoin()">إرسال رابط الربط</button><button class="btn alt" onclick="App.copyCode()">نسخ</button></div>
+  <button class="btn ghost" onclick="App.closeModal('codeModal')">تم</button>
+</div></div>
+
+<!-- نافذة: الإشعارات -->
+<div class="modal" id="notifModal"><div class="card" style="text-align:center">
+  <div style="font-size:50px">🔔</div>
+  <h2>نفعّل الإشعارات؟</h2>
+  <p class="muted">نذكّركم بوقت القصة كل ليلة، ونوصل لك خبر إذا خلص الأطفال قصتهم.</p>
+  <button class="btn" onclick="App.enableNotif()">تفعيل</button>
+  <button class="btn ghost" onclick="App.closeModal('notifModal')">لاحقًا</button>
 </div></div>
 
 <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
+<script src="sync.js"></script>
 <script src="art.js"></script>
 <script src="stories.js"></script>
+<script src="stories-2.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
