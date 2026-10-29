@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B4BDB"/>
+      <stop offset="0.55" stop-color="#8E44C9"/>
+      <stop offset="1" stop-color="#E0559A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.42">
+      <stop offset="0" stop-color="#FFE27A" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#FFB547" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#FFB547" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lamp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD93D"/>
+      <stop offset="1" stop-color="#FF9F1C"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF6B0"/>
+      <stop offset="0.6" stop-color="#FFC93C"/>
+      <stop offset="1" stop-color="#FF7A1A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="1024" rx="0" fill="url(#bg)"/>
+
+  <!-- soft clouds -->
+  <ellipse cx="170" cy="830" rx="190" ry="70" fill="#FFFFFF" opacity="0.10"/>
+  <ellipse cx="880" cy="860" rx="210" ry="80" fill="#FFFFFF" opacity="0.10"/>
+
+  <!-- glow -->
+  <circle cx="512" cy="430" r="400" fill="url(#glow)"/>
+
+  <!-- crescent moon -->
+  <path d="M800 150 a95 95 0 1 0 70 165 a75 75 0 1 1 -70 -165z" fill="#FFF3C4"/>
+
+  <!-- colorful stars -->
+  <g>
+    <path d="M200 190 l18 40 44 5 -33 29 10 43 -39 -23 -39 23 10 -43 -33 -29 44 -5z" fill="#4DD8E6"/>
+    <path d="M330 110 l10 22 24 3 -18 16 5 24 -21 -13 -21 13 5 -24 -18 -16 24 -3z" fill="#7CF29C"/>
+    <path d="M150 470 l12 26 29 3 -22 19 7 28 -26 -15 -26 15 7 -28 -22 -19 29 -3z" fill="#FF8FB1"/>
+    <path d="M880 470 l14 30 33 4 -25 22 8 32 -30 -17 -30 17 8 -32 -25 -22 33 -4z" fill="#FFE066"/>
+    <circle cx="660" cy="130" r="10" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="260" cy="350" r="8" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="790" cy="380" r="9" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="430" cy="160" r="7" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <!-- flame -->
+  <path d="M512 215 C470 280 455 320 470 360 C482 392 542 392 554 360 C569 320 554 280 512 215z" fill="url(#flame)"/>
+  <path d="M512 290 C496 318 492 338 500 355 C506 367 518 367 524 355 C532 338 528 318 512 290z" fill="#FFFDE8"/>
+
+  <!-- wick -->
+  <rect x="504" y="378" width="16" height="26" rx="6" fill="#7A3E12"/>
+
+  <!-- lamp spout + body (oil lamp) -->
+  <path d="M380 470 C380 410 450 395 512 395 C600 395 650 420 690 440 L790 420 C815 416 822 440 805 452 L700 520 C680 590 610 620 512 620 C410 620 380 560 380 470z" fill="url(#lamp)"/>
+  <!-- handle -->
+  <path d="M385 455 C315 440 300 540 380 560" fill="none" stroke="#FF9F1C" stroke-width="30" stroke-linecap="round"/>
+  <!-- base -->
+  <rect x="430" y="610" width="164" height="34" rx="17" fill="#F2771F"/>
+  <rect x="400" y="638" width="224" height="34" rx="17" fill="#E8641A"/>
+
+  <!-- shine -->
+  <path d="M420 455 C430 430 460 420 490 418" fill="none" stroke="#FFF6C9" stroke-width="16" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- cute face -->
+  <path d="M465 505 q14 -16 28 0" fill="none" stroke="#5A2A0A" stroke-width="11" stroke-linecap="round"/>
+  <path d="M545 505 q14 -16 28 0" fill="none" stroke="#5A2A0A" stroke-width="11" stroke-linecap="round"/>
+  <path d="M495 545 q24 22 48 0" fill="none" stroke="#5A2A0A" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="450" cy="540" r="16" fill="#FF7A9C" opacity="0.7"/>
+  <circle cx="588" cy="540" r="16" fill="#FF7A9C" opacity="0.7"/>
+
+  <!-- WAMD ARC orange pill -->
+  <rect x="332" y="790" width="360" height="96" rx="48" fill="#FF6B1A"/>
+  <text x="512" y="855" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="50" letter-spacing="6" fill="#FFFFFF">WAMD ARC</text>
+</svg>

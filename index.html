@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>سِراج | SIRAJ</title>
+<meta name="description" content="قصص ما قبل النوم بأسماء أطفالك">
+<meta name="theme-color" content="#5B4BDB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="سِراج | SIRAJ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#5B4BDB;--bg2:#8E44C9;--bg3:#E0559A;
+  --card:#ffffff;--ink:#2B2350;--soft:#6E668F;
+  --orange:#FF6B1A;--yellow:#FFD93D;--mint:#4CD97B;--sky:#4DB8F0;--pink:#FF7AB6;
+  --night:#120F33;--night2:#221B55;
+  --r:24px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Baloo Bhaijaan 2",system-ui,sans-serif;color:var(--ink);
+  background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,var(--bg3));
+  background-attachment:fixed;overflow-x:hidden;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+button{font-family:inherit;cursor:pointer;border:0}
+input,select{font-family:inherit}
+.screen{display:none;min-height:100vh;padding:20px 16px 40px;max-width:760px;margin:0 auto}
+.screen.on{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:24px}
+.brand img{width:44px;height:44px;border-radius:12px;box-shadow:0 4px 12px #0003}
+.iconbtn{background:#ffffff26;color:#fff;width:46px;height:46px;border-radius:14px;font-size:22px;display:grid;place-items:center}
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 10px 30px #2b235033;margin-bottom:16px}
+h2{margin:0 0 6px;font-size:22px}
+.muted{color:var(--soft);font-size:15px;margin:0 0 12px}
+.btn{display:block;width:100%;padding:14px 18px;border-radius:18px;font-size:19px;font-weight:700;color:#fff;background:var(--orange);box-shadow:0 6px 0 #d4520e}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #d4520e}
+.btn.alt{background:#EFEAFF;color:var(--bg1);box-shadow:0 6px 0 #d5ccf7}
+.btn.ghost{background:transparent;color:var(--soft);box-shadow:none;font-weight:600}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+/* home */
+.hello{color:#fff;font-size:20px;margin:4px 4px 12px;font-weight:600}
+.kids{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.kid{background:#fff;border-radius:22px;padding:8px 10px 6px;text-align:center;width:110px;border:4px solid transparent;transition:.2s;position:relative}
+.kid.sel{border-color:var(--yellow);transform:scale(1.04);box-shadow:0 0 0 4px #FFD93D55}
+.kid .nm{font-weight:800;font-size:18px}
+.kid .badge{position:absolute;top:-10px;left:-6px;background:var(--orange);color:#fff;border-radius:12px;font-size:12px;padding:1px 8px;display:none}
+.kid.hero .badge{display:block}
+.tonight{position:relative;overflow:hidden;padding:0}
+.tonight .art{display:block;width:100%;height:auto;aspect-ratio:400/260}
+.tonight .info{padding:14px 18px 18px}
+.tonight .title{font-size:24px;font-weight:800;margin:0}
+.tag{display:inline-block;background:#FFF1D6;color:#B4630E;border-radius:10px;padding:2px 10px;font-size:14px;font-weight:700;margin-top:4px}
+.tabs{display:flex;gap:8px;margin:6px 0 14px}
+.tabs button{flex:1;padding:10px;border-radius:14px;background:#ffffff26;color:#fff;font-size:17px;font-weight:700}
+.tabs button.on{background:#fff;color:var(--bg1)}
+.lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.lib .item{background:#fff;border-radius:18px;overflow:hidden;text-align:right;padding:0}
+.lib .item .art{display:block;width:100%;height:auto;aspect-ratio:400/260}
+.lib .item div{padding:8px 10px;font-weight:700;font-size:15px}
+.empty{color:#fff;text-align:center;opacity:.85;padding:24px}
+/* reader */
+#reader{background:radial-gradient(circle at 50% 0,var(--night2),var(--night));color:#F4EFFF;padding:0;max-width:none;min-height:100vh}
+#reader.on{display:flex;flex-direction:column}
+.rtop{display:flex;justify-content:space-between;align-items:center;padding:14px 16px}
+.rtop .iconbtn{background:#ffffff1a}
+.stage{flex:1;display:flex;flex-direction:column;max-width:760px;width:100%;margin:0 auto;padding:0 16px}
+.stage .art{width:100%;height:auto;aspect-ratio:400/260;border-radius:24px;box-shadow:0 10px 40px #0006}
+.ptext{font-size:clamp(21px,4.6vw,28px);line-height:1.85;margin:20px 4px;font-weight:600}
+.ptext.anim{animation:fade .5s ease}
+.dots{display:flex;gap:6px;justify-content:center;margin:6px 0 4px}
+.dots i{width:9px;height:9px;border-radius:9px;background:#ffffff40}
+.dots i.on{background:var(--yellow);width:22px}
+.nav{display:flex;gap:12px;padding:14px 16px 22px;max-width:760px;width:100%;margin:0 auto}
+.nav .btn{font-size:20px}
+.q{background:#ffffff14;border:2px dashed #ffffff40;border-radius:22px;padding:18px;font-size:22px;line-height:1.8;text-align:center}
+.goodnight{text-align:center;padding-top:20px}
+.goodnight .moon{font-size:90px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.goodnight h1{font-size:34px;margin:8px 0}
+/* forms */
+label{display:block;font-weight:700;margin:12px 0 6px}
+.inp{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #E3DDF7;font-size:18px;background:#FBFAFF}
+.inp:focus{outline:none;border-color:var(--bg1)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:10px;border-radius:14px;background:#F2EFFC;font-size:17px;font-weight:700;color:var(--soft)}
+.seg button.on{background:var(--bg1);color:#fff}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #E3DDF7}
+.sw.on{box-shadow:0 0 0 3px var(--bg1)}
+.preview{display:grid;place-items:center;background:linear-gradient(160deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px;margin-bottom:6px}
+.list .li{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #EEE}
+.list .li:last-child{border:0}
+.list .li .nm{flex:1;font-weight:700;font-size:18px}
+.small{padding:8px 12px;border-radius:12px;font-size:15px;font-weight:700;background:#F2EFFC;color:var(--bg1)}
+.small.del{background:#FFE5E5;color:#D33}
+.code{width:100%;min-height:90px;font-family:monospace;font-size:13px;direction:ltr;text-align:left;padding:10px;border-radius:12px;border:2px solid #E3DDF7}
+/* modal */
+.modal{position:fixed;inset:0;background:#120F33cc;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:420px;margin:0}
+.pin{display:flex;gap:10px;justify-content:center;direction:ltr;margin:12px 0}
+.pin span{width:46px;height:56px;border-radius:14px;background:#F2EFFC;display:grid;place-items:center;font-size:28px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;direction:ltr}
+.pad button{padding:14px;border-radius:16px;background:#F2EFFC;font-size:24px;font-weight:700;color:var(--ink)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2B2350;color:#fff;padding:10px 18px;border-radius:14px;font-weight:700;z-index:60;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}
+/* welcome */
+#welcome{text-align:center;color:#fff;padding-top:8vh}
+#welcome img{width:130px;height:130px;border-radius:30px;box-shadow:0 12px 30px #0004}
+#welcome h1{font-size:40px;margin:14px 0 0}
+#welcome .steps{background:#fff;color:var(--ink);border-radius:var(--r);padding:16px;text-align:right;margin:20px 0;line-height:1.9}
+.foot{text-align:center;color:#ffffffaa;font-size:13px;margin-top:20px}
+.foot a{color:#fff}
+.pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
+</style>
+</head>
+<body>
+
+<!-- شاشة الترحيب وإضافة التطبيق للشاشة الرئيسية -->
+<section id="welcome" class="screen">
+  <img src="icons/icon-512.png" alt="">
+  <h1>سِراج</h1>
+  <p style="font-size:19px;margin:4px 0">قصص ما قبل النوم، أبطالها أطفالك ✨</p>
+  <div class="steps" id="installSteps"></div>
+  <button class="btn" id="installBtn" style="display:none">أضف سِراج للشاشة الرئيسية</button>
+  <button class="btn ghost" style="color:#fff" onclick="App.skipWelcome()">متابعة في المتصفح</button>
+</section>
+
+<!-- الإعداد الأول -->
+<section id="setup" class="screen">
+  <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">سِراج</div></div>
+  <div class="card">
+    <h2>أهلًا بك 👋</h2>
+    <p class="muted">أضف أطفالك ليصيروا أبطال القصص. كل البيانات تبقى على هذا الجهاز فقط.</p>
+    <div class="list" id="setupKids"></div>
+    <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
+  </div>
+  <div class="card">
+    <h2>رمز وليّ الأمر 🔒</h2>
+    <p class="muted">٤ أرقام تحمي الإعدادات من الصغار.</p>
+    <input class="inp" id="setupPin" type="tel" inputmode="numeric" maxlength="4" placeholder="مثال: 2580" style="direction:ltr;text-align:center;letter-spacing:8px">
+  </div>
+  <button class="btn" onclick="App.finishSetup()">ابدأ الحكايات 🌙</button>
+  <button class="btn ghost" style="color:#fff;margin-top:8px" onclick="App.openRestore()">عندي رمز نسخة احتياطية</button>
+</section>
+
+<!-- الرئيسية -->
+<section id="home" class="screen">
+  <div class="top">
+    <div class="brand"><img src="icons/icon-192.png" alt="">سِراج</div>
+    <button class="iconbtn" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button>
+  </div>
+  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">قصة الليلة</button><button id="tabLib" onclick="App.tab('lib')">مكتبتي</button></div>
+  <div id="paneTonight">
+    <p class="hello" id="hello"></p>
+    <div class="kids" id="kids"></div>
+    <p class="hello" style="font-size:15px;text-align:center;opacity:.85;margin-top:10px">اختر أبطال الليلة، وأول من تختاره هو البطل ⭐</p>
+    <div class="card tonight" id="tonightCard"></div>
+  </div>
+  <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
+  <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
+</section>
+
+<!-- قارئ القصة -->
+<section id="reader" class="screen">
+  <div class="rtop">
+    <button class="iconbtn" onclick="App.closeReader()" aria-label="إغلاق">✕</button>
+    <div class="row" style="flex:0;gap:8px">
+      <button class="iconbtn" id="favBtn" onclick="App.toggleFav()" aria-label="مفضلة">☆</button>
+      <button class="iconbtn" id="voiceBtn" onclick="App.toggleVoice()" aria-label="قراءة بصوت">🔈</button>
+    </div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="nav" id="nav"></div>
+</section>
+
+<!-- الإعدادات -->
+<section id="settings" class="screen">
+  <div class="top">
+    <div class="brand">⚙️ الإعدادات</div>
+    <button class="iconbtn" onclick="App.show('home')" aria-label="رجوع">→</button>
+  </div>
+  <div class="card">
+    <h2>الأطفال</h2>
+    <div class="list" id="setKids"></div>
+    <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
+  </div>
+  <div class="card">
+    <h2>كل القصص</h2>
+    <p class="muted">معاينة أي قصة (لوليّ الأمر فقط).</p>
+    <div class="list" id="allStories"></div>
+  </div>
+  <div class="card">
+    <h2>النسخة الاحتياطية</h2>
+    <p class="muted">انسخ الرمز واحفظه. لو حذفت التطبيق أو غيّرت الجهاز، أدخله ويرجع كل شيء.</p>
+    <textarea class="code" id="backupCode" readonly></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" onclick="App.copyBackup()">نسخ / مشاركة</button>
+      <button class="btn alt" onclick="App.openRestore()">استرجاع</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>رمز وليّ الأمر</h2>
+    <div class="row"><input class="inp" id="newPin" type="tel" inputmode="numeric" maxlength="4" placeholder="رمز جديد" style="direction:ltr;text-align:center;letter-spacing:8px"><button class="btn alt" onclick="App.changePin()">تغيير</button></div>
+  </div>
+  <div class="card" style="text-align:center">
+    <img src="icons/icon-192.png" alt="" style="width:64px;border-radius:16px">
+    <h2 style="margin-top:6px">سِراج | SIRAJ</h2>
+    <p class="muted">الإصدار <b id="ver2"></b><br>قصص أصلية بأسماء أطفالك، وكل البيانات على جهازك فقط.</p>
+    <a href="https://wamdarc.com" target="_blank" rel="noopener" class="pill" style="text-decoration:none">WAMD ARC</a>
+  </div>
+</section>
+
+<!-- نافذة: تعديل طفل -->
+<div class="modal" id="kidModal"><div class="card" style="max-height:92vh;overflow:auto">
+  <h2 id="kidTitle">طفل جديد</h2>
+  <div class="preview" id="kidPreview"></div>
+  <label>الاسم</label><input class="inp" id="kidName" maxlength="20" placeholder="اسم الطفل">
+  <label>ولد أو بنت</label><div class="seg" id="kidG"><button data-v="m">ولد</button><button data-v="f">بنت</button></div>
+  <label>العمر</label><div class="seg" id="kidAge"><button data-v="1">٣-٥</button><button data-v="2">٦-٨</button><button data-v="3">٩-١٢</button></div>
+  <label>لون البشرة</label><div class="swatches" id="kidSkin"></div>
+  <label id="hairLbl">لون الشعر</label><div class="swatches" id="kidHair"></div>
+  <label>اللون المفضل</label><div class="swatches" id="kidShirt"></div>
+  <div id="hijabRow"><label>الحجاب</label><div class="seg" id="kidHijab"><button data-v="0">بدون</button><button data-v="1">مع حجاب</button></div></div>
+  <div class="row" style="margin-top:16px"><button class="btn" onclick="App.saveKid()">حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div>
+</div></div>
+
+<!-- نافذة: رمز وليّ الأمر -->
+<div class="modal" id="pinModal"><div class="card" style="text-align:center">
+  <h2>رمز وليّ الأمر 🔒</h2>
+  <div class="pin" id="pinDots"></div>
+  <div class="pad" id="pinPad"></div>
+  <button class="btn ghost" onclick="App.closeModal('pinModal')">إلغاء</button>
+</div></div>
+
+<!-- نافذة: الاسترجاع -->
+<div class="modal" id="restoreModal"><div class="card">
+  <h2>استرجاع النسخة الاحتياطية</h2>
+  <p class="muted">الصق الرمز اللي حفظته.</p>
+  <textarea class="code" id="restoreCode" placeholder="SIRAJ1-..."></textarea>
+  <div class="row" style="margin-top:12px"><button class="btn" onclick="App.doRestore()">استرجاع</button><button class="btn alt" onclick="App.closeModal('restoreModal')">إلغاء</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="art.js"></script>
+<script src="stories.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
