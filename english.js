@@ -1,4 +1,4 @@
-/* سِراج | SIRAJ — تعلّم الإنجليزي: حروف (٣-٥)، كلمات (٦-٨)، جمل (٩-١٢) */
+/* سِراج | SIRAJ — تعلّم الإنجليزي: حروف (٣-٥)، كلمات وجمل (٦-٨)، متقدّم (٩-١٢: قراءة، مفردات، قواعد، محادثات، إملاء) */
 const EN = (() => {
   const $ = (id) => document.getElementById(id);
   const C = () => App.ctx();
@@ -29,7 +29,8 @@ const EN = (() => {
     ['The camel is big.', 'الجمل كبير.', '🐪'], ['I am sleepy.', 'أنا نعسان.', '😴'], ['I have a red pen.', 'عندي قلم أحمر.', '🖊️'], ['The cake is sweet.', 'الكعكة حلوة.', '🍰']
   ];
 
-  let level = null, cat = Object.keys(WORDS)[0], G = null;
+  const A = typeof EN_ADV !== 'undefined' ? EN_ADV : { READ: [], VOCAB: {}, GRAM: [], DLG: [] };
+  let level = null, cat = Object.keys(WORDS)[0], G = null, sub = 'read', vcat = Object.keys(A.VOCAB)[0];
   const name = () => { const k = C().heroes()[0] || C().myKids()[0]; return k ? k.name : 'Sara'; };
   const nm = (s) => s.replace(/\{n\}/g, name());
   const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -44,7 +45,7 @@ const EN = (() => {
     speechSynthesis.speak(u);
   }
 
-  function defLevel() { const k = C().heroes()[0] || C().myKids()[0]; return !k ? 'letters' : k.age >= 3 ? 'sent' : k.age === 2 ? 'words' : 'letters'; }
+  function defLevel() { const k = C().heroes()[0] || C().myKids()[0]; return !k ? 'letters' : k.age >= 3 ? 'adv' : k.age === 2 ? 'words' : 'letters'; }
   function render() {
     const c = C();
     if (c.isNight()) {
@@ -52,7 +53,7 @@ const EN = (() => {
       return;
     }
     level = level || defLevel();
-    const lv = [['letters', '🔤 حروف', '٣-٥'], ['words', '🧩 كلمات', '٦-٨'], ['sent', '💬 جمل', '٩-١٢']];
+    const lv = [['letters', '🔤 حروف', '٣-٥'], ['words', '🧩 كلمات', '٦-٨'], ['sent', '💬 جمل', '٦-٩'], ['adv', '🚀 متقدّم', '٩-١٢']];
     let body = '';
     if (level === 'letters') {
       body = `<div class="card"><h2>حروف الإنجليزي 🔤</h2><p class="muted">اضغط الحرف واسمعه</p>
@@ -63,6 +64,8 @@ const EN = (() => {
         <div class="chips libchips">${Object.keys(WORDS).map((k) => `<button class="chip ${k === cat ? 'on' : ''}" onclick="EN.setCat('${k}')">${k}</button>`).join('')}</div>
         <div class="words">${WORDS[cat].map((w, i) => `<button class="wd" onclick="EN.word(${i})"><span>${w[2]}</span><b>${w[0]}</b><small>${w[1]}</small></button>`).join('')}</div>
         <button class="btn" style="margin-top:12px" onclick="EN.game('words')">🎧 لعبة: اسمع واختار</button></div>`;
+    } else if (level === 'adv') {
+      body = advBody(c);
     } else {
       body = `<div class="card"><h2>جمل إنجليزي 💬</h2><p class="muted">اضغط الجملة واسمعها</p>
         <div class="sents">${SENT.map((x, i) => `<button class="sn" onclick="EN.sent(${i})"><span>${x[2]}</span><div><b dir="ltr">${c.esc(nm(x[0]))}</b><small>${c.esc(nm(x[1]))}</small></div></button>`).join('')}</div>
@@ -70,6 +73,58 @@ const EN = (() => {
     }
     $('eng').innerHTML = `<div class="seg enlv">${lv.map(([v, t, a]) => `<button class="${v === level ? 'on' : ''}" onclick="EN.setLevel('${v}')">${t}<small>${a}</small></button>`).join('')}</div>${body}`;
   }
+  /* ---- المستوى المتقدّم ---- */
+  const SUBS = [['read', '📖 قراءة'], ['vocab', '🧠 مفردات'], ['gram', '📐 قواعد'], ['dlg', '💬 محادثات'], ['spell', '🎧 إملاء']];
+  const LV = ['', '⭐', '⭐⭐', '⭐⭐⭐'];
+  const q1 = (t) => t.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  function advBody(c) {
+    const tabs = `<div class="ensub">${SUBS.map(([v, t]) => `<button class="chip ${v === sub ? 'on' : ''}" onclick="EN.setSub('${v}')">${t}</button>`).join('')}</div>`;
+    let x = '';
+    if (sub === 'read') x = `<p class="muted">اقرأ القصة، اضغط أي جملة واسمعها، وبعدين جاوب الأسئلة</p>
+      <div class="rlist">${A.READ.map((r, i) => `<button class="rcard" onclick="EN.reading(${i})"><span>${r.e}</span><b>${c.esc(r.t)}</b><small>${LV[r.lv]} · ${r.en.split(' ').length} كلمة</small></button>`).join('')}</div>`;
+    if (sub === 'vocab') x = `<div class="chips libchips">${Object.keys(A.VOCAB).map((k) => `<button class="chip ${k === vcat ? 'on' : ''}" onclick="EN.setVcat('${k}')">${k}</button>`).join('')}</div>
+      <div class="vlist">${A.VOCAB[vcat].map((w, i) => `<button class="vrow" onclick="EN.vword(${i})"><span>${w[2]}</span><div><b>${c.esc(w[0])}</b><em>${c.esc(w[1])}</em><small>${c.esc(w[3])}</small></div></button>`).join('')}</div>
+      <div class="row" style="margin-top:12px"><button class="btn" onclick="EN.game('vocab')">❓ وش معناها؟</button><button class="btn alt" onclick="EN.game('abuild')">🧱 رتّب الجملة</button></div>`;
+    if (sub === 'gram') x = A.GRAM.map((g, i) => `<div class="gl"><h3>${c.esc(g.a)} <small class="muted" dir="ltr">${c.esc(g.t)}</small></h3><p>${c.esc(g.r)}</p>
+      ${g.ex.map((e) => `<div class="ex" onclick="EN.say('${q1(e[0])}')">🔊 ${c.esc(e[0])}<small>${c.esc(e[1])}</small></div>`).join('')}
+      <button class="btn alt" style="margin-top:6px" onclick="EN.game('gram', ${i})">✏️ تمرين (٥ أسئلة)</button></div>`).join('') +
+      `<button class="btn" onclick="EN.game('gram', -1)">🏆 اختبار شامل في القواعد</button>`;
+    if (sub === 'dlg') x = `<p class="muted">محادثات يومية، وأنت{|ِ} أحد الشخصيات! اضغط أي جملة واسمعها</p>
+      <div class="rlist">${A.DLG.map((d, i) => `<button class="rcard" onclick="EN.dialog(${i})"><span>${d.e}</span><b>${c.esc(d.t)}</b><small>${d.l.length} جمل</small></button>`).join('')}</div>`;
+    if (sub === 'spell') x = `<p class="muted">تسمع الكلمة وتكتبها بالإنجليزي. فيه تلميح لو احتجت 💡</p>
+      <div class="row"><button class="btn" onclick="EN.game('spell')">🎧 ابدأ الإملاء</button></div>`;
+    const k = c.heroes()[0] || c.myKids()[0], f = k && k.g === 'f';
+    return `<div class="card"><h2>إنجليزي متقدّم 🚀</h2>${tabs}${x.replace(/\{\|ِ\}/g, f ? 'ِ' : '')}</div>`;
+  }
+  function setSub(v) { sub = v; render(); }
+  function setVcat(k) { vcat = k; render(); }
+  function vword(i) { const w = A.VOCAB[vcat][i]; say(w[0] + '. ' + w[3]); show(`<div class="bige">${w[2]}</div><p class="ent">${C().esc(w[0])}</p><p class="muted">${C().esc(w[1])}</p><p class="gq">${C().esc(w[3])}</p><button class="btn alt" onclick="EN.vword(${i})">🔊 اسمع مرة ثانية</button>`); }
+  function reading(i) {
+    const r = A.READ[i], c = C(), sents = r.en.match(/[^.!?]+[.!?]+["”]?/g) || [r.en];
+    show(`<div class="bige" style="font-size:54px">${r.e}</div><p class="ent" style="font-size:22px">${c.esc(r.t)}</p>
+      <div class="passage">${sents.map((x, k) => `<span class="sx" onclick="EN.sx(this,${i},${k})">${c.esc(x.trim())}</span> `).join('')}</div>
+      <div id="artr" class="artr" style="display:none">${c.esc(r.ar)}</div>
+      <div class="row"><button class="btn alt" onclick="EN.say('${q1(r.en)}')">🔊 اسمع القصة</button><button class="btn alt" onclick="EN.tr()">🇸🇦 الترجمة</button></div>
+      <button class="btn" style="margin-top:10px" onclick="EN.game('read', ${i})">❓ جاوب الأسئلة</button>`);
+    $('gameBody').querySelector('.encard').style.textAlign = 'center';
+  }
+  function sx(el, i, k) {
+    const r = A.READ[i], sents = r.en.match(/[^.!?]+[.!?]+["”]?/g) || [r.en];
+    document.querySelectorAll('.passage .sx').forEach((e) => e.classList.remove('on')); el.classList.add('on'); say(sents[k].trim());
+  }
+  function tr() { const e = $('artr'); if (e) e.style.display = e.style.display === 'none' ? '' : 'none'; }
+  function dialog(i) {
+    const d = A.DLG[i], c = C(), me = name();
+    show(`<div class="bige" style="font-size:54px">${d.e}</div><p class="ent" style="font-size:22px">${c.esc(d.t)}</p>
+      <div class="dlg">${d.l.map((l, k) => `<div class="dl ${l[0]}" onclick="EN.say('${q1(nm(l[1]))}')"><b>${c.esc(l[0] === 'a' ? me : d.b)}</b>${c.esc(nm(l[1]))}<small>${c.esc(nm(l[2]))}</small></div>`).join('')}</div>
+      <button class="btn alt" onclick="EN.playDlg(${i})">▶ شغّل المحادثة كاملة</button>`);
+  }
+  function playDlg(i) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel(); const v = enVoice();
+    A.DLG[i].l.forEach((l) => { const u = new SpeechSynthesisUtterance(nm(l[1])); if (v) u.voice = v; u.lang = v ? v.lang : 'en-US'; u.rate = 0.85; u.pitch = l[0] === 'a' ? 1.25 : 0.9; speechSynthesis.speak(u); });
+  }
+
   function setLevel(v) { level = v; render(); }
   function setCat(k) { cat = k; render(); }
   function letter(i) { const l = LETTERS[i]; say(l[0] + '. ' + l[1]); show(`<div class="big">${l[0]} <small>${l[0].toLowerCase()}</small></div><div class="bige">${l[3]}</div><p class="ent">${l[1]}</p><p class="muted">${l[2]}</p><button class="btn alt" onclick="EN.say('${l[0]}. ${l[1]}')">🔊 اسمع مرة ثانية</button>`); }
@@ -78,13 +133,22 @@ const EN = (() => {
   function show(html) { $('gameBody').innerHTML = `<div class="encard">${html}</div>`; $('gameModal').classList.add('on'); }
 
   /* ---- الألعاب: ٥ جولات، وفي الآخر ملصق ---- */
-  function game(kind) {
+  function game(kind, arg) {
     let qs = [];
     if (kind === 'letters') qs = shuffle(LETTERS).slice(0, 5).map((l) => ({ say: l[0], a: l[0], o: shuffle([l[0], ...shuffle(LETTERS.filter((x) => x !== l).map((x) => x[0])).slice(0, 2)]), big: true, q: 'اسمع الحرف، ووين هو؟' }));
     if (kind === 'words') { const all = Object.values(WORDS).flat(); qs = shuffle(WORDS[cat]).slice(0, 5).map((w) => ({ say: w[0], a: w[2], o: shuffle([w[2], ...shuffle(all.filter((x) => x[2] !== w[2])).slice(0, 2).map((x) => x[2])]), big: true, q: 'اسمع الكلمة، ووين صورتها؟' })); }
     if (kind === 'mean') qs = shuffle(SENT).slice(0, 5).map((x) => ({ say: nm(x[0]), show: nm(x[0]), a: nm(x[1]), o: shuffle([nm(x[1]), ...shuffle(SENT.filter((y) => y !== x)).slice(0, 2).map((y) => nm(y[1]))]), q: 'وش معنى الجملة؟' }));
     if (kind === 'build') qs = shuffle(SENT.filter((x) => x[0].split(' ').length <= 5)).slice(0, 5).map((x) => ({ build: true, words: nm(x[0]).split(' '), ar: nm(x[1]), say: nm(x[0]) }));
-    G = { kind, qs, i: 0, score: 0, picked: null, built: [] };
+    const mcq = (row, extra) => Object.assign({ a: row[1], o: shuffle(row.slice(1)), en: true }, extra);
+    if (kind === 'read') { const r = A.READ[arg]; qs = r.q.map((x) => mcq(x, { show: x[0], say: x[0], q: r.e + ' ' + r.t })); }
+    if (kind === 'gram') {
+      const src = arg >= 0 ? A.GRAM[arg].quiz : shuffle(A.GRAM.flatMap((g) => g.quiz)).slice(0, 8);
+      qs = src.map((x) => mcq(x, { gq: x[0], say: x[0].replace('___', x[1]), mute: true, q: 'اختر الكلمة الصحيحة' }));
+    }
+    if (kind === 'vocab') { const all = Object.values(A.VOCAB).flat(); qs = shuffle(A.VOCAB[vcat]).slice(0, 6).map((w) => ({ say: w[0], show: w[0], a: w[1], o: shuffle([w[1], ...shuffle(all.filter((x) => x[1] !== w[1])).slice(0, 3).map((x) => x[1])]), q: 'وش معنى الكلمة؟' })); }
+    if (kind === 'abuild') qs = shuffle(A.VOCAB[vcat].filter((w) => w[3].split(' ').length <= 8)).slice(0, 5).map((w) => ({ build: true, words: w[3].split(' '), ar: w[2] + ' ' + w[1], say: w[3] }));
+    if (kind === 'spell') { const all = Object.values(A.VOCAB).flat().filter((w) => /^[a-z]{4,10}$/.test(w[0])); qs = shuffle(all).slice(0, 6).map((w) => ({ spell: true, a: w[0], say: w[0], hint: w[2] + ' ' + w[1] })); }
+    G = { kind, arg, qs, i: 0, score: 0, picked: null, built: [], typed: null, hint: 0 };
     draw();
     $('gameModal').classList.add('on');
   }
@@ -93,11 +157,22 @@ const EN = (() => {
     if (!it) {
       const stars = '⭐'.repeat(G.score) + '☆'.repeat(G.qs.length - G.score);
       $('gameBody').innerHTML = `<h2>🎉 Great job!</h2><div class="celebrate" style="font-size:28px">${stars}</div><p class="ptext" style="color:var(--ink);text-align:center">${G.score >= 4 ? 'Excellent! ممتاز 🏆' : G.score >= 2 ? 'Good! زين، كمّل 👏' : 'Try again! جرّب مرة ثانية 💪'}</p>
-        <div class="row"><button class="btn" onclick="EN.game('${G.kind}')">العب مرة ثانية 🔁</button><button class="btn alt" onclick="Play.closeGame()">إغلاق</button></div>`;
-      Play.logAct('en', { id: 'en-' + G.kind }, G.score);
+        <div class="row"><button class="btn" onclick="EN.game('${G.kind}'${G.arg != null ? ', ' + G.arg : ''})">العب مرة ثانية 🔁</button><button class="btn alt" onclick="Play.closeGame()">إغلاق</button></div>`;
+      Play.logAct('en', { id: 'en-' + G.kind + (G.arg != null && G.arg >= 0 ? '-' + G.arg : '') }, Math.round(G.score * 5 / G.qs.length));
       return;
     }
-    const head = `<h2>${{ letters: '🎯 وين الحرف؟', words: '🎧 اسمع واختار', mean: '❓ وش معناها؟', build: '🧱 رتّب الجملة' }[G.kind]} <small class="muted">${G.i + 1}/${G.qs.length}</small></h2>`;
+    const head = `<h2>${{ letters: '🎯 وين الحرف؟', words: '🎧 اسمع واختار', mean: '❓ وش معناها؟', build: '🧱 رتّب الجملة', abuild: '🧱 رتّب الجملة', read: '📖 فهم المقروء', gram: '📐 تمرين قواعد', vocab: '🧠 وش معناها؟', spell: '🎧 إملاء' }[G.kind]} <small class="muted">${G.i + 1}/${G.qs.length}</small></h2>`;
+    if (it.spell) {
+      const done = G.typed != null, ok = done && G.typed === it.a;
+      $('gameBody').innerHTML = `${head}<p class="ptext" style="color:var(--ink)">اسمع الكلمة واكتبها</p>
+        <button class="btn alt" onclick="EN.say('${it.say}')">🔊 اسمع</button>
+        ${G.hint ? `<p class="muted" style="font-size:18px">💡 ${c.esc(it.hint)} · تبدأ بـ <b dir="ltr">${it.a[0]}</b> · ${it.a.length} حروف</p>` : ''}
+        <input id="spellIn" class="spell" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" ${done ? 'disabled' : ''} value="${done ? c.esc(G.typed) : ''}" onkeydown="if(event.key==='Enter')EN.check()">
+        ${done ? `<p class="fb">${ok ? '✅ Perfect! صح' : '💡 الصحيح: <b dir="ltr">' + it.a + '</b>'}</p><button class="btn" onclick="EN.next(0)">التالي ←</button>`
+          : `<div class="row"><button class="btn" onclick="EN.check()">تحقّق ✓</button>${G.hint ? '' : '<button class="btn alt" onclick="EN.hint()">💡 تلميح</button>'}</div>`}`;
+      if (!done) { setTimeout(() => say(it.say), 250); const el = $('spellIn'); if (el) el.focus(); }
+      return;
+    }
     if (it.build) {
       const left = it.pool || (it.pool = shuffle(it.words.map((w, k) => ({ w, k }))));
       const done = G.built.length === it.words.length, ok = done && G.built.map((x) => x.w).join(' ') === it.words.join(' ');
@@ -108,16 +183,18 @@ const EN = (() => {
       return;
     }
     const ans = G.picked != null;
-    $('gameBody').innerHTML = `${head}<p class="ptext" style="color:var(--ink)">${c.esc(it.q)}</p>${it.show ? `<p class="ent" dir="ltr">${c.esc(it.show)}</p>` : ''}
-      <button class="btn alt" onclick="EN.say('${it.say.replace(/'/g, "\\'")}')">🔊 اسمع</button>
-      <div class="opts ${it.big ? 'big' : ''}">${it.o.map((o, k) => `<button class="opt ${ans ? (o === it.a ? 'ok' : k === G.picked ? 'no' : '') : ''}" ${ans ? 'disabled' : `onclick="EN.answer(${k})"`}>${c.esc(o)}</button>`).join('')}</div>
+    $('gameBody').innerHTML = `${head}<p class="ptext" style="color:var(--ink)">${c.esc(it.q)}</p>${it.gq ? `<p class="gq">${c.esc(ans ? it.say : it.gq)}</p>` : it.show ? `<p class="ent" dir="ltr" ${it.en ? 'style="font-size:20px"' : ''}>${c.esc(it.show)}</p>` : ''}
+      ${it.mute && !ans ? '' : `<button class="btn alt" onclick="EN.say('${it.say.replace(/'/g, "\\'")}')">🔊 اسمع</button>`}
+      <div class="opts ${it.big ? 'big' : ''} ${it.en ? 'en' : ''}">${it.o.map((o, k) => `<button class="opt ${ans ? (o === it.a ? 'ok' : k === G.picked ? 'no' : '') : ''}" ${ans ? 'disabled' : `onclick="EN.answer(${k})"`}>${c.esc(o)}</button>`).join('')}</div>
       ${ans ? `<p class="fb">${it.o[G.picked] === it.a ? '✅ Yes! صح' : '💡 الجواب: ' + c.esc(it.a)}</p><button class="btn" onclick="EN.next(0)">التالي ←</button>` : ''}`;
-    if (!ans) setTimeout(() => say(it.say), 250);
+    if (!ans && !it.mute) setTimeout(() => say(it.say), 250);
   }
-  function answer(k) { const it = G.qs[G.i]; G.picked = k; if (it.o[k] === it.a) G.score++; draw(); }
+  function answer(k) { const it = G.qs[G.i]; G.picked = k; if (it.o[k] === it.a) G.score++; draw(); if (it.mute) say(it.say); }
+  function check() { const it = G.qs[G.i], v = (($('spellIn') || {}).value || '').trim().toLowerCase(); if (!v) return; G.typed = v; if (v === it.a) G.score++; draw(); }
+  function hint() { G.hint = 1; draw(); }
   function pick(k) { const it = G.qs[G.i]; G.built.push(it.pool[k]); if (G.built.length === it.words.length) say(it.say); draw(); }
   function unpick(k) { G.built.splice(k, 1); draw(); }
-  function next(add) { G.score += add || 0; G.i++; G.picked = null; G.built = []; draw(); }
+  function next(add) { G.score += add || 0; G.i++; G.picked = null; G.built = []; G.typed = null; G.hint = 0; draw(); }
 
-  return { render, setLevel, setCat, letter, word, sent, say, game, answer, pick, unpick, next };
+  return { render, setLevel, setCat, letter, word, sent, say, game, answer, pick, unpick, next, setSub, setVcat, vword, reading, sx, tr, dialog, playDlg, check, hint };
 })();

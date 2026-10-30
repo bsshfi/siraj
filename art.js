@@ -205,6 +205,35 @@ const ART = (() => {
       <g fill="#fff" opacity=".75"><ellipse cx="120" cy="110" rx="60" ry="12"/><ellipse cx="300" cy="95" rx="70" ry="12"/></g>
       ${[30, 70, 330, 370].map((x) => `<path d="M${x} 230 l14 -38 l14 38z" fill="#2A6E3A"/>`).join('')}
       <path d="M40 30 L360 70" stroke="#6E668F" stroke-width="2"/><rect x="180" y="45" width="26" height="20" rx="4" fill="#FF6B6B"/>`,
+    /* v2.5 مشاهد تراثية لقصص الأنبياء (بلا أي أشخاص) */
+    hills: `<defs><linearGradient id="sl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7C98B"/><stop offset="1" stop-color="#FFF0D6"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sl)"/><circle cx="80" cy="60" r="26" fill="#FFE08A"/>
+      <path d="M0 175 L70 85 L120 130 L200 45 L270 125 L330 75 L400 140 V260 H0Z" fill="#B9825A"/>
+      <path d="M200 45 L215 70 L190 72Z M70 85 L82 100 L60 102Z" fill="#D6A27A"/>
+      <path d="M0 210 L90 150 L170 200 L260 155 L400 205 V260 H0Z" fill="#8C5E3C"/>
+      <path d="M0 232 Q200 214 400 232 V260 H0Z" fill="#E9B97A"/>
+      <path d="M150 128 q10 -14 20 0z" fill="#4A2F1F" opacity=".7"/>`,
+    souq: `<defs><linearGradient id="so" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD9A0"/><stop offset="1" stop-color="#FFF4E0"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#so)"/>
+      <rect y="70" width="400" height="140" fill="#E8C49A"/>
+      ${[0, 1, 2].map((k) => `<path d="M${20 + k * 130} 210 V115 Q${75 + k * 130} 70 ${130 + k * 130} 115 V210Z" fill="#C99566"/><path d="M${34 + k * 130} 210 V122 Q${75 + k * 130} 88 ${116 + k * 130} 122 V210Z" fill="#7A4E2D"/>`).join('')}
+      ${[0, 1, 2].map((k) => `<path d="M${10 + k * 130} 120 L${140 + k * 130} 120 L${130 + k * 130} 140 L${20 + k * 130} 140Z" fill="${['#E85D5D', '#4DB8A8', '#F2B84B'][k]}"/><path d="M${10 + k * 130} 140 ${[0, 1, 2, 3, 4, 5].map((j) => `q${10.8} 10 ${21.6} 0`).join(' ')}" fill="${['#E85D5D', '#4DB8A8', '#F2B84B'][k]}"/>`).join('')}
+      <rect y="208" width="400" height="52" fill="#D9A86C"/>
+      ${[40, 70, 175, 300, 330].map((x, i) => `<path d="M${x} 222 q-12 0 -12 -14 q0 -12 12 -16 q12 4 12 16 q0 14 -12 14z" fill="${i % 2 ? '#B5643B' : '#C97B4A'}"/><rect x="${x - 4}" y="188" width="8" height="6" fill="#8C4A2A"/>`).join('')}
+      <ellipse cx="240" cy="222" rx="26" ry="8" fill="#8C5E3C"/><g fill="#F2C94C">${[226, 236, 246, 256].map((x) => `<circle cx="${x}" cy="216" r="5"/>`).join('')}</g>`,
+    oldhome: `<rect width="400" height="260" fill="#C9A27A"/>
+      <g fill="#B88E66" opacity=".7">${Array.from({ length: 18 }, (_, k) => `<rect x="${(k * 67) % 400}" y="${20 + ((k * 41) % 150)}" width="34" height="12" rx="3"/>`).join('')}</g>
+      <path d="M250 150 V80 Q290 40 330 80 V150Z" fill="#241C4A"/>${stars(14, 9, 400, 140).replace(/<circle cx="(\d+)" cy="(\d+)"/g, (m, x, y) => (+x > 254 && +x < 326 && +y > 70 && +y < 148 ? m : '<circle cx="-9" cy="-9"'))}
+      <path d="M296 92 a10 10 0 1 0 8 16 a8 8 0 1 1 -8 -16z" fill="#FFE27A"/>
+      <path d="M250 150 V80 Q290 40 330 80 V150" fill="none" stroke="#8C5E3C" stroke-width="6"/>
+      <rect y="200" width="400" height="60" fill="#9C6B45"/><rect x="40" y="212" width="250" height="34" rx="6" fill="#B5333A"/>
+      <path d="M40 220 H290 M40 238 H290" stroke="#F2C94C" stroke-width="3" stroke-dasharray="8 6"/>
+      <path d="M78 118 q14 -8 28 0 l-4 10 h-20z" fill="#C98B3A"/><path d="M92 104 q5 6 0 12 q-5 -6 0 -12z" fill="#FFB52E"/><circle cx="92" cy="112" r="16" fill="#FFD27A" opacity=".25"/>`,
+    fields: `<defs><linearGradient id="si" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BE1FF"/><stop offset="1" stop-color="#FFF8E1"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#si)"/><circle cx="60" cy="50" r="24" fill="#FFD93D"/>
+      <path d="M0 175 Q200 155 400 175 V260 H0Z" fill="#E8C35A"/>
+      <g stroke="#C9962E" stroke-width="3" stroke-linecap="round">${Array.from({ length: 26 }, (_, k) => { const x = 8 + k * 15, y = 190 + (k % 3) * 8; return `<line x1="${x}" y1="${y + 40}" x2="${x}" y2="${y}"/><ellipse cx="${x}" cy="${y - 4}" rx="3.5" ry="8" fill="#F2C94C" stroke="none"/>`; }).join('')}</g>
+      ${[300, 350].map((x) => `<path d="M${x} 175 q4 -50 0 -90" stroke="#8C5E3C" stroke-width="7" fill="none"/><g fill="#3E9150">${[-60, -25, 15, 50].map((a) => `<path d="M${x} 85 q${a * .9} ${-10 + Math.abs(a) * .2} ${a * 1.2} ${20 + Math.abs(a) * .3}" stroke="#3E9150" stroke-width="7" fill="none" stroke-linecap="round"/>`).join('')}</g>`).join('')}`,
     farm: `<defs><linearGradient id="sf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BE1FF"/><stop offset="1" stop-color="#FFF8E1"/></linearGradient></defs>
       <rect width="400" height="260" fill="url(#sf)"/><circle cx="60" cy="50" r="24" fill="#FFD93D"/>
       <path d="M0 180 Q200 160 400 180 V260 H0Z" fill="#9BD86A"/>

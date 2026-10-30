@@ -65,15 +65,52 @@ const App = (() => {
     return STORIES.find((s) => s.occ && ((s.occ.cal === 'g' && s.occ.m === d.getMonth() + 1 && s.occ.d.includes(d.getDate())) ||
       (s.occ.cal === 'h' && h && s.occ.m === h.m && s.occ.d.includes(h.d))));
   }
+  /* قصص الأنبياء: كل اثنين وجمعة بالترتيب من آدم إلى محمد ﷺ */
+  const isPro = (s) => s && s.cat === 'pro';
+  const isProDay = (d) => d.getDay() === 1 || d.getDay() === 5;
+  function proOfDay(d) {
+    const pros = STORIES.filter(isPro); if (!pros.length) return null;
+    const a = new Date(2026, 0, 1); let n = 0;
+    for (let x = new Date(a); x <= d; x.setDate(x.getDate() + 1)) if (isProDay(x)) n++;
+    return pros[(Math.max(n, 1) - 1) % pros.length];
+  }
   function storyOfDay(d = new Date()) {
     const occ = occasion(d); if (occ) return occ;
-    const pool = STORIES.filter((s) => !s.occ);
+    if (isProDay(d)) { const p = proOfDay(d); if (p) return p; }
+    const pool = STORIES.filter((s) => !s.occ && !isPro(s));
     const seed = S.code || S.fam.kids.map((k) => k.name.trim()).sort().join('|');
     const order = pool.map((_, i) => i);
     const r = rng(hash(seed + '#' + d.getFullYear()));
     for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
     return pool[order[(dayOfYear(d) - 1) % order.length]];
   }
+
+  /* ---------- التصنيفات: تظهر تحت اسم كل قصة ---------- */
+  const CATS = [
+    ['pro', '🕌', 'قصص الأنبياء', null],
+    ['occ', '🎉', 'المناسبات', null],
+    ['truth', '🤝', 'الصدق والأمانة', /الصدق|الأمانة|الوفاء|الوعد/],
+    ['share', '🎁', 'المشاركة والعطاء', /المشاركة|العطاء|التعاون|الكرم|ضيف|مساعدة|نصرة|التطوعي|الصدقة|العاملين|الإيثار/],
+    ['mercy', '💗', 'الرحمة واللطف', /الرحمة|الرفق|اللطف|التسامح|المريض|الاعتذار/],
+    ['brave', '🦁', 'الشجاعة والثقة', /الشجاعة|الثقة|المحاولة|الطموح|تقبّل/],
+    ['patience', '🌱', 'الصبر', /الصبر|ضبط|الهدوء|التركيز|الطمأنينة/],
+    ['faith', '🤲', 'الإيمان والعبادة', /الصلاة|العبادة|الشكر|الامتنان|رمضان|العيد/],
+    ['know', '📚', 'العلم والمعرفة', /العلم|القراءة|تعلّم|التأمّل|التعليم|الخيال|الاستماع|التعلّم/],
+    ['family', '🏠', 'العائلة', /الوالدين|العائلة|الكبار|الحب/],
+    ['habits', '✨', 'العادات الجميلة', /النظافة|الترتيب|النوم|الأكل|الاستعداد|السلامة|الأمان|آداب|الاستئذان|السلام|إماطة|الأجهزة|الوقت|المسؤولية|المال|الادّخار|البيئة|النِّعَم|القناعة|البيت|الطعام|الدور/],
+    ['manners', '🌟', 'أخلاق جميلة', null]
+  ];
+  function catOf(s) {
+    if (isPro(s)) return CATS[0];
+    if (s.occ) return CATS[1];
+    return CATS.find((c) => c[3] && c[3].test(s.value)) || CATS[CATS.length - 1];
+  }
+  function catChip(s, withVal) {
+    const c = catOf(s);
+    return `<div class="cats"><span class="cat c-${c[0]}">${c[1]} ${c[2]}</span>${withVal && s.value !== c[2] ? `<span class="val">${esc(s.value)}</span>` : ''}</div>`;
+  }
+  /* في قصص الأنبياء: ما نرسم الأطفال إلا في صفحة البداية وهم يسمعون */
+  const artHs = (st, hs, pg) => (isPro(st) ? (pg && pg.k ? hs : []) : hs);
 
   /* ---------- محرّك القوالب ---------- */
   function fill(str, heroes) {
@@ -326,9 +363,9 @@ const App = (() => {
     const hs = heroes(), n = readTonight(), allow = allowedTonight(), nxt = nextTonight();
     const st = nxt || tonightList()[0], done = !nxt;
     const lbl = ['قصة الليلة', 'القصة الثانية الليلة', 'القصة الثالثة الليلة', 'القصة الرابعة الليلة'][n] || 'قصة إضافية';
-    $('tonightCard').innerHTML = hs.length ? `${ART.page(st.scene, done ? '🌙' : st.occ ? '🎉' : '✨', hs)}
+    $('tonightCard').innerHTML = hs.length ? `${ART.page(st.scene, done ? '🌙' : st.occ ? '🎉' : isPro(st) ? '📖' : '✨', artHs(st, hs))}
       <div class="info">${done ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">خلّصتوا قصص الليلة 🌙 (${n}/${allow})</span>` : (st.occ ? '<span class="tag" style="background:#E5FBEA;color:#1E8E4A">قصة المناسبة 🎉</span> ' : '') + (allow > 1 ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">${lbl} · ${n + 1}/${allow}</span>` : '')}
-      <p class="title">${esc(fill(st.title, hs))}</p><span class="tag">${esc(st.value)}</span>
+      <p class="title">${esc(fill(st.title, hs))}</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
       ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا بكرة مع قصة جديدة ✨ تقدرون تعيدون قصة من «مكتبتي».</p><button class="btn alt" style="margin-top:12px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
         : `<button class="btn" style="margin-top:14px" onclick="App.openStory('${st.id}')">ابدأ ${lbl} ✨</button>`}</div>`
       : '<div class="info"><p class="muted">اختر بطلًا واحدًا على الأقل</p></div>';
@@ -340,6 +377,11 @@ const App = (() => {
     mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">🔍 معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">📖 أقرأ مع العيال</button>`;
     $('modeHint').textContent = S.role !== 'parent' ? '' : kidsMode ? 'القصص والألعاب تنحسب للأبطال المختارين ⭐' : 'تتصفح بس، وما ينحسب شي على العيال';
     renderLib();
+  }
+  function tonightRows(hs, n, allow) {
+    const L = tonightList().slice(0, allow);
+    return `<div class="tl"><b>قصص الليلة</b>${L.map((s, i) => { const c = catOf(s);
+      return `<button class="tlr ${i < n ? 'done' : i === n ? 'now' : ''}" onclick="App.openStory('${s.id}')"><i>${i < n ? '✓' : AR(i + 1)}</i><span>${esc(fill(s.title, hs))}</span><em class="cat c-${c[0]}">${c[1]} ${c[2]}</em></button>`; }).join('')}</div>`;
   }
   function pick(id) {
     const i = sel.indexOf(id);
@@ -363,7 +405,7 @@ const App = (() => {
     S.fav.forEach((id) => { if (!seen.has(id)) { seen.add(id); items.push(id); } });
     allLogs().forEach((e) => { if (!seen.has(e.s)) { seen.add(e.s); items.push(e.s); } });
     const list = items.map((id) => STORIES.find((s) => s.id === id)).filter(Boolean);
-    $('lib').innerHTML = list.length && hs.length ? list.map((s) => `<button class="item" onclick="App.openStory('${s.id}')">${ART.page(s.scene, S.fav.includes(s.id) ? '⭐' : '', hs)}<div>${esc(fill(s.title, hs))}</div></button>`).join('')
+    $('lib').innerHTML = list.length && hs.length ? list.map((s) => `<button class="item" onclick="App.openStory('${s.id}')">${ART.page(s.scene, S.fav.includes(s.id) ? '⭐' : '', artHs(s, hs))}<div>${esc(fill(s.title, hs))}</div>${catChip(s)}</button>`).join('')
       : '<p class="empty" style="grid-column:1/-1">القصص اللي تقرونها تنحفظ هنا، وتقدرون ترجعون لها متى ما حبيتوا 📚</p>';
   }
 
@@ -487,7 +529,7 @@ const App = (() => {
   function nightKey() { const d = new Date(); if (nowMin() < MORNING) d.setDate(d.getDate() - 1); return dateKey(d); }
   function allowedTonight() { const x = S.fam.extra; return (S.fam.perNight || 1) + (x && x.d === nightKey() ? x.n : 0); }
   function tonightList() {
-    const first = storyOfDay(), pool = STORIES.filter((s) => !s.occ && s.id !== first.id);
+    const first = storyOfDay(), pool = STORIES.filter((s) => !s.occ && !isPro(s) && s.id !== first.id);
     const today = new Set([dateKey(), nightKey()]);
     const read = new Set(allLogs().filter((e) => !today.has(e.d)).map((e) => e.s)); // اللي انقرت قبل الليلة بس، عشان ما تتغير القائمة أثناء الليل
     const r = rng(hash((S.code || 'x') + '#extra#' + nightKey()));
@@ -561,12 +603,12 @@ const App = (() => {
     let html = '', nav = '', say = '';
     if (i < st.pages.length) {
       const p = st.pages[i], txt = fill(p.t, hs);
-      html = (i === 0 ? `<h2 style="text-align:center;color:var(--yellow);margin:0 0 10px">${esc(fill(st.title, hs))}</h2>` : '') + ART.page(p.s, p.p, hs) + dots + `<p class="ptext anim">${esc(txt)}</p>`;
+      html = (i === 0 ? `<h2 style="text-align:center;color:var(--yellow);margin:0 0 6px">${esc(fill(st.title, hs))}</h2><div style="text-align:center;margin-bottom:8px">${catChip(st)}</div>` : '') + ART.page(p.s, p.p, artHs(st, hs, p)) + dots + `<p class="ptext anim">${esc(txt)}</p>`;
       say = (i === 0 ? fill(st.title, hs) + '. ' : '') + txt;
       nav = `${i > 0 ? '<button class="btn alt" onclick="App.step(-1)">→ السابق</button>' : ''}<button class="btn" onclick="App.step(1)">التالي ←</button>`;
     } else if (i === st.pages.length) {
       const q = fill(st.q, hs);
-      html = ART.page('night', '💭', hs) + dots + `<p class="ptext" style="text-align:center;color:var(--yellow);margin-bottom:8px">سؤال قبل النوم</p><div class="q anim">${esc(q)}</div>`;
+      html = ART.page('night', '💭', hs) + dots + `<p class="ptext" style="text-align:center;color:var(--yellow);margin-bottom:8px">سؤال قبل النوم</p><div class="q anim">${esc(q)}</div>${st.src ? `<p class="src">📚 المصدر: ${esc(st.src)}</p>` : ''}`;
       say = 'سؤال قبل النوم. ' + q;
       nav = '<button class="btn alt" onclick="App.step(-1)">→ السابق</button><button class="btn" onclick="App.step(1)">النهاية 🌙</button>';
       if (!R.rec) logStory();
@@ -709,23 +751,21 @@ const App = (() => {
     $('ver2').textContent = CONFIG.VERSION;
   }
   /* مكتبة القصص في الإعدادات: فلاتر + بحث + بطاقات بصور، ٨ في كل دفعة */
-  const LIB_FILTERS = [['الكل', ''], ['الصدق والأمانة', 'الصدق|الأمانة'], ['الرحمة', 'الرحمة|الرفق'], ['المشاركة', 'المشاركة|العطاء|التعاون|الكرم|ضيف'],
-    ['الشجاعة والثقة', 'الشجاعة|الثقة'], ['العادات الجميلة', 'النظافة|الترتيب|النوم|الأكل|الاستعداد|السلامة|الأمان'], ['العائلة', 'الوالدين|العائلة|الكبار|الحب'], ['المناسبات', '#occ']];
+  const LIB_FILTERS = [['الكل', ''], ...CATS.map((c) => [c[1] + ' ' + c[2], c[0]])];
   let libFilter = '', libShown = 8;
   function setLibFilter(f) { libFilter = f; libShown = 8; filterStories(); }
   function moreStories() { libShown += 8; filterStories(); }
   function filterStories() {
     $('libChips').innerHTML = LIB_FILTERS.map(([t, f]) => `<button class="chip ${f === libFilter ? 'on' : ''}" onclick="App.setLibFilter('${f}')">${t}</button>`).join('');
     const q = ($('storySearch').value || '').trim();
-    const re = libFilter && libFilter !== '#occ' ? new RegExp(libFilter) : null;
     const hero = S.fam.kids.length ? [S.fam.kids[0]] : [{ name: 'البطل', g: 'm', av: {} }];
-    const all = STORIES.filter((s) => (!q || s.title.includes(q) || s.value.includes(q)) &&
-      (libFilter === '#occ' ? !!s.occ : !re || re.test(s.value)));
+    const all = STORIES.filter((s) => (!q || s.title.includes(q) || s.value.includes(q) || catOf(s)[2].includes(q)) &&
+      (!libFilter || catOf(s)[0] === libFilter));
     const read = new Set(allLogs().map((e) => e.s));
     $('allStories').innerHTML = all.slice(0, libShown).map((s) => `<button class="sitem" onclick="App.preview('${s.id}')">
-        ${ART.page(s.scene, s.occ ? '🎉' : '', [])}
+        ${ART.page(s.scene, s.occ ? '🎉' : isPro(s) ? '📖' : '', [])}
         <div class="st">${esc(fill(s.title, hero))}</div>
-        <div class="sv"><span class="tag">${esc(s.value)}</span>${read.has(s.id) ? '<span class="rd">✓ قُرئت</span>' : ''}</div>
+        <div class="sv">${catChip(s)}${read.has(s.id) ? '<span class="rd">✓ قُرئت</span>' : ''}</div>
       </button>`).join('') || '<p class="muted" style="grid-column:1/-1;text-align:center">ما لقينا قصة بهذا الاسم</p>';
     $('moreStories').style.display = all.length > libShown ? '' : 'none';
     $('moreStories').textContent = 'عرض المزيد (' + (all.length - libShown) + ')';
