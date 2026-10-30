@@ -206,6 +206,7 @@ const App = (() => {
       loadRemote();
       if (changed && $('home').classList.contains('on')) renderHome();
       if (changed) checkLock();
+      if (S.fam.forceAt && S.fam.forceAt > (S.forceSeen || 0)) { S.forceSeen = S.fam.forceAt; save(); hardRefresh(true); }
     } catch (e) {}
     syncing = false;
   }
@@ -254,7 +255,7 @@ const App = (() => {
   function editKid(id, self) {
     const k = kidById(id);
     selfEdit = !!(self && k);
-    editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { skin: 0, hair: 0, shirt: Math.floor(Math.random() * 7), style: 0, head: '', outfit: 'tee' } };
+    editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { ...ART.DEFAULTS.m } };
     if (editing.av.head == null) editing.av.head = editing.av.hijab ? 'hijab' : '';
     $('kidTitle').textContent = selfEdit ? 'غيّر شكلك يا ' + k.name + ' ✨' : k ? 'تعديل ' + k.name : 'طفل جديد';
     $('kidBasics').style.display = selfEdit ? 'none' : '';
@@ -265,17 +266,18 @@ const App = (() => {
     const e = editing, a = e.av, G = e.g === 'f' ? 'f' : 'm';
     const seg = (id, val, set) => { $(id).querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b.dataset.v == val); b.onclick = () => { set(b.dataset.v); buildKidForm(); }; }); };
     const opts = (id, list) => { $(id).innerHTML = list.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join(''); };
-    seg('kidG', e.g, (v) => { e.g = v; a.head = ''; a.style = 0; a.outfit = 'tee'; });
+    seg('kidG', e.g, (v) => { if (v !== e.g) { e.g = v; e.av = { ...ART.DEFAULTS[v === 'f' ? 'f' : 'm'] }; } });
     seg('kidAge', e.age, (v) => (e.age = +v));
     opts('kidHead', ART.HEADS[G]); seg('kidHead', ART.headOf(a, G === 'f'), (v) => { a.head = v; a.hijab = v === 'hijab' ? 1 : 0; });
     opts('kidStyle', ART.STYLES[G].map((t, i) => [i, t])); seg('kidStyle', a.style || 0, (v) => (a.style = +v));
     opts('kidOutfit', ART.OUTFITS[G]); seg('kidOutfit', a.outfit || 'tee', (v) => (a.outfit = v));
     const sw = (id, arr, key) => { $(id).innerHTML = arr.map((c, i) => `<button class="sw ${(a[key] || 0) === i ? 'on' : ''}" style="background:${c}" data-i="${i}" aria-label="لون"></button>`).join(''); $(id).querySelectorAll('.sw').forEach((b) => (b.onclick = () => { a[key] = +b.dataset.i; buildKidForm(); })); };
-    sw('kidSkin', ART.SKIN, 'skin'); sw('kidHair', ART.HAIR, 'hair'); sw('kidShirt', ART.SHIRT, 'shirt'); sw('kidHC', ART.HEADC, 'hc');
+    sw('kidSkin', ART.SKIN, 'skin'); sw('kidHair', ART.HAIR, 'hair'); sw('kidShirt', ART.SHIRT, 'shirt'); sw('kidHC', ART.HEADC, 'hc'); sw('kidPants', ART.PANTS, 'pants');
     const head = ART.headOf(a, G === 'f');
     $('hcRow').style.display = head === 'hijab' ? '' : 'none';
     $('hairRow').style.display = head ? 'none' : '';
     $('shirtRow').style.display = a.outfit === 'thobe' ? 'none' : '';
+    $('pantsRow').style.display = ['thobe', 'dress'].includes(a.outfit) ? 'none' : '';
     $('kidPreview').innerHTML = ART.avatarSVG(a, e.g, 110);
   }
   function saveKid() {
@@ -701,6 +703,8 @@ const App = (() => {
     const ex = S.fam.extra && S.fam.extra.d === nightKey() ? S.fam.extra.n : 0;
     $('extraNote').textContent = ex ? 'الليلة: ' + AR(allowedTonight()) + ' قصص (منها ' + AR(ex) + ' إضافية)' : '';
     $('storyCount').textContent = STORIES.length;
+    $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
+    $('verNote').textContent = 'الإصدار الحالي: ' + CONFIG.VERSION;
     libShown = 8; filterStories();
     $('ver2').textContent = CONFIG.VERSION;
   }
@@ -827,13 +831,28 @@ const App = (() => {
     const go = () => location.reload();
     if (swReg && swReg.waiting) { swReg.waiting.postMessage('skip'); setTimeout(go, 1500); } else setTimeout(go, 300);
   }
+  /* ---------- تحديث فوري (زر وليّ الأمر) ---------- */
+  async function hardRefresh(silent) {
+    if (navigator.onLine === false) return toast('التحديث يحتاج إنترنت');
+    if (R) { pendingReload = true; return; }
+    if (!silent) toast('جاري التحديث… 🔄');
+    try { await syncNow(); } catch (e) {}
+    try { const ks = await caches.keys(); await Promise.all(ks.filter((k) => k.startsWith('siraj-v')).map((k) => caches.delete(k))); } catch (e) {}
+    try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
+    try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
+    location.replace(location.pathname + '?r=' + Date.now());
+  }
+  function refreshAll() {
+    S.fam.forceAt = Date.now(); S.forceSeen = S.fam.forceAt; famChanged();
+    toast('أرسلت أمر التحديث لأجهزة العيال 📲 يوصلهم خلال دقائق');
+  }
   function setupSW() {
     if (!('serviceWorker' in navigator)) return;
     const had = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
       swReg = reg;
       const wake = () => { checkVersion(); syncNow(); };
-      setInterval(wake, 10 * 60000);                       // كل ١٠ دقائق
+      setInterval(wake, 3 * 60000);                        // كل ٣ دقائق
       document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
       ['focus', 'pageshow', 'online'].forEach((ev) => addEventListener(ev, wake));
       document.addEventListener('pointerdown', () => { if (Date.now() - lastCheck > 15 * 60000) checkVersion(); }, { passive: true });
@@ -884,7 +903,7 @@ const App = (() => {
   }
 
   return {
-    ctx, setMode, clearMine, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
+    ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S

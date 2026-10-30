@@ -100,7 +100,7 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .swatches{display:flex;gap:8px;flex-wrap:wrap}
 .sw{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #E3DDF7}
 .sw.on{box-shadow:0 0 0 3px var(--bg1)}
-.preview{display:grid;place-items:center;background:linear-gradient(160deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px;margin-bottom:6px}
+.preview{min-height:180px;display:grid;place-items:center;background:linear-gradient(160deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px;margin-bottom:6px}
 .list .li{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #EEE}
 .list .li:last-child{border:0}
 .list .li .nm{flex:1;font-weight:700;font-size:18px}
@@ -125,6 +125,18 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .foot a{color:#fff}
 .pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
 /* v1.1 */
+/* v2.3 info */
+.md[role=button]{cursor:pointer}.md[role=button]:active{transform:scale(.92)}
+button.stk{border:0;padding:0;cursor:pointer;color:inherit;font-family:inherit}
+.infocard{text-align:center}
+.infocard .bigi{font-size:72px;line-height:1.1;margin:4px auto}
+.infocard .bigi.stk{width:110px;height:110px;font-size:64px;border-radius:24px}
+.infocard .lockq{color:#CFC8E8;font-weight:800}
+.ilist{list-style:none;padding:0;margin:10px 0;text-align:right}
+.ilist li{display:flex;gap:10px;align-items:center;background:#F6F3FF;border-radius:14px;padding:8px 10px;margin-bottom:8px}
+.ilist .ii{font-size:30px}
+.cheer{background:linear-gradient(135deg,#FFF1D6,#FFE1EE);border-radius:16px;padding:10px 12px;font-weight:800;color:#B4410E;font-size:17px}
+.pbar{height:12px;background:#EFEAFF;border-radius:10px;overflow:hidden;margin:10px 0}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#FFD93D,#FF9F1C)}
 /* v2.2 */
 .seg.wrap{flex-wrap:wrap}.seg.wrap button{flex:1 0 28%}
 /* زر التالي ثابت تحت مهما طال الكلام */
@@ -466,6 +478,13 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
   </div>
   <div class="card">
+    <h2>التحديث 🔄</h2>
+    <p class="muted">التطبيق يتحدث لحاله، وهنا تقدر تحدّثه فورًا: آخر إصدار، والقصص، وشخصيات العيال وإعداداتهم.</p>
+    <button class="btn" onclick="App.hardRefresh()">🔄 حدّث هذا الجهاز الآن</button>
+    <button class="btn alt" id="pushAllBtn" style="margin-top:10px" onclick="App.refreshAll()">📲 حدّث كل أجهزة العيال</button>
+    <p class="muted" id="verNote" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card">
     <h2>الليل والنوم 🌙</h2>
     <label>كم قصة الليلة؟</label>
     <div class="seg" id="perNight"></div>
@@ -516,7 +535,8 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
   <div id="hairRow"><label>تسريحة الشعر</label><div class="seg wrap" id="kidStyle"></div>
   <label>لون الشعر</label><div class="swatches" id="kidHair"></div></div>
   <label>اللبس</label><div class="seg wrap" id="kidOutfit"></div>
-  <div id="shirtRow"><label>اللون المفضل</label><div class="swatches" id="kidShirt"></div></div>
+  <div id="shirtRow"><label>لون اللبس</label><div class="swatches" id="kidShirt"></div></div>
+  <div id="pantsRow"><label>لون البنطلون</label><div class="swatches" id="kidPants"></div></div>
   <div class="row" style="margin-top:16px"><button class="btn" onclick="App.saveKid()">حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div>
 </div></div>
 

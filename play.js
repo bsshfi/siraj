@@ -68,7 +68,7 @@ const Play = (() => {
     for (let d = 1; d <= days; d++) {
       const E = byDay[key(d)] || [], story = E.some((e) => e.type === 'story'), today = d === now.getDate();
       const st = E.slice(-2).map((e) => e.st[0]).join('');
-      cells += `<i class="md ${story ? 'lit' : ''} ${today ? 'today' : ''} ${d > now.getDate() ? 'future' : ''}"><b>${d}</b><span>${story ? '⭐' : ''}${st}</span></i>`;
+      cells += `<i class="md ${story ? 'lit' : ''} ${today ? 'today' : ''} ${d > now.getDate() ? 'future' : ''}" ${E.length ? `role="button" onclick="Play.dayInfo('${kid.id}','${key(d)}')"` : d <= now.getDate() ? `role="button" onclick="Play.emptyDay('${kid.id}',${d === now.getDate() ? 1 : 0})"` : ''}><b>${d}</b><span>${story ? '⭐' : ''}${st}</span></i>`;
     }
     const inMonth = ev.filter((e) => e.d.startsWith(y + '-' + String(m + 1).padStart(2, '0')));
     const nStories = new Set(inMonth.filter((e) => e.type === 'story').map((e) => e.d)).size;
@@ -78,19 +78,19 @@ const Play = (() => {
   function album(ev) {
     const have = {}; ev.forEach((e) => { have[e.st[0]] = (have[e.st[0]] || 0) + 1; });
     const got = ALL_ST.filter(([e]) => have[e]).length;
-    return `<h3 class="sub">ألبوم الملصقات (${got}/${ALL_ST.length}) 📒</h3><div class="album">${ALL_ST.map(([e, t]) => have[e]
-      ? `<span class="stk ${t}">${e}${have[e] > 1 ? `<small>×${have[e]}</small>` : ''}</span>` : `<span class="stk none ${t}">?</span>`).join('')}</div>
+    return `<h3 class="sub">ألبوم الملصقات (${got}/${ALL_ST.length}) 📒</h3><div class="album">${ALL_ST.map(([e, t], i) => have[e]
+      ? `<button class="stk ${t}" onclick="Play.stkInfo('${ev.kid}',${i})">${e}${have[e] > 1 ? `<small>×${have[e]}</small>` : ''}</button>` : `<button class="stk none ${t}" onclick="Play.stkInfo('${ev.kid}',${i})">?</button>`).join('')}</div>
       <p class="muted" style="font-size:13px;margin:6px 0 0">🟣 نادر · 🌟 أسطوري: حظك مع كل قصة ولعبة!</p>`;
   }
   function renderSky() {
     const c = C(), kids = c.myKids();
     $('sky').innerHTML = kids.map((k) => {
-      const info = skyInfo(k), name = CONST[info.done % CONST.length], ev = kidEvents(k);
+      const info = skyInfo(k), name = CONST[info.done % CONST.length], ev = kidEvents(k); ev.kid = k.id;
       const f = k.g === 'f', left = 7 - info.cur;
       const chips = Array.from({ length: info.done }, (_, i) => `<span class="cchip">✨ ${CONST[i % CONST.length]}</span>`).join('');
       const accs = ART.ACC.map((a, i) => {
         const open = i < info.done, on = (k.av.acc || '') === a.id;
-        return `<button class="accb ${open ? '' : 'lock'} ${on ? 'on' : ''}" ${open ? `onclick="Play.wear('${k.id}','${on ? '' : a.id}')"` : 'disabled'}><span>${open ? a.icon : '🔒'}</span><small>${open ? a.name : (i + 1) * 7 + ' نجمة'}</small></button>`;
+        return `<button class="accb ${open ? '' : 'lock'} ${on ? 'on' : ''}" onclick="Play.accInfo('${k.id}',${i})"><span>${open ? a.icon : '🔒'}</span><small>${open ? a.name : (i + 1) * 7 + ' نجمة'}</small></button>`;
       }).join('');
       return `<div class="card skycard">
         <div class="row" style="align-items:center;gap:12px;flex:none">${ART.avatarSVG(k.av, k.g, 62)}<div style="flex:1"><h2 style="margin:0">سماء ${c.esc(k.name)}</h2>
@@ -105,6 +105,72 @@ const Play = (() => {
       </div>`;
     }).join('') || '<p class="empty">أضف الأطفال أولًا</p>';
   }
+
+  /* ================= شرح النجوم والملصقات والهدايا (لما يضغطون) ================= */
+  const ST_NAMES = { '🐱': 'قطة', '🐶': 'كلب', '🐰': 'أرنب', '🐻': 'دبدوب', '🐼': 'باندا', '🐨': 'كوالا', '🐸': 'ضفدع', '🐥': 'صوص', '🐢': 'سلحفاة', '🐠': 'سمكة', '🦋': 'فراشة', '🐞': 'دعسوقة', '🌻': 'زهرة شمس', '🌈': 'قوس قزح', '🍉': 'بطيخ', '🍓': 'فراولة', '🍩': 'دونات', '🎈': 'بالون', '⚽': 'كورة', '🪁': 'طيارة ورق', '🧸': 'دبدوب قطني', '🚗': 'سيارة', '🎨': 'ألوان', '📚': 'كتب',
+    '🦊': 'ثعلب', '🦒': 'زرافة', '🐬': 'دلفين', '🦜': 'ببغاء', '🐙': 'أخطبوط', '🚀': 'صاروخ', '🏰': 'قلعة', '🎡': 'دولاب الهوا', '🌋': 'بركان', '🦄': 'حصان وحيد القرن', '🐉': 'تنين', '👑': 'تاج ذهبي' };
+  const RARITY = { c: ['ملصق', ''], r: ['ملصق نادر', '🟣'], l: ['ملصق أسطوري', '🌟'] };
+  const ACT_NAME = { color: 'لوّنت المشهد 🎨', puzzle: 'رتّبت الأحجية 🧩', quiz: 'جاوبت أسئلة القصة ❓', en: 'لعبت English 🔤' };
+  const WEEKDAY = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const gx = (k, m, f) => (k.g === 'f' ? f : m);
+  const pickMsg = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  function cheer(k, value) {
+    const n = C().esc(k.name), f = k.g === 'f';
+    return pickMsg([
+      value ? `يا ${n}، ${f ? 'أنتِ بطلة' : 'أنت بطل'} ${value} اليوم! 🏅` : `يا ${n}، ${f ? 'أنتِ نجمة' : 'أنت نجم'} العيلة! 🌟`,
+      `كل قصة ${f ? 'تقرينها' : 'تقراها'} تخلي سماك تلمع أكثر ✨`,
+      `${f ? 'كمّلي' : 'كمّل'} يا ${n}، الكوكبة الجاية قريبة! 🚀`,
+      `ما شاء الله يا ${n}، ${f ? 'شاطرة' : 'شاطر'} ومجتهد${f ? 'ة' : ''} 💪`
+    ]);
+  }
+  function card(html) { $('gameBody').innerHTML = `<div class="infocard">${html}</div><button class="btn" style="margin-top:14px" onclick="Play.closeGame()">حلو! 👍</button>`; $('gameModal').classList.add('on'); }
+  function dayInfo(kidId, day) {
+    const c = C(), k = c.kidById(kidId); if (!k) return;
+    const E = kidEvents(k).filter((e) => e.d === day), d = new Date(day + 'T12:00');
+    let lastValue = '';
+    const rows = E.map((e) => {
+      const [em, r] = e.st, rn = RARITY[r];
+      if (e.type === 'story') {
+        const st = STORIES.find((x) => x.id === e.s); const title = st ? c.fill(st.title, [k]) : 'قصة';
+        if (st) lastValue = st.value;
+        return `<li><span class="ii">⭐</span><div><b>نجمة</b> لأن${gx(k, 'ك', 'كِ')} ${gx(k, 'قريت', 'قريتي')} «${c.esc(title)}»${st ? ` و${gx(k, 'تعلّمت', 'تعلّمتِ')} <b>${c.esc(st.value)}</b>` : ''}</div></li>
+          <li><span class="ii">${em}</span><div><b>${rn[0]} ${rn[1]}</b>: ${ST_NAMES[em] || ''}، ${gx(k, 'كسبته', 'كسبتيه')} من القصة</div></li>`;
+      }
+      return `<li><span class="ii">${em}</span><div><b>${rn[0]} ${rn[1]}</b>: ${ST_NAMES[em] || ''}، لأن${gx(k, 'ك', 'كِ')} ${(ACT_NAME[e.type] || 'لعبت').replace('لعبت', gx(k, 'لعبت', 'لعبتِ')).replace('لوّنت', gx(k, 'لوّنت', 'لوّنتِ')).replace('رتّبت', gx(k, 'رتّبت', 'رتّبتِ')).replace('جاوبت', gx(k, 'جاوبت', 'جاوبتِ'))}</div></li>`;
+    }).join('');
+    card(`<h2>${WEEKDAY[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} 🌟</h2><ul class="ilist">${rows}</ul><p class="cheer">${cheer(k, lastValue)}</p>`);
+  }
+  function emptyDay(kidId, today) {
+    const k = C().kidById(kidId); if (!k) return;
+    card(`<div class="bigi">${today ? '🌙' : '💤'}</div><h2>${today ? 'اليوم لسا ما فيه نجمة' : 'هاليوم ما فيه نجمة'}</h2><p class="cheer">${today ? `${gx(k, 'اقرأ', 'اقرئي')} قصة الليلة و${gx(k, 'خذ', 'خذي')} نجمة ⭐ وملصق جديد!` : `ولا يهم! كل يوم فرصة جديدة، ${gx(k, 'كمّل', 'كمّلي')} يا ${C().esc(k.name)} 💪`}</p>`);
+  }
+  function stkInfo(kidId, i) {
+    const c = C(), k = c.kidById(kidId); if (!k) return;
+    const [em, r] = ALL_ST[i], rn = RARITY[r];
+    const mine = kidEvents(k).filter((e) => e.st[0] === em);
+    if (!mine.length) {
+      const hint = r === 'l' ? 'ملصق أسطوري 🌟 وصعب يطلع! بس مع كل قصة ولعبة فيه فرصة.' : r === 'r' ? 'ملصق نادر 🟣، يطلع أحيانًا مع القصص والألعاب.' : 'ملصق عادي، أكيد يطلع لك قريب!';
+      return card(`<div class="bigi lockq">?</div><h2>ملصق مقفّل 🔒</h2><p>${hint}</p><p class="cheer">${gx(k, 'اقرأ', 'اقرئي')} و${gx(k, 'العب', 'العبي')}، يمكن يطلع ${gx(k, 'لك', 'لكِ')} المرة الجاية! 🍀</p>`);
+    }
+    const first = mine[0], fd = new Date(first.t);
+    const from = first.type === 'story' ? (() => { const st = STORIES.find((x) => x.id === first.s); return st ? 'قصة «' + c.esc(c.fill(st.title, [k])) + '»' : 'قصة'; })() : (ACT_NAME[first.type] || 'لعبة');
+    card(`<div class="bigi stk ${r}">${em}</div><h2>${ST_NAMES[em] || ''} ${rn[1]}</h2><p><b>${rn[0]}</b> · ${gx(k, 'كسبته', 'كسبتيه')} ${mine.length === 1 ? 'مرة وحدة' : mine.length + ' مرات'}</p>
+      <p class="muted">أول مرة: ${fd.getDate()} ${MONTHS[fd.getMonth()]}، من ${from}</p><p class="cheer">${r === 'l' ? 'واو! هذا من أندر الملصقات 🤩' : r === 'r' ? 'محظوظ' + gx(k, '', 'ة') + '! ملصق نادر 🟣' : cheer(k, '')}</p>`);
+  }
+  function accInfo(kidId, i) {
+    const k = C().kidById(kidId); if (!k) return;
+    const a = ART.ACC[i], info = skyInfo(k), open = i < info.done, cname = CONST[i % CONST.length];
+    if (!open) {
+      const left = (i + 1) * 7 - info.n;
+      return card(`<div class="bigi">${a.icon}</div><h2>${a.name} 🔒</h2><div class="pbar"><i style="width:${Math.min(100, info.n / ((i + 1) * 7) * 100)}%"></i></div>
+        <p>باقي <b>${left}</b> ${left === 1 ? 'قصة' : 'قصص'} و${gx(k, 'تفتح', 'تفتحين')} ${a.name} مع <b>${cname}</b> ✨</p><p class="cheer">${gx(k, 'اقرأ', 'اقرئي')} كل ليلة، وتوصل${gx(k, '', 'ين')}! 🚀</p>`);
+    }
+    const on = (k.av.acc || '') === a.id;
+    $('gameBody').innerHTML = `<div class="infocard"><div class="bigi">${a.icon}</div><h2>${a.name} 🎁</h2><p>${gx(k, 'فتحته', 'فتحتيه')} لما ${gx(k, 'أكملت', 'أكملتِ')} <b>${cname}</b> ✨</p><p class="cheer">${cheer(k, '')}</p></div>
+      <div class="row" style="margin-top:14px"><button class="btn" onclick="Play.wear('${k.id}','${on ? '' : a.id}');Play.closeGame()">${on ? 'اخلعه' : 'البسه'} ${a.icon}</button><button class="btn alt" onclick="Play.closeGame()">إغلاق</button></div>`;
+    $('gameModal').classList.add('on');
+  }
+
   function lastSticker(kids) {
     const k = kids[0]; if (!k) return '';
     const ev = kidEvents(k), e = ev[ev.length - 1];
@@ -336,6 +402,6 @@ const Play = (() => {
     return r;
   }
 
-  return { renderSky, wear, celebrate, skyInfo, logAct, lastSticker, kidEvents, renderPlay, pickStory, setStory, open, closeGame, setPaint, saveArt, delArt, tile, answer, nextQ,
+  return { dayInfo, emptyDay, stkInfo, accInfo, renderSky, wear, celebrate, skyInfo, logAct, lastSticker, kidEvents, renderPlay, pickStory, setStory, open, closeGame, setPaint, saveArt, delArt, tile, answer, nextQ,
     getRec, delRec, startRec, stopRec, recording, playRec, stopPlay, canRec, hasStoryRec, acts };
 })();
