@@ -864,11 +864,16 @@ const App = (() => {
       if (m && m[1] !== CONFIG.VERSION) applyUpdate();
     } catch (e) {}
   }
+  /* المتصفح يحتفظ بنسخ الملفات حتى ١٠ دقائق (GitHub Pages)، فنجبره يجيب الجديد قبل إعادة التحميل */
+  async function freshFiles() {
+    const list = ['./', 'index.html', 'sw.js', ...Array.from(document.scripts).map((x) => x.getAttribute('src')).filter((x) => x && !/^https?:/.test(x))];
+    await Promise.all(list.map((f) => fetch(f, { cache: 'reload' }).catch(() => {})));
+  }
   function applyUpdate() {
     if (R) { pendingReload = true; return; }             // لا نقاطع قصة شغالة
     updating = true;
     try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
-    const go = () => location.reload();
+    const go = () => freshFiles().then(() => location.reload());
     if (swReg && swReg.waiting) { swReg.waiting.postMessage('skip'); setTimeout(go, 1500); } else setTimeout(go, 300);
   }
   /* ---------- تحديث فوري (زر وليّ الأمر) ---------- */
@@ -891,6 +896,7 @@ const App = (() => {
     try { await syncNow(); } catch (e) {}
     try { const ks = await caches.keys(); await Promise.all(ks.filter((k) => k.startsWith('siraj-v')).map((k) => caches.delete(k))); } catch (e) {}
     try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
+    try { await freshFiles(); } catch (e) {}
     try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
     location.replace(location.pathname + '?r=' + Date.now());
   }
