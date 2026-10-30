@@ -861,7 +861,13 @@ const App = (() => {
       if (swReg && swReg.update) swReg.update().catch(() => {});
       const txt = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store' })).text();
       const m = txt.match(/VERSION:\s*'([^']+)'/);
-      if (m && m[1] !== CONFIG.VERSION) applyUpdate();
+      if (m && m[1] !== CONFIG.VERSION) {
+        // حماية من الدوران: لو حاولنا نفس النسخة قبل أقل من ١٠ دقائق وما تغيّر شي، ما نعيد التحميل مرة ثانية
+        let tried = null; try { tried = JSON.parse(sessionStorage.getItem('siraj-upd-try') || 'null'); } catch (e) {}
+        if (tried && tried.v === m[1] && Date.now() - tried.t < 10 * 60000) return;
+        try { sessionStorage.setItem('siraj-upd-try', JSON.stringify({ v: m[1], t: Date.now() })); } catch (e) {}
+        applyUpdate();
+      }
     } catch (e) {}
   }
   /* المتصفح يحتفظ بنسخ الملفات حتى ١٠ دقائق (GitHub Pages)، فنجبره يجيب الجديد قبل إعادة التحميل */
@@ -873,7 +879,7 @@ const App = (() => {
     if (R) { pendingReload = true; return; }             // لا نقاطع قصة شغالة
     updating = true;
     try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
-    const go = () => freshFiles().then(() => location.reload());
+    const go = () => freshFiles().then(() => location.replace(location.pathname + '?r=' + Date.now()));
     if (swReg && swReg.waiting) { swReg.waiting.postMessage('skip'); setTimeout(go, 1500); } else setTimeout(go, 300);
   }
   /* ---------- تحديث فوري (زر وليّ الأمر) ---------- */
