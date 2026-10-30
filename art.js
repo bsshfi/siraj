@@ -9,60 +9,83 @@ const ART = (() => {
   const HEADS = { m: [['', 'بدون'], ['shmagh', 'شماغ'], ['ghutra', 'غترة'], ['taqiya', 'طاقية']], f: [['', 'بدون'], ['hijab', 'حجاب']] };
   const OUTFITS = { m: [['tee', 'تيشيرت'], ['thobe', 'ثوب'], ['hoodie', 'هودي']], f: [['tee', 'تيشيرت'], ['dress', 'فستان'], ['hoodie', 'هودي']] };
 
+  const PANTS = ['#3B5BA5', '#2B2350', '#8B5A2B', '#4CD97B', '#FF7AB6', '#9B6BF2', '#E0E0E0', '#FF9F1C'];
+  // الشكل الافتراضي: البنت مثل يارا، والولد مثل وليد
+  const DEFAULTS = {
+    f: { skin: 0, hair: 1, style: 0, head: '', outfit: 'hoodie', shirt: 2, pants: 0 },
+    m: { skin: 0, hair: 0, style: 0, head: 'shmagh', outfit: 'tee', shirt: 10, pants: 1 }
+  };
+  OUTFITS.m.push(['overalls', 'صدرية']); OUTFITS.f.push(['overalls', 'صدرية']);
+
   function headOf(av, girl) { const h = av.head != null ? av.head : (av.hijab ? 'hijab' : ''); return girl ? (h === 'hijab' ? 'hijab' : '') : (['shmagh', 'ghutra', 'taqiya'].includes(h) ? h : ''); }
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = (v) => Math.max(0, Math.min(255, Math.round(v * k))); return '#' + [n >> 16, (n >> 8) & 255, n & 255].map((v) => f(v).toString(16).padStart(2, '0')).join(''); };
+
+  /* شخصية كاملة (راس كبير وجسم صغير) على لوحة 100×150 */
   function avatar(av, g) {
     av = av || {};
     const girl = g === 'f', skin = SKIN[av.skin ?? 0] || SKIN[0], hair = HAIR[av.hair ?? 0] || HAIR[0];
-    const shirt = SHIRT[av.shirt ?? 0] || SHIRT[0], head = headOf(av, girl), st = av.style || 0;
-    const outfit = (OUTFITS[girl ? 'f' : 'm'].find((o) => o[0] === av.outfit) || OUTFITS.m[0])[0];
-    let back = '', front = '', body = '', over = '';
-    /* الجسم واللبس */
-    if (outfit === 'thobe') body = `<path d="M16 122 Q16 84 50 84 Q84 84 84 122Z" fill="#FAFAF5" stroke="#E2E0D8" stroke-width="1.2"/><path d="M50 86 V122" stroke="#E2E0D8" stroke-width="1.5"/><circle cx="50" cy="95" r="1.8" fill="#C9C6BC"/><circle cx="50" cy="104" r="1.8" fill="#C9C6BC"/>`;
-    else if (outfit === 'dress') body = `<path d="M24 122 Q22 90 50 84 Q78 90 76 122Z" fill="${shirt}"/><path d="M14 122 Q20 104 30 100 L70 100 Q80 104 86 122Z" fill="${shirt}"/><path d="M30 100 Q50 106 70 100" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/>`;
-    else if (outfit === 'hoodie') body = `<path d="M18 122 Q18 84 50 84 Q82 84 82 122Z" fill="${shirt}"/><path d="M32 86 Q50 100 68 86" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="5"/><rect x="38" y="106" width="24" height="12" rx="5" fill="#000" fill-opacity=".12"/><path d="M44 92 v10 M56 92 v10" stroke="#fff" stroke-width="1.6"/>`;
-    else body = `<path d="M18 122 Q18 84 50 84 Q82 84 82 122Z" fill="${shirt}"/>`;
-    /* الشعر وغطاء الرأس */
+    const shirt = SHIRT[av.shirt ?? 0] || SHIRT[0], pants = PANTS[av.pants ?? 0] || PANTS[0], head = headOf(av, girl), st = av.style || 0;
+    const outfit = ([...OUTFITS[girl ? 'f' : 'm']].find((o) => o[0] === av.outfit) || OUTFITS.m[0])[0];
+    const line = '#3A2E5C', sw = 'stroke="' + line + '" stroke-width="1.6" stroke-linejoin="round"';
+    const dark = shade(shirt === '#FFFFFF' ? '#DDDDDD' : shirt, .82);
+    let hairBack = '', front = '', drape = '', over = '';
+    /* ----- الشعر وغطاء الرأس (بإحداثيات الراس: مركز 50،40 نصف قطر 30) ----- */
     if (head === 'hijab') {
       const hc = HEADC[av.hc ?? 0] || HEADC[0];
-      back = `<path d="M15 56 Q15 13 50 13 Q85 13 85 56 Q85 92 50 98 Q15 92 15 56Z" fill="${hc}"/><path d="M15 56 Q15 13 50 13 Q85 13 85 56 Q85 92 50 98 Q15 92 15 56Z" fill="#fff" opacity=".18"/>`;
+      drape = `<path d="M18 44 Q16 6 50 6 Q84 6 82 44 Q84 74 70 84 L30 84 Q16 74 18 44Z" fill="${hc}" ${sw}/><path d="M28 80 Q50 92 72 80 L74 92 Q50 100 26 92Z" fill="${shade(hc, .9)}" ${sw}/>`;
     } else if (head === 'shmagh' || head === 'ghutra') {
       const fill = head === 'shmagh' ? 'url(#shmP)' : '#FFFFFF';
-      back = `<defs><pattern id="shmP" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fff"/><path d="M0 0h4v4H0zM4 4h4v4H4z" fill="#D63031"/></pattern></defs>
-        <path d="M12 62 Q12 14 50 14 Q88 14 88 62 L92 104 Q72 96 68 78 L32 78 Q28 96 8 104Z" fill="${fill}" stroke="#E0DEDA" stroke-width="1"/>`;
-      over = `<ellipse cx="50" cy="25" rx="31" ry="7" fill="none" stroke="#1E1E24" stroke-width="3.6"/><ellipse cx="50" cy="19" rx="27" ry="5.5" fill="none" stroke="#1E1E24" stroke-width="3.2"/>`;
+      drape = `<defs><pattern id="shmP" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fff"/><path d="M0 0h3.5v3.5H0zM3.5 3.5h3.5v3.5H3.5z" fill="#D63031"/></pattern></defs>
+        <path d="M14 46 Q12 6 50 6 Q88 6 86 46 L90 90 Q74 84 70 66 L30 66 Q26 84 10 90Z" fill="${fill}" ${sw}/>`;
+      over = `<ellipse cx="50" cy="14" rx="31" ry="7" fill="none" stroke="#1E1E24" stroke-width="4"/><ellipse cx="50" cy="8" rx="26" ry="5" fill="none" stroke="#1E1E24" stroke-width="3.4"/>`;
+    } else if (head === 'taqiya') {
+      over = `<path d="M22 30 Q22 6 50 6 Q78 6 78 30Z" fill="#FFFFFF" ${sw}/><path d="M23 26 H77" stroke="#DDD" stroke-width="1.5"/>`;
     } else if (girl) {
-      if (st === 1) { // ذيل حصان
-        front = `<path d="M23 48 Q25 21 50 21 Q75 21 77 48 Q64 33 50 37 Q36 33 23 48Z" fill="${hair}"/>`;
-        back = `<path d="M70 26 Q96 30 90 70 Q86 58 78 50Z" fill="${hair}"/><circle cx="74" cy="30" r="5" fill="${SHIRT[((av.shirt || 0) + 3) % SHIRT.length]}"/>`;
-      } else if (st === 2) { // ضفائر
-        front = `<path d="M23 48 Q25 21 50 21 Q75 21 77 48 Q64 33 50 37 Q36 33 23 48Z" fill="${hair}"/>`;
-        back = [24, 76].map((x) => `<path d="M${x} 50 q-6 10 0 18 q6 8 0 16 q-5 8 0 14" fill="none" stroke="${hair}" stroke-width="9" stroke-linecap="round"/><circle cx="${x}" cy="99" r="4" fill="${SHIRT[((av.shirt || 0) + 3) % SHIRT.length]}"/>`).join('');
-      } else if (st === 3) { // قصير
-        back = `<path d="M20 58 Q16 18 50 18 Q84 18 80 58 Q78 70 72 72 L28 72 Q22 70 20 58Z" fill="${hair}"/>`;
-        front = `<path d="M23 46 Q26 21 50 21 Q74 21 77 46 Q60 30 40 38 Q30 40 23 46Z" fill="${hair}"/>`;
-      } else { // طويل
-        back = `<path d="M19 54 Q17 17 50 17 Q83 17 81 54 L83 92 Q67 96 64 74 L36 74 Q33 96 17 92Z" fill="${hair}"/>`;
-        front = `<path d="M23 48 Q25 21 50 21 Q75 21 77 48 Q64 33 50 37 Q36 33 23 48Z" fill="${hair}"/><circle cx="74" cy="34" r="6" fill="${SHIRT[((av.shirt || 0) + 3) % SHIRT.length]}"/>`;
-      }
-    } else if (head !== 'taqiya') {
-      if (st === 1) front = `<path d="M21 52 Q19 22 50 20 Q81 22 79 52 L74 36 L68 44 L62 30 L55 40 L48 28 L42 40 L35 30 L30 42 L26 34Z" fill="${hair}"/>`;
-      else if (st === 2) front = [26, 36, 46, 56, 66, 74, 31, 41, 51, 61, 70].map((x, i) => `<circle cx="${x}" cy="${i < 6 ? 30 : 23}" r="${i < 6 ? 8 : 7}" fill="${hair}"/>`).join('') + `<path d="M21 52 Q20 36 28 34 L72 34 Q80 36 79 52 Q74 40 50 38 Q26 40 21 52Z" fill="${hair}"/>`;
-      else if (st === 3) front = `<path d="M24 46 Q26 24 50 24 Q74 24 76 46 Q64 36 50 36 Q36 36 24 46Z" fill="${hair}" opacity=".55"/>`;
-      else front = `<path d="M21 52 Q19 19 50 19 Q81 19 79 52 Q74 35 50 34 Q28 35 21 52Z" fill="${hair}"/>`;
+      const bow = SHIRT[((av.shirt || 0) + 3) % SHIRT.length];
+      const fringe = `<path d="M20 40 Q20 8 50 8 Q80 8 80 40 Q72 22 56 26 Q46 16 34 28 Q26 30 20 40Z" fill="${hair}" ${sw}/>`;
+      if (st === 1) { hairBack = `<path d="M70 18 Q100 22 92 66 Q88 52 76 44Z" fill="${hair}" ${sw}/>`; front = fringe + `<circle cx="74" cy="20" r="5" fill="${bow}" ${sw}/>`; }
+      else if (st === 2) { hairBack = [20, 80].map((x) => `<path d="M${x} 42 q-7 11 0 20 q7 9 0 18 q-6 9 0 16" fill="none" stroke="${line}" stroke-width="12.5" stroke-linecap="round"/><path d="M${x} 42 q-7 11 0 20 q7 9 0 18 q-6 9 0 16" fill="none" stroke="${hair}" stroke-width="9.5" stroke-linecap="round"/><circle cx="${x}" cy="97" r="4.5" fill="${bow}" ${sw}/>`).join(''); front = fringe; }
+      else if (st === 3) { hairBack = `<path d="M16 46 Q12 6 50 6 Q88 6 84 46 Q84 62 74 64 L26 64 Q16 62 16 46Z" fill="${hair}" ${sw}/>`; front = fringe; }
+      else { hairBack = `<path d="M15 44 Q13 5 50 5 Q87 5 85 44 L88 92 Q70 98 66 70 L34 70 Q30 98 12 92Z" fill="${hair}" ${sw}/>`; front = fringe + `<circle cx="76" cy="22" r="5.5" fill="${bow}" ${sw}/>`; }
+    } else {
+      if (st === 1) front = `<path d="M20 42 Q18 10 50 9 Q82 10 80 42 L75 26 L68 34 L62 18 L55 30 L48 15 L42 30 L35 18 L29 32 L24 24Z" fill="${hair}" ${sw}/>`;
+      else if (st === 2) front = [24, 34, 44, 56, 66, 76, 29, 39, 50, 61, 71].map((x, i) => `<circle cx="${x}" cy="${i < 6 ? 22 : 13}" r="${i < 6 ? 8.5 : 7.5}" fill="${hair}" ${sw}/>`).join('') + `<path d="M20 42 Q20 24 30 22 L70 22 Q80 24 80 42 Q72 30 50 28 Q28 30 20 42Z" fill="${hair}"/>`;
+      else if (st === 3) front = `<path d="M23 34 Q25 12 50 12 Q75 12 77 34 Q64 24 50 24 Q36 24 23 34Z" fill="${hair}" opacity=".55"/>`;
+      else front = `<path d="M19 42 Q17 7 50 7 Q83 7 81 42 Q76 22 60 24 Q50 16 38 24 Q26 24 19 42Z" fill="${hair}" ${sw}/>`;
     }
-    if (head === 'taqiya') over = `<path d="M23 40 Q24 18 50 18 Q76 18 77 40Z" fill="#FFFFFF" stroke="#DDD" stroke-width="1"/><path d="M24 36 H76" stroke="#E5E2DA" stroke-width="1.5"/>`;
-    const covered = head === 'hijab';
-    const face = covered ? `<ellipse cx="50" cy="56" rx="23" ry="26" fill="${skin}"/>` : head === 'shmagh' || head === 'ghutra' ? `<ellipse cx="50" cy="55" rx="24" ry="26" fill="${skin}"/>` : `<circle cx="50" cy="54" r="28" fill="${skin}"/>`;
-    return `<g>
-      ${body}
-      <rect x="44" y="76" width="12" height="12" rx="5" fill="${skin}"/>
-      ${back}${face}${front}${over}
-      <circle cx="40" cy="56" r="3.8" fill="#2B1B12"/><circle cx="60" cy="56" r="3.8" fill="#2B1B12"/>
-      <circle cx="41.3" cy="54.6" r="1.2" fill="#fff"/><circle cx="61.3" cy="54.6" r="1.2" fill="#fff"/>
-      <path d="M42 66 Q50 73 58 66" fill="none" stroke="#7A3B1F" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="33" cy="64" r="5" fill="#FF7A9C" opacity=".45"/><circle cx="67" cy="64" r="5" fill="#FF7A9C" opacity=".45"/>
-      ${acc(av.acc, !!head)}
-    </g>`;
+    /* ----- الجسم واللبس (تحت الراس) ----- */
+    const arm = (x, sleeve) => `<path d="M${x} 84 q${x < 50 ? -9 : 9} 6 ${x < 50 ? -8 : 8} 22" stroke="${line}" stroke-width="10" stroke-linecap="round" fill="none"/><path d="M${x} 84 q${x < 50 ? -9 : 9} 6 ${x < 50 ? -8 : 8} 22" stroke="${sleeve}" stroke-width="7.4" stroke-linecap="round" fill="none"/><circle cx="${x < 50 ? x - 8 : x + 8}" cy="107" r="4.4" fill="${skin}" ${sw}/>`;
+    const legs = (c) => `<rect x="36" y="112" width="11" height="24" rx="5" fill="${c}" ${sw}/><rect x="53" y="112" width="11" height="24" rx="5" fill="${c}" ${sw}/>`;
+    const shoes = `<path d="M33 136 h15 v4 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="#FFFFFF" ${sw}/><path d="M52 136 h15 v4 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="#FFFFFF" ${sw}/><path d="M33 141 h15 M52 141 h15" stroke="${shirt === '#FFFFFF' ? '#9B6BF2' : shirt}" stroke-width="2"/>`;
+    let body = '';
+    if (outfit === 'thobe') {
+      body = arm(34, '#FAFAF5') + arm(66, '#FAFAF5') + `<path d="M34 76 Q50 70 66 76 L70 138 L30 138Z" fill="#FAFAF5" ${sw}/><path d="M50 74 V100" stroke="#D8D5CC" stroke-width="1.6"/><circle cx="50" cy="82" r="1.6" fill="#BDB9AE"/><circle cx="50" cy="90" r="1.6" fill="#BDB9AE"/>` + shoes.replace(/#FFFFFF/g, '#5A3B2A');
+    } else if (outfit === 'dress') {
+      body = arm(34, skin) + arm(66, skin) + legs(skin) + `<path d="M36 76 Q50 70 64 76 L66 92 L78 120 Q50 128 22 120 L34 92Z" fill="${shirt}" ${sw}/><path d="M34 92 Q50 98 66 92" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>` + shoes;
+    } else if (outfit === 'overalls') {
+      body = arm(34, shirt) + arm(66, shirt) + legs(pants) + `<path d="M34 76 Q50 70 66 76 L67 114 L33 114Z" fill="${shirt}" ${sw}/><path d="M38 88 H62 V114 H38Z" fill="${pants}" ${sw}/><path d="M38 88 L36 76 M62 88 L64 76" stroke="${pants}" stroke-width="4"/><circle cx="41" cy="92" r="1.8" fill="#FFD93D"/><circle cx="59" cy="92" r="1.8" fill="#FFD93D"/><rect x="45" y="96" width="10" height="8" rx="2" fill="none" stroke="${line}" stroke-width="1.2"/>` + shoes;
+    } else if (outfit === 'hoodie') {
+      body = arm(34, shirt) + arm(66, shirt) + legs(pants) + `<path d="M33 76 Q50 70 67 76 L68 114 L32 114Z" fill="${shirt}" ${sw}/><path d="M38 76 Q50 88 62 76" fill="none" stroke="${dark}" stroke-width="4"/><rect x="40" y="100" width="20" height="10" rx="4" fill="${dark}"/><path d="M46 82 v9 M54 82 v9" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>` + shoes;
+    } else {
+      body = arm(34, skin) + arm(66, skin) + legs(pants) + `<path d="M30 80 L36 75 Q50 70 64 75 L70 80 L66 88 L66 114 L34 114 L34 88Z" fill="${shirt}" ${sw}/><path d="M43 74 Q50 80 57 74" fill="none" stroke="${dark}" stroke-width="2"/>` + shoes;
+    }
+    const cape = av.acc === 'cape' ? `<path d="M34 78 Q16 112 20 140 L80 140 Q84 112 66 78Z" fill="#FF6B6B" ${sw}/>` : '';
+    const face = `<circle cx="50" cy="40" r="30" fill="${skin}" ${sw}/><circle cx="20" cy="44" r="5" fill="${skin}" ${sw}/><circle cx="80" cy="44" r="5" fill="${skin}" ${sw}/><circle cx="50" cy="40" r="28.6" fill="${skin}"/>`;
+    const eyes = `<ellipse cx="39" cy="44" rx="4.4" ry="5.2" fill="#2B1B12"/><ellipse cx="61" cy="44" rx="4.4" ry="5.2" fill="#2B1B12"/><circle cx="40.6" cy="42" r="1.6" fill="#fff"/><circle cx="62.6" cy="42" r="1.6" fill="#fff"/>
+      <path d="M44 55 Q50 60 56 55" fill="none" stroke="#7A3B1F" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="31" cy="52" rx="5" ry="3.2" fill="#FF7A9C" opacity=".5"/><ellipse cx="69" cy="52" rx="5" ry="3.2" fill="#FF7A9C" opacity=".5"/>`;
+    const neck = `<rect x="45" y="66" width="10" height="10" rx="4" fill="${skin}" ${sw}/>`;
+    const headGroup = drape && head === 'hijab'
+      ? `${drape}<ellipse cx="50" cy="44" rx="22" ry="25" fill="${skin}" ${sw}/>${eyes}`
+      : drape ? `${drape}<ellipse cx="50" cy="42" rx="23" ry="25" fill="${skin}" ${sw}/>${eyes}${over}`
+      : `${face}${eyes}${front}${over}`;
+    const headAcc = `<g transform="translate(50 40) scale(1.07) translate(-50 -54)">${acc(av.acc === 'cape' ? '' : av.acc, false)}</g>`;
+    return `<g>${cape}${hairBack}${neck}${body}${headGroup}${headAcc}</g>`;
+  }
+
+  /* صورة الشخصية: كاملة، أو الراس والكتفين للأيقونات الصغيرة */
+  function avatarSVG(av, g, size = 80) {
+    if (size <= 62) return `<svg viewBox="6 2 88 92" width="${size}" height="${Math.round(size * 92 / 88)}" aria-hidden="true">${avatar(av, g)}</svg>`;
+    return `<svg viewBox="0 0 100 150" width="${size}" height="${Math.round(size * 1.5)}" aria-hidden="true">${avatar(av, g)}</svg>`;
   }
 
   /* إكسسوارات تنفتح من «سماء سِراج» (كل كوكبة = إكسسوار) */
@@ -91,9 +114,6 @@ const ART = (() => {
     }
   }
 
-  function avatarSVG(av, g, size = 80) {
-    return `<svg viewBox="0 0 100 122" width="${size}" height="${size * 1.22}" aria-hidden="true">${avatar(av, g)}</svg>`;
-  }
 
   function stars(n, seed, w = 400, h = 200) {
     let s = seed, out = '';
@@ -215,16 +235,16 @@ const ART = (() => {
     if (heroes && heroes.length) {
       const [main, ...rest] = heroes;
       rest.slice(0, 3).forEach((k, i) => {
-        const x = 30 + i * 62;
-        people += `<g transform="translate(${x} 170) scale(.68)"><g class="bob b${i + 2}">${avatar(k.av, k.g)}</g></g>`;
+        const x = 26 + i * 58;
+        people += `<g transform="translate(${x} 168) scale(.6)"><g class="bob b${i + 2}">${avatar(k.av, k.g)}</g></g>`;
       });
-      const mx = rest.length ? 30 + Math.min(rest.length, 3) * 62 + 4 : 120;
-      people += `<g transform="translate(${mx} 128) scale(1.05)"><g class="bob b1">${avatar(main.av, main.g)}</g></g>`;
+      const mx = rest.length ? 26 + Math.min(rest.length, 3) * 58 + 6 : 132;
+      people += `<g transform="translate(${mx} 120) scale(.92)"><g class="bob b1">${avatar(main.av, main.g)}</g></g>`;
     }
     const p = prop ? `<g class="floaty"><text x="318" y="210" font-size="62" text-anchor="middle">${prop}</text></g>` : '';
     return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" class="art"><g class="scene">${scene}</g>${people}${p}</svg>`;
   }
 
   page.n = 0;
-  return { avatar, avatarSVG, page, SKIN, HAIR, SHIRT, HEADC, STYLES, HEADS, OUTFITS, headOf, ACC, SCENES: Object.keys(SCENES) };
+  return { avatar, avatarSVG, page, SKIN, HAIR, SHIRT, PANTS, DEFAULTS, HEADC, STYLES, HEADS, OUTFITS, headOf, ACC, SCENES: Object.keys(SCENES) };
 })();

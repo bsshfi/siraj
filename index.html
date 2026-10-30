@@ -100,7 +100,7 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .swatches{display:flex;gap:8px;flex-wrap:wrap}
 .sw{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #E3DDF7}
 .sw.on{box-shadow:0 0 0 3px var(--bg1)}
-.preview{display:grid;place-items:center;background:linear-gradient(160deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px;margin-bottom:6px}
+.preview{min-height:180px;display:grid;place-items:center;background:linear-gradient(160deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px;margin-bottom:6px}
 .list .li{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #EEE}
 .list .li:last-child{border:0}
 .list .li .nm{flex:1;font-weight:700;font-size:18px}
@@ -466,6 +466,13 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
   </div>
   <div class="card">
+    <h2>التحديث 🔄</h2>
+    <p class="muted">التطبيق يتحدث لحاله، وهنا تقدر تحدّثه فورًا: آخر إصدار، والقصص، وشخصيات العيال وإعداداتهم.</p>
+    <button class="btn" onclick="App.hardRefresh()">🔄 حدّث هذا الجهاز الآن</button>
+    <button class="btn alt" id="pushAllBtn" style="margin-top:10px" onclick="App.refreshAll()">📲 حدّث كل أجهزة العيال</button>
+    <p class="muted" id="verNote" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card">
     <h2>الليل والنوم 🌙</h2>
     <label>كم قصة الليلة؟</label>
     <div class="seg" id="perNight"></div>
@@ -516,7 +523,8 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
   <div id="hairRow"><label>تسريحة الشعر</label><div class="seg wrap" id="kidStyle"></div>
   <label>لون الشعر</label><div class="swatches" id="kidHair"></div></div>
   <label>اللبس</label><div class="seg wrap" id="kidOutfit"></div>
-  <div id="shirtRow"><label>اللون المفضل</label><div class="swatches" id="kidShirt"></div></div>
+  <div id="shirtRow"><label>لون اللبس</label><div class="swatches" id="kidShirt"></div></div>
+  <div id="pantsRow"><label>لون البنطلون</label><div class="swatches" id="kidPants"></div></div>
   <div class="row" style="margin-top:16px"><button class="btn" onclick="App.saveKid()">حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div>
 </div></div>
 
