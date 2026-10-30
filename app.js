@@ -875,7 +875,19 @@ const App = (() => {
   async function hardRefresh(silent) {
     if (navigator.onLine === false) return toast('التحديث يحتاج إنترنت');
     if (R) { pendingReload = true; return; }
-    if (!silent) toast('جاري التحديث… 🔄');
+    if (!silent) {
+      // الضغط اليدوي: نتأكد أول هل فيه نسخة أحدث، وإذا ما فيه نقول له إنه على آخر نسخة بدل ما نرجعه للرئيسية
+      toast('جاري التحقق من التحديثات… 🔄');
+      let latest = null;
+      try { const t = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store' })).text(); const m = t.match(/VERSION:\s*'([^']+)'/); latest = m && m[1]; } catch (e) {}
+      if (!latest) return toast('ما قدرت أتحقق، جرّب بعد شوي');
+      if (latest === CONFIG.VERSION) {
+        try { await syncNow(); } catch (e) {}
+        const n = $('verNote'); if (n) n.textContent = 'الإصدار الحالي: ' + CONFIG.VERSION + ' ✓ آخر نسخة';
+        return toast('عندك آخر نسخة ✓ الإصدار ' + CONFIG.VERSION);
+      }
+      toast('فيه نسخة جديدة ' + latest + '، جاري التحديث… ✨');
+    }
     try { await syncNow(); } catch (e) {}
     try { const ks = await caches.keys(); await Promise.all(ks.filter((k) => k.startsWith('siraj-v')).map((k) => caches.delete(k))); } catch (e) {}
     try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
