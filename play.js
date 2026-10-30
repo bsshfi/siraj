@@ -58,7 +58,7 @@ const Play = (() => {
   }
   const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
   function monthGrid(kid, ev) {
-    const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    const now = new Date(), y = now.getFullYear(), m = now.getMonth(), td = now.getDate();
     const days = new Date(y, m + 1, 0).getDate(), first = new Date(y, m, 1).getDay(); // الأحد = 0
     const pre = (first + 1) % 7; // الأسبوع يبدأ السبت
     const key = (d) => y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
@@ -66,14 +66,25 @@ const Play = (() => {
     let cells = '';
     for (let i = 0; i < pre; i++) cells += '<i class="md empty"></i>';
     for (let d = 1; d <= days; d++) {
-      const E = byDay[key(d)] || [], story = E.some((e) => e.type === 'story'), today = d === now.getDate();
-      const st = E.slice(-2).map((e) => e.st[0]).join('');
-      cells += `<i class="md ${story ? 'lit' : ''} ${today ? 'today' : ''} ${d > now.getDate() ? 'future' : ''}" ${E.length ? `role="button" onclick="Play.dayInfo('${kid.id}','${key(d)}')"` : d <= now.getDate() ? `role="button" onclick="Play.emptyDay('${kid.id}',${d === now.getDate() ? 1 : 0})"` : ''}><b>${d}</b><span>${story ? '⭐' : ''}${st}</span></i>`;
+      const E = byDay[key(d)] || [], story = E.some((e) => e.type === 'story'), today = d === td, fut = d > td;
+      const stk = E.map((e) => e.st), best = stk.find((x) => x[1] === 'l') || stk.find((x) => x[1] === 'r') || stk[stk.length - 1];
+      const main = story ? '⭐' : best ? best[0] : today ? '🌙' : '';
+      const badge = story && best ? `<em class="mb ${best[1]}">${best[0]}</em>` : '';
+      const more = E.length > 2 ? `<u>+${E.length - (story ? 2 : 1)}</u>` : '';
+      const tap = fut ? '' : E.length ? `role="button" onclick="Play.dayInfo('${kid.id}','${key(d)}')"` : `role="button" onclick="Play.emptyDay('${kid.id}',${today ? 1 : 0})"`;
+      cells += `<i class="md ${story ? 'lit' : E.length ? 'got' : ''} ${today ? 'today' : ''} ${fut ? 'future' : ''}" ${tap}><b>${d}</b>${main ? `<span>${main}</span>` : ''}${badge}${more}</i>`;
     }
-    const inMonth = ev.filter((e) => e.d.startsWith(y + '-' + String(m + 1).padStart(2, '0')));
-    const nStories = new Set(inMonth.filter((e) => e.type === 'story').map((e) => e.d)).size;
-    return `<div class="month"><div class="mhead"><b>${MONTHS[m]} ${y}</b><span>⭐ ${nStories} ليلة · 🎁 ${inMonth.length} ملصق</span></div>
-      <div class="mdays">${['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map((x) => `<i class="mw">${x}</i>`).join('')}${cells}</div></div>`;
+    const mk = y + '-' + String(m + 1).padStart(2, '0'), inMonth = ev.filter((e) => e.d.startsWith(mk));
+    const nights = new Set(inMonth.filter((e) => e.type === 'story').map((e) => e.d)), nStories = nights.size;
+    let streak = 0; for (let d = nights.has(key(td)) ? td : td - 1; d >= 1 && nights.has(key(d)); d--) streak++;
+    const pct = Math.round(nStories / days * 100), f = kid.g === 'f';
+    const goal = nStories >= 20 ? `🏆 ${f ? 'بطلة' : 'بطل'} الشهر!` : nStories >= 10 ? '🥈 قربت من البطولة!' : '🎯 هدف الشهر: ٢٠ ليلة';
+    return `<div class="month">
+      <div class="mhead"><b>📅 ${MONTHS[m]}</b><span class="goal">${goal}</span></div>
+      <div class="mstats"><div><b>${nStories}</b><span>⭐ ليلة</span></div><div><b>${inMonth.length}</b><span>🎁 ملصق</span></div><div><b>${streak}</b><span>🔥 متتالية</span></div></div>
+      <div class="mbar"><i style="width:${pct}%"></i><span>${nStories} من ${days}</span></div>
+      <div class="mdays">${['سبت', 'أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع'].map((x) => `<i class="mw">${x}</i>`).join('')}${cells}</div>
+      <p class="mhint">👆 اضغط أي يوم وشوف وش ${f ? 'كسبتي' : 'كسبت'} فيه</p></div>`;
   }
   function album(ev) {
     const have = {}; ev.forEach((e) => { have[e.st[0]] = (have[e.st[0]] || 0) + 1; });
@@ -90,11 +101,11 @@ const Play = (() => {
       const chips = Array.from({ length: info.done }, (_, i) => `<span class="cchip">✨ ${CONST[i % CONST.length]}</span>`).join('');
       const accs = ART.ACC.map((a, i) => {
         const open = i < info.done, on = (k.av.acc || '') === a.id;
-        return `<button class="accb ${open ? '' : 'lock'} ${on ? 'on' : ''}" onclick="Play.accInfo('${k.id}',${i})"><span>${open ? a.icon : '🔒'}</span><small>${open ? a.name : (i + 1) * 7 + ' نجمة'}</small></button>`;
+        return `<button class="accb ${open ? '' : 'lock'} ${on ? 'on' : ''}" onclick="Play.accInfo('${k.id}',${i})"><span>${a.icon}</span>${open ? '' : '<em class="lk">🔒</em>'}<small>${open ? a.name : 'باقي ' + Math.max(0, (i + 1) * 7 - info.n)}</small></button>`;
       }).join('');
       return `<div class="card skycard">
-        <div class="row" style="align-items:center;gap:12px;flex:none">${ART.avatarSVG(k.av, k.g, 62)}<div style="flex:1"><h2 style="margin:0">سماء ${c.esc(k.name)}</h2>
-        <span class="muted" style="margin:0">⭐ ${info.n} نجمة · ✨ ${info.done} كوكبة · 🎁 ${ev.length} ملصق</span></div>
+        <div class="skyhead">${ART.avatarSVG(k.av, k.g, 90)}<div class="shinfo"><h2>سماء ${c.esc(k.name)}</h2>
+        <div class="shchips"><span>⭐ ${info.n}</span><span>✨ ${info.done}</span><span>🎁 ${ev.length}</span></div></div>
         <button class="small" onclick="App.editKid('${k.id}', true)">✏️ غيّر شكلي</button></div>
         ${monthGrid(k, ev)}
         <div class="skywrap">${skySVG(info.done, info.cur)}<div class="skylbl">${name} · ${info.cur}/7</div></div>
