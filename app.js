@@ -305,6 +305,10 @@ const App = (() => {
     const opts = (id, list) => { $(id).innerHTML = list.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join(''); };
     seg('kidG', e.g, (v) => { if (v !== e.g) { e.g = v; e.av = { ...ART.DEFAULTS[v === 'f' ? 'f' : 'm'] }; } });
     seg('kidAge', e.age, (v) => (e.age = +v));
+    e.app = e.app || {};
+    $('kidPal').innerHTML = PALS.map(([v, t, g]) => `<button type="button" class="${(e.app.pal || 'sky') === v ? 'on' : ''}" data-p="${v}"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
+    $('kidPal').querySelectorAll('button').forEach((b) => (b.onclick = () => { e.app.pal = b.dataset.p; buildKidForm(); }));
+    seg('kidTheme', e.app.theme || 'light', (v) => (e.app.theme = v));
     opts('kidHead', ART.HEADS[G]); seg('kidHead', ART.headOf(a, G === 'f'), (v) => { a.head = v; a.hijab = v === 'hijab' ? 1 : 0; });
     opts('kidStyle', ART.STYLES[G].map((t, i) => [i, t])); seg('kidStyle', a.style || 0, (v) => (a.style = +v));
     opts('kidOutfit', ART.OUTFITS[G]); seg('kidOutfit', a.outfit || 'tee', (v) => (a.outfit = v));
@@ -385,8 +389,8 @@ const App = (() => {
     $('clk').textContent = d.toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long' });
     $('dt').textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
     const se = season(d); $('season').innerHTML = se[0] + '<em>' + se[2] + '</em>'; $('season').className = 'season ' + se[1];
-    document.body.dataset.pal = S.pal || 'sky';
-    const th = S.theme || 'light';
+    const ap = appPrefs(); document.body.dataset.pal = ap.pal;
+    const th = ap.theme;
     document.body.classList.toggle('nt', th === 'dark' || (th === 'auto' && isNight()));
   }
   /* الفصول الفلكية (نصف الكرة الشمالي) */
@@ -402,8 +406,13 @@ const App = (() => {
     const cld = '<svg class="cld" viewBox="0 0 150 44" preserveAspectRatio="none"><g fill="#fff" opacity=".9"><ellipse cx="30" cy="32" rx="30" ry="12"/><ellipse cx="58" cy="26" rx="24" ry="14"/><ellipse cx="92" cy="32" rx="30" ry="11"/><ellipse cx="124" cy="34" rx="24" ry="9"/></g></svg>';
     return `<i class="mn">${Space.moonSVG(Space.moonAge(), 108, true)}</i>${cld}${spk}<i class="sat">${Space.planetSVG(5, 58)}</i>`;
   }
-  function setTheme(t) { S.theme = t; save(); tickClock(); renderSettings(); }
-  function setPal(p) { S.pal = p; save(); tickClock(); renderSettings(); }
+  /* المظهر: جهاز الطفل ياخذ اللون اللي اختاره وليّ الأمر للطفل، وجهاز وليّ الأمر له اختياره */
+  function devKid() { return S.role === 'child' && (S.devKids || []).length ? kidById(S.devKids[0]) : null; }
+  function appPrefs() { const k = devKid(), a = (k && k.app) || {}; return k ? { pal: a.pal || 'sky', theme: a.theme || 'light' } : { pal: S.pal || 'sky', theme: S.theme || 'light' }; }
+  function setPref(key, v) { const k = devKid(); if (k) { k.app = { ...(k.app || {}), [key]: v }; famChanged(); } else { S[key] = v; save(); } tickClock(); renderSettings(); }
+  function setTheme(t) { setPref('theme', t); }
+  function setPal(p) { setPref('pal', p); }
+  const PALS = [['sky', 'سماوي', '#7FBFEF,#EEF6FD'], ['pink', 'وردي', '#F3A6C8,#FFF3F8'], ['green', 'أخضر', '#86D2AE,#F1FBF6'], ['sand', 'رملي', '#93AECF,#EFE5D6']];
   function kidNights(k) {
     const d = new Date(), mk = dateKey(d).slice(0, 7);
     const days = new Set(allLogs().filter((e) => (e.k || []).includes(k.id)).map((e) => e.d));
@@ -809,9 +818,8 @@ const App = (() => {
     const ex = S.fam.extra && S.fam.extra.d === nightKey() ? S.fam.extra.n : 0;
     $('extraNote').textContent = ex ? 'الليلة: ' + AR(allowedTonight()) + ' قصص (منها ' + AR(ex) + ' إضافية)' : '';
     $('storyCount').textContent = STORIES.length;
-    $('themeSeg').innerHTML = [['auto', '🌗 تلقائي'], ['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${(S.theme || 'light') === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
-    $('palSeg').innerHTML = [['sky', 'سماوي', '#7FBFEF,#EEF6FD'], ['pink', 'وردي', '#F3A6C8,#FFF3F8'], ['green', 'أخضر', '#86D2AE,#F1FBF6'], ['sand', 'رملي', '#93AECF,#EFE5D6']]
-      .map(([v, t, g]) => `<button class="${(S.pal || 'sky') === v ? 'on' : ''}" onclick="App.setPal('${v}')"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
+    $('themeSeg').innerHTML = [['auto', '🌗 تلقائي'], ['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${appPrefs().theme === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
+    $('palSeg').innerHTML = PALS.map(([v, t, g]) => `<button class="${appPrefs().pal === v ? 'on' : ''}" onclick="App.setPal('${v}')"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
     $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
     $('verNote').textContent = 'الإصدار الحالي: ' + CONFIG.VERSION;
     libShown = 8; filterStories();
