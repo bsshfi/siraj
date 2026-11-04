@@ -32,7 +32,7 @@ body{
   background-attachment:fixed;overflow-x:hidden;
   padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
-button{font-family:inherit;cursor:pointer;border:0}
+button{font-family:inherit;cursor:pointer;border:0;color:var(--ink)}
 input,select{font-family:inherit}
 .screen{display:none;min-height:100vh;padding:20px 16px 40px;max-width:760px;margin:0 auto}
 .screen.on{display:block;animation:fade .35s ease}
@@ -418,6 +418,7 @@ body:before{content:"";position:fixed;inset:auto 0 0 0;height:42vh;pointer-event
 .hchips{display:flex;gap:8px;margin-bottom:12px;align-items:center}
 .hchip{flex:1;background:var(--glass);border:1.5px solid var(--gline);border-radius:999px;padding:7px 8px;font-size:13.5px;font-weight:700;display:flex;justify-content:center;gap:5px;color:var(--ink);white-space:nowrap}
 .hchip em{font-style:normal;color:#1F9D57;font-weight:800}
+.hicon.on{background:var(--orange);border-color:var(--orange)}
 .hicon{width:40px;height:40px;flex:none;border-radius:50%;background:var(--glass);border:1.5px solid var(--gline);font-size:18px;display:grid;place-items:center}
 /* الأبطال */
 .kidsbar{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:12px}
@@ -455,12 +456,14 @@ body:before{content:"";position:fixed;inset:auto 0 0 0;height:42vh;pointer-event
 /* الوضع الليلي التلقائي وقت النوم */
 body.nt{background:linear-gradient(180deg,#1E2348 0%,#2C2F5C 45%,#4A3F6B 100%)}
 body.nt:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#433760 0 45%,transparent 46%)}
-body.nt{--glass:rgba(255,255,255,.1);--gline:rgba(255,255,255,.16);--ink:#F2EEFF;--soft:#B9B5D6;--card:rgba(255,255,255,.1)}
-body.nt .brand3 small,body.nt .clock small{color:#C9C4E8}
-body.nt .bnav{background:rgba(30,32,70,.86);border-color:#ffffff22}
-body.nt .kid svg{border-color:#ffffff33;background:#fff}
-body.nt .bedbar .bar{background:#ffffff22}
-body.nt .tonight .art{opacity:.92}
+body.nt{--glass:rgba(255,255,255,.9);--gline:rgba(255,255,255,.35)}
+body.nt .brand3 b,body.nt .clock b{color:#F4F1FF}
+body.nt .brand3 small,body.nt .clock small,body.nt .modehint,body.nt .foot{color:#C9C4E8}
+body.nt .bnav{background:rgba(28,30,66,.9);border-color:#ffffff22}
+body.nt .bnav button{color:#AFAACF}
+body.nt .bnav button span{opacity:.75}
+body.nt .modebar{background:#ffffff1f;border-color:#ffffff2e}body.nt .modebar button{color:#D9D5F2}body.nt .modebar button.on{color:#fff}
+body.nt .tonight .art{opacity:.94}
 /* الكواكب */
 .mooncard{background:linear-gradient(160deg,#1E2350,#3B2F7A)!important;color:#fff;display:flex;gap:12px;align-items:center;padding:16px;border:0!important}
 .mc-art{flex:none;animation:moonpulse 6s ease-in-out infinite}
@@ -584,7 +587,7 @@ body.nt .tonight .art{opacity:.92}
     <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
   </header>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
-    <button class="hicon" onclick="App.shareApp()" aria-label="مشاركة التطبيق">📤</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
+    <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
   <div class="modebar" id="modeBar" style="display:none"></div>
   <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
@@ -600,7 +603,7 @@ body.nt .tonight .art{opacity:.92}
   <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
   <div id="paneDash" style="display:none"><div id="dash"></div></div>
   <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
-  <nav class="tabs bnav"><button id="tabTonight" class="on" onclick="App.tab('tonight')"><span>🌙</span>الليلة</button><button id="tabSky" onclick="App.tab('sky')"><span>⭐</span>سمائي</button><button id="tabSpace" onclick="App.tab('space')"><span>🪐</span>الكواكب</button><button id="tabPlay" onclick="App.tab('play')"><span>🎨</span>ألعاب</button><button id="tabEng" onclick="App.tab('eng')"><span>🔤</span>English</button><button id="tabLib" onclick="App.tab('lib')"><span>📚</span>مكتبتي</button><button id="tabDash" onclick="App.tab('dash')"><span>📊</span>المتابعة</button></nav>
+  <nav class="tabs bnav"><button id="tabTonight" class="on" onclick="App.tab('tonight')"><span>🌙</span>الليلة</button><button id="tabSky" onclick="App.tab('sky')"><span>⭐</span>سمائي</button><button id="tabSpace" onclick="App.tab('space')"><span>🪐</span>الكواكب</button><button id="tabPlay" onclick="App.tab('play')"><span>🎨</span>ألعاب</button><button id="tabEng" onclick="App.tab('eng')"><span>🔤</span>English</button><button id="tabLib" onclick="App.tab('lib')"><span>📚</span>مكتبتي</button><button id="tabDash" style="display:none!important" onclick="App.tab('dash')"></button></nav>
 </section>
 
 <!-- قارئ القصة -->
@@ -774,18 +777,18 @@ body.nt .tonight .art{opacity:.92}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.0"></script>
-<script src="sync.js?v=3.0"></script>
-<script src="art.js?v=3.0"></script>
-<script src="stories.js?v=3.0"></script>
-<script src="stories-2.js?v=3.0"></script>
-<script src="stories-3.js?v=3.0"></script>
-<script src="stories-4.js?v=3.0"></script>
-<script src="play.js?v=3.0"></script>
-<script src="english-2.js?v=3.0"></script>
-<script src="english.js?v=3.0"></script>
-<script src="space.js?v=3.0"></script>
-<script src="app.js?v=3.0"></script>
-<script src="wamd-stats.js?v=3.0" data-app="siraj"></script>
+<script src="config.js?v=3.1"></script>
+<script src="sync.js?v=3.1"></script>
+<script src="art.js?v=3.1"></script>
+<script src="stories.js?v=3.1"></script>
+<script src="stories-2.js?v=3.1"></script>
+<script src="stories-3.js?v=3.1"></script>
+<script src="stories-4.js?v=3.1"></script>
+<script src="play.js?v=3.1"></script>
+<script src="english-2.js?v=3.1"></script>
+<script src="english.js?v=3.1"></script>
+<script src="space.js?v=3.1"></script>
+<script src="app.js?v=3.1"></script>
+<script src="wamd-stats.js?v=3.1" data-app="siraj"></script>
 </body>
 </html>

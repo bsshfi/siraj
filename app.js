@@ -372,7 +372,7 @@ const App = (() => {
     $('tabPlay').classList.toggle('dim', isNight()); $('tabEng').classList.toggle('dim', isNight());
     renderTop(hs.length ? hs : shown.slice(0, 1));
     $('ver').textContent = 'v' + CONFIG.VERSION;
-    $('tabDash').style.display = S.role === 'parent' ? '' : 'none';
+    $('dashBtn').style.display = S.role === 'parent' ? '' : 'none';
     const mb = $('modeBar'), kidsMode = S.parentMode === 'kids';
     mb.style.display = S.role === 'parent' ? '' : 'none';
     mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">🔍 معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">📖 أقرأ مع العيال</button>`;
@@ -430,6 +430,7 @@ const App = (() => {
     if (t === 'play') Play.renderPlay();
     if (t === 'eng') EN.render();
     if (t === 'space') Space.render();
+    if ($('dashBtn')) $('dashBtn').classList.toggle('on', t === 'dash');
     window.scrollTo(0, 0);
     if (t !== 'dash') loadRemote(true);
   }
