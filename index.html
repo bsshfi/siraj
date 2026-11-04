@@ -520,6 +520,43 @@ body.nt .tonight .art{opacity:.94}
 @keyframes pageturn{from{opacity:0;transform:perspective(900px) rotateY(-28deg) translateX(-20px)}to{opacity:1;transform:none}}
 .ptext .w{transition:.2s;border-radius:6px;padding:0 1px}.ptext .w.on{background:#FFD93D;color:#2A2F45}
 @media (prefers-reduced-motion:reduce){.art [class*="fx-"],.moonbtn,.mc-art,.spin svg{animation:none!important}}
+
+/* ================= v3.3 ألوان الخلفية + رأس أنظف ================= */
+body,body[data-pal="sky"]{background:linear-gradient(180deg,#7FBFEF 0%,#A8D4F5 30%,#D3E9FA 65%,#EEF6FD 100%);background-attachment:fixed}
+body:before,body[data-pal="sky"]:before{background:radial-gradient(120% 60% at 15% 100%,#C8E2F7 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#D9ECFA 0 45%,transparent 46%)}
+body[data-pal="pink"]{background:linear-gradient(180deg,#F3A6C8 0%,#F7C3DA 32%,#FBE0EC 68%,#FFF3F8 100%)}
+body[data-pal="pink"]:before{background:radial-gradient(120% 60% at 15% 100%,#F6CFE0 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#FADCE9 0 45%,transparent 46%)}
+body[data-pal="green"]{background:linear-gradient(180deg,#86D2AE 0%,#ADE2C7 32%,#D6F1E3 68%,#F1FBF6 100%)}
+body[data-pal="green"]:before{background:radial-gradient(120% 60% at 15% 100%,#C4EBD6 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#D7F3E4 0 45%,transparent 46%)}
+body[data-pal="sand"]{background:linear-gradient(180deg,#93AECF 0%,#B7C8DC 28%,#E6DBCB 68%,#EFE5D6 100%)}
+body[data-pal="sand"]:before{background:radial-gradient(120% 60% at 15% 100%,#E3D0B7 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#E9D9C3 0 45%,transparent 46%)}
+.brand3 small{color:#3F4865}
+/* بطاقة التاريخ: القمر يمين، وجنبه اليوم والتاريخ والفصل */
+.hd3l{gap:10px;background:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.9);border-radius:24px;padding:6px 12px 6px 8px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 22px #3a5a8a1f}
+.moonbtn{width:64px;height:64px;flex:none}.moonbtn svg{width:64px;height:64px}
+.moonbtn:after{bottom:-2px;left:-4px;font-size:15px}
+.clock{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.clock b{font-size:20px;line-height:1.1}
+.clock small{font-size:13px;color:#4B5470;margin:0;font-weight:700;letter-spacing:.3px}
+.season{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:800;color:#fff;margin-top:2px;box-shadow:0 3px 8px #0000001f}
+.season.autumn{background:linear-gradient(135deg,#F0913A,#D9622B)}
+.season.winter{background:linear-gradient(135deg,#6AA8F5,#3D6FE0)}
+.season.spring{background:linear-gradient(135deg,#F37BB0,#D8478A)}
+.season.summer{background:linear-gradient(135deg,#FFC93D,#F59E0B);color:#5A3A00}
+@media (max-width:380px){.brand3 b{font-size:34px}.moonbtn,.moonbtn svg{width:56px;height:56px}}
+/* الداكن: عنوان الإعدادات وبطاقة التاريخ */
+body.nt .top,body.nt .top .brand{color:#F4F1FF}
+body.nt .top .iconbtn{background:#ffffff1f;color:#fff;border-color:#ffffff2e}
+body.nt .hd3l{background:#ffffff14;border-color:#ffffff26}
+/* اختيار لون الخلفية */
+.pals{display:flex;gap:10px}
+.pals button{flex:1;border-radius:16px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13.5px;font-weight:700;background:#fff;border:2px solid #EEE;color:var(--ink)}
+.pals button i{width:34px;height:34px;border-radius:50%;display:block;box-shadow:inset 0 0 0 2px #ffffffaa}
+.pals button.on{border-color:var(--orange);box-shadow:0 0 0 3px #F2851E33}
+
+.clock #season.season{color:#fff}.clock #season.season.summer{color:#5A3A00}
+body.nt[data-pal]{background:linear-gradient(180deg,#1E2348 0%,#2C2F5C 45%,#4A3F6B 100%)}
+body.nt[data-pal]:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#433760 0 45%,transparent 46%)}
 </style>
 </head>
 <body>
@@ -590,7 +627,7 @@ body.nt .tonight .art{opacity:.94}
 <section id="home" class="screen">
   <header class="hd3">
     <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""></b><small id="hello">حكاية الليلة</small></div>
-    <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small><small id="season"></small></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
+    <div class="hd3l"><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button><div class="clock"><b id="clk"></b><small id="dt"></small><span id="season" class="season"></span></div></div>
   </header>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
     <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
@@ -682,8 +719,10 @@ body.nt .tonight .art{opacity:.94}
   </div>
   <div class="card">
     <h2>المظهر 🎨</h2>
-    <p class="muted">تلقائي: فاتح في النهار، ويصير كحلي هادي من وقت النوم لين الصبح.</p>
+    <p class="muted">فاتح هو الأساسي. «تلقائي» يخليه كحلي هادي من وقت النوم لين الصبح.</p>
     <div class="seg" id="themeSeg"></div>
+    <p class="muted" style="margin:12px 0 6px">لون الخلفية في الوضع الفاتح:</p>
+    <div class="pals" id="palSeg"></div>
   </div>
   <div class="card">
     <h2>التحديث 🔄</h2>
@@ -788,18 +827,18 @@ body.nt .tonight .art{opacity:.94}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.2"></script>
-<script src="sync.js?v=3.2"></script>
-<script src="art.js?v=3.2"></script>
-<script src="stories.js?v=3.2"></script>
-<script src="stories-2.js?v=3.2"></script>
-<script src="stories-3.js?v=3.2"></script>
-<script src="stories-4.js?v=3.2"></script>
-<script src="play.js?v=3.2"></script>
-<script src="english-2.js?v=3.2"></script>
-<script src="english.js?v=3.2"></script>
-<script src="space.js?v=3.2"></script>
-<script src="app.js?v=3.2"></script>
-<script src="wamd-stats.js?v=3.2" data-app="siraj"></script>
+<script src="config.js?v=3.3"></script>
+<script src="sync.js?v=3.3"></script>
+<script src="art.js?v=3.3"></script>
+<script src="stories.js?v=3.3"></script>
+<script src="stories-2.js?v=3.3"></script>
+<script src="stories-3.js?v=3.3"></script>
+<script src="stories-4.js?v=3.3"></script>
+<script src="play.js?v=3.3"></script>
+<script src="english-2.js?v=3.3"></script>
+<script src="english.js?v=3.3"></script>
+<script src="space.js?v=3.3"></script>
+<script src="app.js?v=3.3"></script>
+<script src="wamd-stats.js?v=3.3" data-app="siraj"></script>
 </body>
 </html>

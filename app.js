@@ -384,16 +384,18 @@ const App = (() => {
     const d = new Date(); if (!$('clk')) return;
     $('clk').textContent = d.toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long' });
     $('dt').textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-    $('season').textContent = 'حنا في فصل ' + season(d);
-    const th = S.theme || 'auto';
+    const se = season(d); $('season').textContent = se[0]; $('season').className = 'season ' + se[1];
+    document.body.dataset.pal = S.pal || 'sky';
+    const th = S.theme || 'light';
     document.body.classList.toggle('nt', th === 'dark' || (th === 'auto' && isNight()));
   }
   /* الفصول الفلكية (نصف الكرة الشمالي) */
   function season(d) {
     const v = (d.getMonth() + 1) * 100 + d.getDate();
-    return v >= 320 && v < 621 ? 'الربيع 🌸' : v >= 621 && v < 923 ? 'الصيف ☀️' : v >= 923 && v < 1221 ? 'الخريف 🍂' : 'الشتاء ❄️';
+    return v >= 320 && v < 621 ? ['🌸 فصل الربيع', 'spring'] : v >= 621 && v < 923 ? ['☀️ فصل الصيف', 'summer'] : v >= 923 && v < 1221 ? ['🍂 فصل الخريف', 'autumn'] : ['❄️ فصل الشتاء', 'winter'];
   }
   function setTheme(t) { S.theme = t; save(); tickClock(); renderSettings(); }
+  function setPal(p) { S.pal = p; save(); tickClock(); renderSettings(); }
   function kidNights(k) {
     const d = new Date(), mk = dateKey(d).slice(0, 7);
     const days = new Set(allLogs().filter((e) => (e.k || []).includes(k.id)).map((e) => e.d));
@@ -799,7 +801,9 @@ const App = (() => {
     const ex = S.fam.extra && S.fam.extra.d === nightKey() ? S.fam.extra.n : 0;
     $('extraNote').textContent = ex ? 'الليلة: ' + AR(allowedTonight()) + ' قصص (منها ' + AR(ex) + ' إضافية)' : '';
     $('storyCount').textContent = STORIES.length;
-    $('themeSeg').innerHTML = [['auto', '🌗 تلقائي'], ['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${(S.theme || 'auto') === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
+    $('themeSeg').innerHTML = [['auto', '🌗 تلقائي'], ['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${(S.theme || 'light') === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
+    $('palSeg').innerHTML = [['sky', 'سماوي', '#7FBFEF,#EEF6FD'], ['pink', 'وردي', '#F3A6C8,#FFF3F8'], ['green', 'أخضر', '#86D2AE,#F1FBF6'], ['sand', 'رملي', '#93AECF,#EFE5D6']]
+      .map(([v, t, g]) => `<button class="${(S.pal || 'sky') === v ? 'on' : ''}" onclick="App.setPal('${v}')"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
     $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
     $('verNote').textContent = 'الإصدار الحالي: ' + CONFIG.VERSION;
     libShown = 8; filterStories();
@@ -1025,7 +1029,7 @@ const App = (() => {
     ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
-    setTheme, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
+    setTheme, setPal, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
 
