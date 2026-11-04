@@ -383,6 +383,134 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
 #sleep{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 30s ease;z-index:40}
 #sleep.on{opacity:.93;pointer-events:auto}
 .search{width:100%;padding:10px 14px;border-radius:14px;border:2px solid #E3DDF7;font-size:16px;margin-bottom:8px;font-family:inherit}
+
+/* ================= v3.0 الواجهة الجديدة (نفس عائلة سهم وفلق، بروح أطفال) ================= */
+:root{--bg1:#F2851E;--orange:#F2851E;--or2:#FFA03E;--ink:#2A2F45;--soft:#7A8098;--glass:rgba(255,255,255,.74);--gline:rgba(255,255,255,.95)}
+body{background:linear-gradient(180deg,#93AECF 0%,#B7C8DC 28%,#E6DBCB 68%,#EFE5D6 100%);background-attachment:fixed}
+body:before{content:"";position:fixed;inset:auto 0 0 0;height:42vh;pointer-events:none;z-index:-1;background:
+ radial-gradient(120% 60% at 15% 100%,#E3D0B7 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#E9D9C3 0 45%,transparent 46%)}
+.card{background:var(--glass);border:1.5px solid var(--gline);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 10px 28px #50628a1c;border-radius:26px}
+.btn{background:linear-gradient(180deg,var(--or2),var(--orange));box-shadow:0 7px 16px #F2851E4d,inset 0 -4px 0 #0000001a;border-radius:20px}
+.btn:active{transform:translateY(2px);box-shadow:0 3px 8px #F2851E4d}
+.btn.alt{background:#fff;color:#C9650C;box-shadow:0 4px 10px #50628a1a;border:1.5px solid #F6E3CF}
+.btn.ghost{color:var(--soft)!important;background:transparent;box-shadow:none;border:0}
+.chip{background:#ffffffb0;color:var(--soft);border:1.5px solid var(--gline)}.chip.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.seg button.on,.tquick button.on,.count{background:var(--orange)}
+.top,.hello:not(#hello),#welcome,.empty{color:var(--ink)}
+.foot{color:var(--soft)}.foot a{color:var(--ink)}
+.iconbtn{background:#ffffffb0;color:var(--ink);border:1.5px solid var(--gline)}
+#reader .iconbtn{background:#ffffff1f;color:#fff;border:0}
+.modehint{color:var(--soft)}
+.modebar{background:#ffffff80;border:1.5px solid var(--gline)}.modebar button{color:var(--soft)}.modebar button.on{background:var(--orange);color:#fff}
+.enlv{background:#ffffff80!important;border:1.5px solid var(--gline)}.enlv button{color:var(--soft)}.enlv button.on{background:#fff;color:var(--orange)}
+/* الرأس */
+.hd3{display:flex;justify-content:space-between;align-items:flex-start;margin:4px 2px 12px}
+.brand3{display:flex;flex-direction:column}
+.brand3 b{font-size:40px;font-weight:800;line-height:1;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.brand3 img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 10px #0002}
+.brand3 small{color:#4B5470;font-size:14.5px;font-weight:600;margin-top:4px;max-width:210px;line-height:1.4}
+.hd3l{display:flex;align-items:center;gap:10px}
+.clock{text-align:left;direction:ltr}.clock b{display:block;font-size:24px;font-weight:800;color:var(--ink);line-height:1}.clock small{display:block;direction:rtl;text-align:right;font-size:12.5px;color:#4B5470;font-weight:700;margin-top:3px}
+.moonbtn{width:54px;height:54px;border-radius:50%;background:transparent;padding:0;position:relative;filter:drop-shadow(0 4px 10px #2A2F4544);animation:moonpulse 4s ease-in-out infinite}
+.moonbtn svg{width:54px;height:54px;display:block}
+.moonbtn:after{content:"🪐";position:absolute;bottom:-4px;left:-6px;font-size:16px}
+@keyframes moonpulse{50%{transform:scale(1.06)}}
+.hchips{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.hchip{flex:1;background:var(--glass);border:1.5px solid var(--gline);border-radius:999px;padding:7px 8px;font-size:13.5px;font-weight:700;display:flex;justify-content:center;gap:5px;color:var(--ink);white-space:nowrap}
+.hchip em{font-style:normal;color:#1F9D57;font-weight:800}
+.hicon{width:40px;height:40px;flex:none;border-radius:50%;background:var(--glass);border:1.5px solid var(--gline);font-size:18px;display:grid;place-items:center}
+/* الأبطال */
+.kidsbar{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:12px}
+.kidsbar .kids{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:10px;scrollbar-width:none}
+.klbl{margin-right:auto;font-size:13.5px;color:var(--soft);font-weight:800;text-align:left;line-height:1.3}.klbl small{display:block;font-size:11px;font-weight:600}
+.kid{background:transparent;border:0;width:auto;padding:0;display:flex;flex-direction:column;align-items:center;box-shadow:none}
+.kid svg{width:60px;height:60px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 3px 8px #50628a26;transition:.2s}
+.kid.sel{transform:none;box-shadow:none}.kid.sel svg{border-color:var(--orange);box-shadow:0 0 0 4px #F2851E33}
+.kid .nm{font-size:14px;margin-top:3px}
+.kid .badge{top:-6px;left:-8px;font-size:10.5px}
+/* قصة الليلة */
+.tonight{padding:0}.tonight .art{border-radius:0}
+.tonight .info{padding:12px 16px 16px}
+.tonight .title{font-size:25px;margin:6px 0 2px}
+.tonight .tmeta{font-size:13px;color:var(--soft);font-weight:600;margin:2px 0 0}
+.tonight .btn{height:56px;font-size:20px;font-weight:800}
+/* شريط وقت النوم */
+.bedbar{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13.5px;font-weight:700;margin-bottom:12px}
+.bedbar .bar{flex:1;height:7px;border-radius:7px;background:#E6E0D6;position:relative;overflow:hidden}
+.bedbar .bar i{position:absolute;top:0;bottom:0;right:0;border-radius:7px;background:linear-gradient(270deg,#F2851E,#FFC37A)}
+.bedbar em{font-style:normal;color:var(--orange);white-space:nowrap}
+/* البلاطات */
+.qtiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.qtiles button{background:var(--glass);border:1.5px solid var(--gline);border-radius:20px;padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:700;color:var(--ink)}
+.qtiles span{font-size:27px;line-height:1.15}.qtiles small{font-size:11px;color:var(--orange);font-weight:800}
+/* الشريط السفلي */
+#home{padding-bottom:110px}
+.bnav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:740px;z-index:30;
+ margin:0;padding:7px;gap:2px;display:flex;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid #fff;border-radius:30px;box-shadow:0 10px 30px #50628a33}
+.bnav button{flex:1;min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px;border-radius:22px;background:transparent;color:#8A8FA3;font-size:12px;font-weight:700}
+.bnav button span{font-size:21px;line-height:1.1;filter:grayscale(1);opacity:.6;transition:.2s}
+.bnav button.on{background:linear-gradient(180deg,var(--or2),var(--orange));color:#fff;box-shadow:0 6px 14px #F2851E55}
+.bnav button.on span{filter:none;opacity:1}
+.bnav button.dim{opacity:.55}
+/* الوضع الليلي التلقائي وقت النوم */
+body.nt{background:linear-gradient(180deg,#1E2348 0%,#2C2F5C 45%,#4A3F6B 100%)}
+body.nt:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#433760 0 45%,transparent 46%)}
+body.nt{--glass:rgba(255,255,255,.1);--gline:rgba(255,255,255,.16);--ink:#F2EEFF;--soft:#B9B5D6;--card:rgba(255,255,255,.1)}
+body.nt .brand3 small,body.nt .clock small{color:#C9C4E8}
+body.nt .bnav{background:rgba(30,32,70,.86);border-color:#ffffff22}
+body.nt .kid svg{border-color:#ffffff33;background:#fff}
+body.nt .bedbar .bar{background:#ffffff22}
+body.nt .tonight .art{opacity:.92}
+/* الكواكب */
+.mooncard{background:linear-gradient(160deg,#1E2350,#3B2F7A)!important;color:#fff;display:flex;gap:12px;align-items:center;padding:16px;border:0!important}
+.mc-art{flex:none;animation:moonpulse 6s ease-in-out infinite}
+.mc-in{flex:1}.mc-in small{color:#C9C4FF;font-weight:700}.mc-in h2{font-size:28px;margin:0;color:#FFE9A8}.mc-in p{margin:2px 0 8px;font-size:14px;color:#E4E0FF;line-height:1.6}
+.mc-stats{display:flex;gap:6px;margin-bottom:10px}.mc-stats div{flex:1;background:#ffffff14;border-radius:12px;padding:5px 4px;text-align:center}
+.mooncard .btn{font-size:16px;padding:10px 12px;white-space:nowrap}
+.mc-stats b{display:block;font-size:16px;color:#FFE9A8}.mc-stats span{font-size:10.5px;color:#C9C4FF}
+@media (max-width:420px){.mooncard{flex-direction:column;text-align:center}}
+.spsub{margin:0 0 10px}
+.phstrip{display:flex;justify-content:space-between;background:linear-gradient(160deg,#1E2350,#3B2F7A);border-radius:18px;padding:8px;margin-bottom:12px}
+.phstrip div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:12px}
+.phstrip small{font-size:9.5px;color:#C9C4FF;white-space:nowrap}.phstrip div.on{background:#ffffff22}.phstrip div.on small{color:#FFE9A8;font-weight:800}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.mz{background:#fff;border-radius:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;color:var(--ink);border:2px solid #F2EEE6;position:relative}
+.mz i{font-style:normal;font-size:11px;color:var(--soft)}.mz b{font-size:13.5px}.mz em{font-style:normal;font-size:10.5px;color:#fff;background:var(--orange);border-radius:8px;padding:0 6px;margin-top:2px}
+.mz.on{border-color:var(--orange);background:#FFF4E8}
+.ayah{text-align:center;font-size:18px;line-height:1.9;margin:14px 0 0;color:var(--ink)}.ayah small{display:block;font-size:12px;color:var(--soft)}
+.solar{display:flex;align-items:center;gap:2px;overflow-x:auto;background:linear-gradient(90deg,#141838,#2D2A66);border-radius:18px;padding:10px 8px;margin-bottom:12px;direction:ltr;scrollbar-width:none}
+.solar .sun{flex:none;width:46px;height:92px;border-radius:0 92px 92px 0;margin-left:-8px;background:radial-gradient(circle at 0 50%,#FFF3B0,#FFB43B 60%,#FF8A1E);box-shadow:0 0 24px #FFB43B88}
+.solar button{background:none;padding:0;flex:none}
+.plist,.slist{display:flex;flex-direction:column;gap:8px}
+.pcard,.scard{display:flex;gap:10px;align-items:center;background:#fff;border-radius:18px;padding:8px 10px;text-align:right;color:var(--ink);border:2px solid #F2EEE6}
+.pcard b,.scard b{font-size:17px}.pcard small{color:var(--soft);font-size:12px;margin-right:6px}.pcard span{display:block;font-size:13px;color:var(--soft);line-height:1.5}
+.scard>span{font-size:34px}.scard small{display:block;color:var(--soft);font-size:13px;line-height:1.55}
+.spin svg{animation:spin 18s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.facts p{background:#FFF7EC;border-radius:12px;padding:8px 12px;margin:6px 0;text-align:right;font-size:15px;line-height:1.7}
+/* القصص المتحركة ✨ */
+.art .fx-cl{animation:fxcl 16s ease-in-out infinite alternate}
+.art .fx-sun{animation:fxsun 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.art .fx-wv{animation:fxwv 5s ease-in-out infinite alternate}
+.art .fx-wv2{animation:fxwv 3.6s ease-in-out infinite alternate-reverse}
+.art .fx-bd{animation:fxbd 9s linear infinite}
+.art .fx-rn{animation:fxrn .9s linear infinite}
+.art .fx-fl,.art .fx-flame{animation:fxfl .7s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.art .fx-sw{animation:fxsw 4.5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.art .fx-enter{animation:fxenter 1.1s cubic-bezier(.3,1.4,.5,1) both}.art .fx-enter.d2{animation-delay:.2s}.art .fx-enter.d3{animation-delay:.35s}.art .fx-enter.d4{animation-delay:.5s}
+.art .fx-jump{animation:fxjump 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}.art .fx-jump.d2{animation-delay:.25s}.art .fx-jump.d3{animation-delay:.5s}
+@keyframes fxcl{to{transform:translateX(-46px)}}
+@keyframes fxsun{50%{transform:scale(1.08);filter:drop-shadow(0 0 10px #FFE066)}}
+@keyframes fxwv{to{transform:translateX(-16px)}}
+@keyframes fxbd{0%{transform:translate(60px,8px)}50%{transform:translate(-80px,-10px)}100%{transform:translate(-220px,6px)}}
+@keyframes fxrn{to{transform:translateY(14px)}}
+@keyframes fxfl{to{transform:scaleY(1.18) scaleX(.9)}}
+@keyframes fxsw{to{transform:rotate(3deg)}}
+@keyframes fxenter{from{transform:translateX(-120px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fxjump{0%,60%,100%{transform:none}30%{transform:translateY(-16px)}}
+.stage .art{animation:pageturn .7s ease both;transform-origin:100% 50%}
+@keyframes pageturn{from{opacity:0;transform:perspective(900px) rotateY(-28deg) translateX(-20px)}to{opacity:1;transform:none}}
+.ptext .w{transition:.2s;border-radius:6px;padding:0 1px}.ptext .w.on{background:#FFD93D;color:#2A2F45}
+@media (prefers-reduced-motion:reduce){.art [class*="fx-"],.moonbtn,.mc-art,.spin svg{animation:none!important}}
 </style>
 </head>
 <body>
@@ -451,28 +579,28 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
 
 <!-- الرئيسية -->
 <section id="home" class="screen">
-  <div class="top">
-    <div class="brand"><img src="icons/icon-192.png" alt="">سِراج</div>
-    <div class="row" style="flex:0;gap:8px">
-      <button class="iconbtn" onclick="App.shareApp()" aria-label="مشاركة التطبيق">📤</button>
-      <button class="iconbtn" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button>
-    </div>
-  </div>
-  <div class="tabs"><button id="tabTonight" class="on" onclick="App.tab('tonight')">🌙 الليلة</button><button id="tabSky" onclick="App.tab('sky')">⭐ سمائي</button><button id="tabPlay" onclick="App.tab('play')">🎨 ألعاب</button><button id="tabEng" onclick="App.tab('eng')">🔤 English</button><button id="tabLib" onclick="App.tab('lib')">📚 مكتبتي</button><button id="tabDash" onclick="App.tab('dash')">📊 المتابعة</button></div>
+  <header class="hd3">
+    <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""></b><small id="hello">حكاية الليلة</small></div>
+    <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
+  </header>
+  <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
+    <button class="hicon" onclick="App.shareApp()" aria-label="مشاركة التطبيق">📤</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
   <div class="modebar" id="modeBar" style="display:none"></div>
   <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
-    <p class="hello" id="hello"></p>
-    <div class="kids" id="kids"></div>
-    <p class="hello" style="font-size:15px;text-align:center;opacity:.85;margin-top:10px">اختر أبطال الليلة، وأول من تختاره هو البطل ⭐</p>
+    <div class="card kidsbar"><div class="kids" id="kids"></div><span class="klbl">أبطال الليلة<small>أول من تختاره هو البطل ⭐</small></span></div>
     <div class="card tonight" id="tonightCard"></div>
+    <div class="card bedbar" id="bedBar"></div>
+    <div class="qtiles" id="qtiles"></div>
   </div>
   <div id="paneSky" style="display:none"><div id="sky"></div></div>
+  <div id="paneSpace" style="display:none"><div id="space"></div></div>
   <div id="panePlay" style="display:none"><div id="play"></div></div>
   <div id="paneEng" style="display:none"><div id="eng"></div></div>
   <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
   <div id="paneDash" style="display:none"><div id="dash"></div></div>
   <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
+  <nav class="tabs bnav"><button id="tabTonight" class="on" onclick="App.tab('tonight')"><span>🌙</span>الليلة</button><button id="tabSky" onclick="App.tab('sky')"><span>⭐</span>سمائي</button><button id="tabSpace" onclick="App.tab('space')"><span>🪐</span>الكواكب</button><button id="tabPlay" onclick="App.tab('play')"><span>🎨</span>ألعاب</button><button id="tabEng" onclick="App.tab('eng')"><span>🔤</span>English</button><button id="tabLib" onclick="App.tab('lib')"><span>📚</span>مكتبتي</button><button id="tabDash" onclick="App.tab('dash')"><span>📊</span>المتابعة</button></nav>
 </section>
 
 <!-- قارئ القصة -->
@@ -646,17 +774,18 @@ label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=2.6.3"></script>
-<script src="sync.js?v=2.6.3"></script>
-<script src="art.js?v=2.6.3"></script>
-<script src="stories.js?v=2.6.3"></script>
-<script src="stories-2.js?v=2.6.3"></script>
-<script src="stories-3.js?v=2.6.3"></script>
-<script src="stories-4.js?v=2.6.3"></script>
-<script src="play.js?v=2.6.3"></script>
-<script src="english-2.js?v=2.6.3"></script>
-<script src="english.js?v=2.6.3"></script>
-<script src="app.js?v=2.6.3"></script>
-<script src="wamd-stats.js?v=2.6.3" data-app="siraj"></script>
+<script src="config.js?v=3.0"></script>
+<script src="sync.js?v=3.0"></script>
+<script src="art.js?v=3.0"></script>
+<script src="stories.js?v=3.0"></script>
+<script src="stories-2.js?v=3.0"></script>
+<script src="stories-3.js?v=3.0"></script>
+<script src="stories-4.js?v=3.0"></script>
+<script src="play.js?v=3.0"></script>
+<script src="english-2.js?v=3.0"></script>
+<script src="english.js?v=3.0"></script>
+<script src="space.js?v=3.0"></script>
+<script src="app.js?v=3.0"></script>
+<script src="wamd-stats.js?v=3.0" data-app="siraj"></script>
 </body>
 </html>

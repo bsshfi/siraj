@@ -256,21 +256,33 @@ const ART = (() => {
       <rect x="250" y="160" width="100" height="40" rx="10" fill="#FF6B6B"/><circle cx="270" cy="203" r="10" fill="#333"/><circle cx="330" cy="203" r="10" fill="#333"/>`
   };
 
-  function page(sceneName, prop, heroes) {
+  /* v3.0 حركة المشاهد: نعلّم العناصر (سحاب، موج، شمس، طيور، مطر، شعلة، سعف) عشان CSS يحرّكها */
+  function animate(sc) {
+    return sc
+      .replace(/<g fill="#fff" opacity="\.(9|75)">/g, '<g class="fx-cl" fill="#fff" opacity=".$1">')
+      .replace(/<circle cx="(\d+)" cy="(\d+)" r="(2[2-9]|3\d)" fill="#(FFE066|FFD93D|FFE29A|FFE08A)"/g, '<circle class="fx-sun" cx="$1" cy="$2" r="$3" fill="#$4"')
+      .replace(/<path d="M0 140 Q25 130/, '<path class="fx-wv" d="M0 140 Q25 130')
+      .replace(/stroke="#BDEBFF"/, 'class="fx-wv2" stroke="#BDEBFF"')
+      .replace(/<path d="M(\d+) (\d+) q6 -6 12 0 q6 -6 12 0"/g, '<path class="fx-bd" d="M$1 $2 q6 -6 12 0 q6 -6 12 0"')
+      .replace(/<g stroke="#E6F2FF"/g, '<g class="fx-rn" stroke="#E6F2FF"')
+      .replace(/fill="#(FFE27A|FFB52E)"\/>/g, 'class="fx-fl" fill="#$1"/>')
+      .replace(/<g fill="#3FAE4A">/g, '<g class="fx-sw" fill="#3FAE4A">');
+  }
+  function page(sceneName, prop, heroes, fx) {
     // كل رسمة تاخذ معرّفات خاصة فيها عشان ما تتعارض التدرجات بين الرسومات
     const u = 'g' + (++page.n);
-    const scene = (SCENES[sceneName] || SCENES.home).replace(/id="(s\w)"/g, `id="$1${u}"`).replace(/url\(#(s\w)\)/g, `url(#$1${u})`);
+    const scene = animate(SCENES[sceneName] || SCENES.home).replace(/id="(s\w)"/g, `id="$1${u}"`).replace(/url\(#(s\w)\)/g, `url(#$1${u})`);
     let people = '';
     if (heroes && heroes.length) {
       const [main, ...rest] = heroes;
       rest.slice(0, 3).forEach((k, i) => {
         const x = 26 + i * 58;
-        people += `<g transform="translate(${x} 168) scale(.6)"><g class="bob b${i + 2}">${avatar(k.av, k.g)}</g></g>`;
+        people += `<g transform="translate(${x} 168) scale(.6)"><g class="fx-${fx || 'idle'} d${i + 2}"><g class="bob b${i + 2}">${avatar(k.av, k.g)}</g></g></g>`;
       });
       const mx = rest.length ? 26 + Math.min(rest.length, 3) * 58 + 6 : 132;
-      people += `<g transform="translate(${mx} 120) scale(.92)"><g class="bob b1">${avatar(main.av, main.g)}</g></g>`;
+      people += `<g transform="translate(${mx} 120) scale(.92)"><g class="fx-${fx || 'idle'} d1"><g class="bob b1">${avatar(main.av, main.g)}</g></g></g>`;
     }
-    const p = prop ? `<g class="floaty"><text x="318" y="210" font-size="62" text-anchor="middle">${prop}</text></g>` : '';
+    const p = prop ? `<g class="floaty ${/🔥|🕯️|🪔/.test(prop) ? 'fx-flame' : ''}"><text x="318" y="210" font-size="62" text-anchor="middle">${prop}</text></g>` : '';
     return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" class="art"><g class="scene">${scene}</g>${people}${p}</svg>`;
   }
 
