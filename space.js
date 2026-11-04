@@ -23,14 +23,24 @@ const Space = (() => {
   ];
   const phaseOf = (age) => PHASES.find((p) => age < p[0]);
   function moonSVG(age, size = 140, glow = true) {
-    const r = 46, p = age / SYN, k = Math.cos(2 * Math.PI * p), rx = Math.abs(k) * r, wax = p < 0.5;
+    const r = 44, p = age / SYN, k = Math.cos(2 * Math.PI * p), rx = Math.abs(k) * r, wax = p < 0.5;
     const outer = wax ? `M50 ${50 - r} A${r} ${r} 0 0 1 50 ${50 + r}` : `M50 ${50 - r} A${r} ${r} 0 0 0 50 ${50 + r}`;
     const sweep = wax ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
     const lit = `${outer} A${rx.toFixed(2)} ${r} 0 0 ${sweep} 50 ${50 - r}Z`;
     const u = 'm' + Math.random().toString(36).slice(2, 7);
-    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true"><defs><radialGradient id="${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#FFF8DC"/><stop offset="1" stop-color="#F2DE9C"/></radialGradient></defs>
-      ${glow ? `<circle cx="50" cy="50" r="49" fill="#FFF3C4" opacity=".12"/>` : ''}<circle cx="50" cy="50" r="${r}" fill="#2E3350"/>
-      <path d="${lit}" fill="url(#${u})"/><g fill="#000" opacity=".07"><circle cx="38" cy="36" r="7"/><circle cx="62" cy="58" r="9"/><circle cx="44" cy="66" r="5"/><circle cx="66" cy="32" r="4"/></g></svg>`;
+    const craters = [[36, 34, 7], [62, 56, 9], [44, 66, 5.5], [66, 32, 4], [28, 54, 4.5], [54, 78, 3.5], [74, 70, 3]]
+      .map(([x, y, cr]) => `<circle cx="${x}" cy="${y}" r="${cr}" fill="url(#${u}c)"/>`).join('');
+    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true" style="overflow:visible"><defs>
+      <radialGradient id="${u}l" cx=".42" cy=".38" r=".72"><stop offset="0" stop-color="#FFFBEA"/><stop offset=".6" stop-color="#F7E7B0"/><stop offset="1" stop-color="#E6CD84"/></radialGradient>
+      <radialGradient id="${u}d" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#454C72"/><stop offset="1" stop-color="#262B47"/></radialGradient>
+      <radialGradient id="${u}c" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#C9AE66" stop-opacity=".55"/><stop offset="1" stop-color="#B89A55" stop-opacity=".15"/></radialGradient>
+      <radialGradient id="${u}g" cx=".5" cy=".5" r=".5"><stop offset=".6" stop-color="#FFF1B8" stop-opacity=".35"/><stop offset="1" stop-color="#FFF1B8" stop-opacity="0"/></radialGradient>
+      <filter id="${u}s" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation=".7"/></filter>
+      <clipPath id="${u}k"><path d="${lit}"/></clipPath></defs>
+      ${glow ? `<circle cx="50" cy="50" r="${r * (1.1 + illum(age) / 160)}" fill="url(#${u}g)"/>` : ''}
+      <circle cx="50" cy="50" r="${r}" fill="url(#${u}d)"/><g opacity=".22">${craters.replace(/url\(#${u}c\)/g, '#1C2038')}</g>
+      <path d="${lit}" fill="url(#${u}l)" filter="url(#${u}s)"/><g clip-path="url(#${u}k)">${craters}</g>
+      <circle cx="50" cy="50" r="${r}" fill="none" stroke="#ffffff" stroke-opacity=".08"/></svg>`;
   }
   function moonLon(d = new Date()) {
     const n = jd(d) - 2451545, L = 218.316 + 13.176396 * n, M = (134.963 + 13.064993 * n) * Math.PI / 180;
@@ -71,15 +81,24 @@ const Space = (() => {
   const mansionIdx = (d) => Math.floor((((moonLon(d) - 24) % 360) + 360) % 360 / (360 / 28));
 
   /* ---- الكواكب ---- */
+  // d: البعد عن الشمس، sz: الحجم مقارنة بالأرض، day: طول اليوم، yr: السنة بأيام الأرض، mo: الأقمار، t: الحرارة، r: نصف القطر النسبي للرسم
   const PL = [
-    { n: 'عطارد', e: 'Mercury', c: ['#C9C2B8', '#8A8178'], s: 16, f: ['أقرب كوكب للشمس وأصغر الكواكب.', 'سنته قصيرة جدًا: ٨٨ يومًا بس!', 'ما عنده هواء يحميه، فنهاره حار جدًا وليله بارد جدًا.'] },
-    { n: 'الزهرة', e: 'Venus', c: ['#FFE0A3', '#E3A857'], s: 24, f: ['أسخن كوكب في المجموعة الشمسية، أسخن حتى من عطارد!', 'أشد الكواكب لمعانًا في سمائنا، تشوفها مثل نجمة قوية عند الغروب أو قبل الفجر.', 'تدور حول نفسها بالعكس، فالشمس عندها تطلع من الغرب!'] },
-    { n: 'الأرض', e: 'Earth', c: ['#6CC6FF', '#2E7FD1'], s: 25, land: 1, f: ['بيتنا الجميل، والكوكب الوحيد اللي نعرف فيه حياة.', 'أغلبها ماء، لذلك تبان زرقاء من الفضاء.', 'لها قمر واحد يدور حولها كل شهر تقريبًا.'] },
-    { n: 'المريخ', e: 'Mars', c: ['#FF9A6B', '#C4492A'], s: 19, f: ['الكوكب الأحمر، لونه من غبار يشبه الصدأ.', 'فيه أعلى جبل في المجموعة الشمسية، أعلى من إيفرست بحوالي ثلاث مرات.', 'له قمران صغيران.'] },
-    { n: 'المشتري', e: 'Jupiter', c: ['#F3D3A8', '#C98B5A'], s: 50, bands: 1, f: ['أكبر الكواكب، يتسع لأكثر من ألف كوكب مثل الأرض!', 'فيه «البقعة الحمراء العظيمة»، عاصفة ضخمة أكبر من الأرض.', 'كوكب غازي، يعني ما فيه أرض نمشي عليها.'] },
-    { n: 'زحل', e: 'Saturn', c: ['#FBE3A6', '#D9AE5F'], s: 42, ring: 1, f: ['مشهور بحلقاته الجميلة، وهي من قطع ثلج وصخر.', 'خفيف جدًا مع إنه ضخم، لو فيه حوض ماء بحجمه كان يطفو!', 'عنده أقمار كثيرة جدًا.'] },
-    { n: 'أورانوس', e: 'Uranus', c: ['#B9F0F2', '#5FC3CF'], s: 32, f: ['لونه أزرق مخضر جميل.', 'يدور وهو مايل على جنبه، كأنه كرة تتدحرج!', 'بارد جدًا لأنه بعيد عن الشمس.'] },
-    { n: 'نبتون', e: 'Neptune', c: ['#8FB5FF', '#3554C9'], s: 31, f: ['أبعد كوكب عن الشمس.', 'رياحه أسرع رياح في المجموعة الشمسية.', 'سنته طويلة جدًا: حوالي ١٦٥ سنة من سنواتنا!'] }
+    { n: 'عطارد', e: 'Mercury', c: ['#C9C2B8', '#8A8178'], s: 16, d: '٥٨ مليون كم', sz: 'أصغر من الأرض بحوالي ٣ مرات', day: '١٧٦ يومًا من أيامنا!', yr: 88, mo: 'ما له أقمار', t: 'من ١٨٠- إلى ٤٣٠ درجة', r: .38,
+      f: ['أقرب كوكب للشمس وأصغر الكواكب.', 'ما عنده هواء يحميه، فنهاره حار جدًا وليله بارد جدًا.', 'سطحه مليان حفر مثل قمرنا.'] },
+    { n: 'الزهرة', e: 'Venus', c: ['#FFE0A3', '#E3A857'], s: 24, d: '١٠٨ ملايين كم', sz: 'تقريبًا بحجم الأرض', day: 'أطول من سنتها! ٢٤٣ يومًا', yr: 225, mo: 'ما لها أقمار', t: 'حوالي ٤٦٥ درجة', r: .95,
+      f: ['أسخن كوكب في المجموعة الشمسية، أسخن حتى من عطارد! لأن هواءها الكثيف يحبس الحرارة.', 'أشد الكواكب لمعانًا في سمائنا، تبان مثل نجمة قوية عند الغروب أو قبل الفجر.', 'تدور حول نفسها بالعكس، فالشمس عندها تطلع من الغرب!'] },
+    { n: 'الأرض', e: 'Earth', c: ['#6CC6FF', '#2E7FD1'], s: 25, land: 1, d: '١٥٠ مليون كم', sz: 'هذا مقياسنا 😊', day: '٢٤ ساعة', yr: 365, mo: 'قمر واحد', t: 'معتدلة، تقريبًا ١٥ درجة', r: 1,
+      f: ['بيتنا الجميل، والكوكب الوحيد اللي نعرف فيه حياة.', 'أغلبها ماء، لذلك تبان زرقاء من الفضاء.', 'يحيطها غلاف جوي مثل البطانية، يحمينا ويعطينا الهواء.'] },
+    { n: 'المريخ', e: 'Mars', c: ['#FF9A6B', '#C4492A'], s: 19, d: '٢٢٨ مليون كم', sz: 'نصف حجم الأرض تقريبًا', day: '٢٤ ساعة و٣٧ دقيقة', yr: 687, mo: 'قمران صغيران', t: 'بارد، حوالي ٦٠- درجة', r: .53,
+      f: ['الكوكب الأحمر، لونه من غبار يشبه الصدأ.', 'فيه أعلى جبل في المجموعة الشمسية، أعلى من إيفرست بحوالي ٣ مرات.', 'العلماء أرسلوا له سيارات روبوت تستكشفه.'] },
+    { n: 'المشتري', e: 'Jupiter', c: ['#F3D3A8', '#C98B5A'], s: 50, bands: 1, d: '٧٧٨ مليون كم', sz: 'أعرض من الأرض ١١ مرة!', day: '١٠ ساعات بس', yr: 4333, mo: 'أكثر من ٩٠ قمرًا', t: 'بارد جدًا، حوالي ١١٠- درجة', r: 11.2,
+      f: ['أكبر الكواكب، يتسع لأكثر من ألف كوكب مثل الأرض!', 'فيه «البقعة الحمراء العظيمة»، عاصفة ضخمة أكبر من الأرض.', 'كوكب غازي، يعني ما فيه أرض نمشي عليها.'] },
+    { n: 'زحل', e: 'Saturn', c: ['#FBE3A6', '#D9AE5F'], s: 42, ring: 1, d: '١٫٤ مليار كم', sz: 'أعرض من الأرض ٩ مرات', day: '١٠ ساعات ونص', yr: 10759, mo: 'أكثر من ١٤٠ قمرًا', t: 'حوالي ١٤٠- درجة', r: 9.4,
+      f: ['مشهور بحلقاته الجميلة، وهي من قطع ثلج وصخر.', 'خفيف جدًا مع إنه ضخم، لو فيه حوض ماء بحجمه كان يطفو!', 'من أكثر الكواكب أقمارًا.'] },
+    { n: 'أورانوس', e: 'Uranus', c: ['#B9F0F2', '#5FC3CF'], s: 32, d: '٢٫٩ مليار كم', sz: 'أعرض من الأرض ٤ مرات', day: '١٧ ساعة', yr: 30687, mo: '٢٧ قمرًا أو أكثر', t: 'حوالي ١٩٥- درجة', r: 4,
+      f: ['لونه أزرق مخضر جميل.', 'يدور وهو مايل على جنبه، كأنه كرة تتدحرج!', 'أول كوكب اكتشفوه بالتلسكوب.'] },
+    { n: 'نبتون', e: 'Neptune', c: ['#8FB5FF', '#3554C9'], s: 31, d: '٤٫٥ مليار كم', sz: 'أعرض من الأرض ٤ مرات تقريبًا', day: '١٦ ساعة', yr: 60190, mo: 'أكثر من ١٤ قمرًا', t: 'أبرد الكواكب، حوالي ٢٠٠- درجة', r: 3.9,
+      f: ['أبعد كوكب عن الشمس.', 'رياحه أسرع رياح في المجموعة الشمسية.', 'ضوء الشمس ياخذ حوالي ٤ ساعات عشان يوصله!'] }
   ];
   function planetSVG(p, size) {
     const u = 'p' + Math.random().toString(36).slice(2, 7), R = 40;
@@ -136,7 +155,7 @@ const Space = (() => {
     if (sec === 'stars') body = `<p class="muted">نجوم وأشياء جميلة تقدر تدوّر عليها في السماء مع أهلك ✨</p>
       <div class="slist">${STARS.map((s, i) => `<button class="scard" onclick="Space.star(${i})"><span>${s[0]}</span><div><b>${s[1]}</b><small>${esc(s[2])}</small></div></button>`).join('')}</div>`;
     if (sec === 'quiz') body = `<div style="text-align:center;padding:8px 0"><div style="font-size:64px">🚀</div><h2>اختبار رواد الفضاء</h2><p class="muted">٥ أسئلة عن القمر والكواكب والنجوم</p><button class="btn" onclick="Space.quiz()">ابدأ الاختبار 🧠</button></div>`;
-    $('space').innerHTML = `<div class="card mooncard"><div class="mc-art">${moonSVG(age, 150)}</div>
+    $('space').innerHTML = `<div class="card mooncard"><div class="mc-art">${moonSVG(age, 170)}</div>
         <div class="mc-in"><small>قمر الليلة</small><h2>${ph[1]}</h2><p>${esc(ph[2])}</p>
         <div class="mc-stats"><div><b>${AR(Math.max(1, Math.round(age)))}</b><span>عمره بالأيام</span></div><div><b>${AR(illum(age))}٪</b><span>مضيء</span></div><div><b>${m[0]}</b><span>منزلته الليلة</span></div></div>
         <button class="btn alt" onclick="Space.sayMoon()">🔊 احكِ لي عن قمر الليلة</button></div></div>
@@ -157,9 +176,17 @@ const Space = (() => {
     say(`${m[0]}. معنى اسمها ${m[1]}. ${m[2]}`);
   }
   function planet(i) {
-    const p = PL[i], c = C();
-    modal(`<div class="spin">${planetSVG(p, 170)}</div><p class="ent" style="font-family:inherit">${p.n} <small class="muted" dir="ltr">${p.e}</small></p>
-      <p class="muted">الكوكب رقم ${AR(i + 1)} من الشمس</p>
+    const p = PL[i], c = C(), e = PL[2];
+    const k = (c.heroes()[0] || c.myKids()[0]), yrs = k && k.age ? [4, 7, 10][k.age - 1] || 10 : 10;
+    const there = p.yr === 365 ? '' : (() => { const v = yrs * 365 / p.yr; return v >= 1 ? 'عمرك هناك تقريبًا ' + AR(Math.round(v * 10) / 10) + ' سنة' : 'ما كمّلت سنة وحدة هناك! 😄 (' + AR(Math.round(v * 100)) + '٪ من سنة)'; })();
+    const pw = p.r > 1 ? 110 : Math.round(80 * p.r), ew = p.r > 1 ? Math.max(8, Math.round(110 / p.r)) : 80;
+    const ball = (w, q) => `<i style="width:${w}px;height:${w}px;background:radial-gradient(circle at 35% 30%,${q.c[0]},${q.c[1]})"></i>`;
+    const cmp = p.r === 1 ? '' : `<div class="cmp"><div>${ball(pw, p)}${p.n}</div><div>${ball(ew, e)}الأرض</div></div><p class="muted" style="font-size:12px;margin-top:-4px">الحجم الحقيقي بالمقارنة 👆</p>`;
+    modal(`<div class="spin">${planetSVG(p, 160)}</div><p class="ent" style="font-family:inherit">${p.n} <small class="muted" dir="ltr">${p.e}</small></p>
+      <p class="muted">الكوكب رقم ${AR(i + 1)} من الشمس</p>${cmp}
+      <div class="pstats"><div>📏 الحجم<b>${p.sz}</b></div><div>☀️ البعد عن الشمس<b>${p.d}</b></div><div>🌗 طول اليوم<b>${p.day}</b></div>
+        <div>🗓️ طول السنة<b>${p.yr === 365 ? '٣٦٥ يومًا' : p.yr < 1000 ? AR(p.yr) + ' يومًا' : 'حوالي ' + AR(Math.round(p.yr / 365)) + ' سنة من سنواتنا'}</b></div><div>🌙 الأقمار<b>${p.mo}</b></div><div>🌡️ الحرارة<b>${p.t}</b></div></div>
+      ${there ? `<p class="myage">🎂 لو عمرك ${AR(yrs)} سنين على الأرض، ${there}</p>` : ''}
       <div class="facts">${p.f.map((x) => `<p>💡 ${c.esc(x)}</p>`).join('')}</div>
       <div class="row"><button class="btn alt" onclick="Space.planet(${(i + 7) % 8})">→ السابق</button><button class="btn alt" onclick="Space.planet(${(i + 1) % 8})">التالي ←</button></div>`);
     say(p.n + '. ' + p.f.join(' '));

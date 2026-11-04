@@ -410,10 +410,10 @@ body:before{content:"";position:fixed;inset:auto 0 0 0;height:42vh;pointer-event
 .brand3 img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 10px #0002}
 .brand3 small{color:#4B5470;font-size:14.5px;font-weight:600;margin-top:4px;max-width:210px;line-height:1.4}
 .hd3l{display:flex;align-items:center;gap:10px}
-.clock{text-align:left;direction:ltr}.clock b{display:block;font-size:24px;font-weight:800;color:var(--ink);line-height:1}.clock small{display:block;direction:rtl;text-align:right;font-size:12.5px;color:#4B5470;font-weight:700;margin-top:3px}
-.moonbtn{width:54px;height:54px;border-radius:50%;background:transparent;padding:0;position:relative;filter:drop-shadow(0 4px 10px #2A2F4544);animation:moonpulse 4s ease-in-out infinite}
-.moonbtn svg{width:54px;height:54px;display:block}
-.moonbtn:after{content:"🪐";position:absolute;bottom:-4px;left:-6px;font-size:16px}
+.clock{text-align:right}.clock b{display:block;font-size:22px;font-weight:800;color:var(--ink);line-height:1.1}.clock small{display:block;font-size:13px;color:#4B5470;font-weight:700;margin-top:2px}.clock #season{color:var(--orange);font-weight:800;font-size:12.5px}
+.moonbtn{width:78px;height:78px;border-radius:50%;background:transparent;padding:0;position:relative;filter:drop-shadow(0 4px 10px #2A2F4544);animation:moonpulse 4s ease-in-out infinite}
+.moonbtn svg{width:78px;height:78px;display:block}
+.moonbtn:after{content:"🪐";position:absolute;bottom:0;left:-2px;font-size:18px}
 @keyframes moonpulse{50%{transform:scale(1.06)}}
 .hchips{display:flex;gap:8px;margin-bottom:12px;align-items:center}
 .hchip{flex:1;background:var(--glass);border:1.5px solid var(--gline);border-radius:999px;padding:7px 8px;font-size:13.5px;font-weight:700;display:flex;justify-content:center;gap:5px;color:var(--ink);white-space:nowrap}
@@ -473,9 +473,10 @@ body.nt .tonight .art{opacity:.94}
 .mc-stats b{display:block;font-size:16px;color:#FFE9A8}.mc-stats span{font-size:10.5px;color:#C9C4FF}
 @media (max-width:420px){.mooncard{flex-direction:column;text-align:center}}
 .spsub{margin:0 0 10px}
-.phstrip{display:flex;justify-content:space-between;background:linear-gradient(160deg,#1E2350,#3B2F7A);border-radius:18px;padding:8px;margin-bottom:12px}
-.phstrip div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:12px}
-.phstrip small{font-size:9.5px;color:#C9C4FF;white-space:nowrap}.phstrip div.on{background:#ffffff22}.phstrip div.on small{color:#FFE9A8;font-weight:800}
+.phstrip{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;background:linear-gradient(160deg,#1E2350,#3B2F7A);border-radius:18px;padding:8px;margin-bottom:12px}
+@media (max-width:560px){.phstrip{grid-template-columns:repeat(4,1fr);row-gap:6px}}
+.phstrip div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:12px;min-width:0}
+.phstrip small{font-size:11px;color:#C9C4FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.phstrip div.on{background:#ffffff22}.phstrip div.on small{color:#FFE9A8;font-weight:800}
 .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .mz{background:#fff;border-radius:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;color:var(--ink);border:2px solid #F2EEE6;position:relative}
 .mz i{font-style:normal;font-size:11px;color:var(--soft)}.mz b{font-size:13.5px}.mz em{font-style:normal;font-size:10.5px;color:#fff;background:var(--orange);border-radius:8px;padding:0 6px;margin-top:2px}
@@ -489,6 +490,11 @@ body.nt .tonight .art{opacity:.94}
 .pcard b,.scard b{font-size:17px}.pcard small{color:var(--soft);font-size:12px;margin-right:6px}.pcard span{display:block;font-size:13px;color:var(--soft);line-height:1.5}
 .scard>span{font-size:34px}.scard small{display:block;color:var(--soft);font-size:13px;line-height:1.55}
 .spin svg{animation:spin 18s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.pstats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:8px 0}
+.pstats div{background:#F4F1FF;border-radius:12px;padding:7px 8px;text-align:right;font-size:13px;color:var(--soft);line-height:1.4}.pstats b{display:block;font-size:15px;color:var(--ink)}
+.cmp{display:flex;align-items:flex-end;justify-content:center;gap:18px;background:linear-gradient(160deg,#1E2350,#3B2F7A);border-radius:16px;padding:12px;margin:8px 0;color:#E4E0FF;font-size:12.5px}
+.cmp div{display:flex;flex-direction:column;align-items:center;gap:4px}.cmp i{display:block;border-radius:50%}
+.myage{background:#FFF0E0;border-radius:12px;padding:8px 12px;font-size:14.5px;color:#9A4D08;font-weight:700;margin:6px 0}
 .facts p{background:#FFF7EC;border-radius:12px;padding:8px 12px;margin:6px 0;text-align:right;font-size:15px;line-height:1.7}
 /* القصص المتحركة ✨ */
 .art .fx-cl{animation:fxcl 16s ease-in-out infinite alternate}
@@ -584,7 +590,7 @@ body.nt .tonight .art{opacity:.94}
 <section id="home" class="screen">
   <header class="hd3">
     <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""></b><small id="hello">حكاية الليلة</small></div>
-    <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
+    <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small><small id="season"></small></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
   </header>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
     <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
@@ -673,6 +679,11 @@ body.nt .tonight .art{opacity:.94}
     <div class="tquick" id="bedTimeQuick"></div>
     <p class="muted" id="remindNote" style="margin-top:8px"></p>
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
+  </div>
+  <div class="card">
+    <h2>المظهر 🎨</h2>
+    <p class="muted">تلقائي: فاتح في النهار، ويصير كحلي هادي من وقت النوم لين الصبح.</p>
+    <div class="seg" id="themeSeg"></div>
   </div>
   <div class="card">
     <h2>التحديث 🔄</h2>
@@ -777,18 +788,18 @@ body.nt .tonight .art{opacity:.94}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.1"></script>
-<script src="sync.js?v=3.1"></script>
-<script src="art.js?v=3.1"></script>
-<script src="stories.js?v=3.1"></script>
-<script src="stories-2.js?v=3.1"></script>
-<script src="stories-3.js?v=3.1"></script>
-<script src="stories-4.js?v=3.1"></script>
-<script src="play.js?v=3.1"></script>
-<script src="english-2.js?v=3.1"></script>
-<script src="english.js?v=3.1"></script>
-<script src="space.js?v=3.1"></script>
-<script src="app.js?v=3.1"></script>
-<script src="wamd-stats.js?v=3.1" data-app="siraj"></script>
+<script src="config.js?v=3.2"></script>
+<script src="sync.js?v=3.2"></script>
+<script src="art.js?v=3.2"></script>
+<script src="stories.js?v=3.2"></script>
+<script src="stories-2.js?v=3.2"></script>
+<script src="stories-3.js?v=3.2"></script>
+<script src="stories-4.js?v=3.2"></script>
+<script src="play.js?v=3.2"></script>
+<script src="english-2.js?v=3.2"></script>
+<script src="english.js?v=3.2"></script>
+<script src="space.js?v=3.2"></script>
+<script src="app.js?v=3.2"></script>
+<script src="wamd-stats.js?v=3.2" data-app="siraj"></script>
 </body>
 </html>
