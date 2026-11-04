@@ -28,7 +28,7 @@ const Space = (() => {
     const sweep = wax ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
     const lit = `${outer} A${rx.toFixed(2)} ${r} 0 0 ${sweep} 50 ${50 - r}Z`;
     const u = 'm' + Math.random().toString(36).slice(2, 7);
-    const craters = [[36, 34, 7], [62, 56, 9], [44, 66, 5.5], [66, 32, 4], [28, 54, 4.5], [54, 78, 3.5], [74, 70, 3]]
+    const craters = [[36, 34, 7], [62, 56, 9], [44, 66, 5.5], [66, 32, 4], [28, 54, 4.5], [54, 78, 3.5], [74, 70, 3], [48, 24, 3], [24, 40, 2.5], [70, 46, 2.5], [38, 50, 2], [58, 40, 2.2], [32, 72, 2.4], [78, 56, 2]]
       .map(([x, y, cr]) => `<circle cx="${x}" cy="${y}" r="${cr}" fill="url(#${u}c)"/>`).join('');
     return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true" style="overflow:visible"><defs>
       <radialGradient id="${u}l" cx=".42" cy=".38" r=".72"><stop offset="0" stop-color="#FFFBEA"/><stop offset=".6" stop-color="#F7E7B0"/><stop offset="1" stop-color="#E6CD84"/></radialGradient>
@@ -39,7 +39,7 @@ const Space = (() => {
       <clipPath id="${u}k"><path d="${lit}"/></clipPath></defs>
       ${glow ? `<circle cx="50" cy="50" r="${r * (1.1 + illum(age) / 160)}" fill="url(#${u}g)"/>` : ''}
       <circle cx="50" cy="50" r="${r}" fill="url(#${u}d)"/><g opacity=".22">${craters.replace(/url\(#${u}c\)/g, '#1C2038')}</g>
-      <path d="${lit}" fill="url(#${u}l)" filter="url(#${u}s)"/><g clip-path="url(#${u}k)">${craters}</g>
+      <path d="${lit}" fill="url(#${u}l)" filter="url(#${u}s)"/><g clip-path="url(#${u}k)"><g fill="#D9BE78" opacity=".35"><path d="M30 30 q10 -8 20 0 q6 8 -4 14 q-12 4 -16 -6z"/><path d="M52 50 q12 -6 18 6 q2 12 -10 12 q-12 -2 -8 -18z"/><path d="M34 60 q6 -4 10 2 q0 6 -6 6 q-6 -2 -4 -8z"/></g>${craters}</g>
       <circle cx="50" cy="50" r="${r}" fill="none" stroke="#ffffff" stroke-opacity=".08"/></svg>`;
   }
   function moonLon(d = new Date()) {
@@ -210,5 +210,5 @@ const Space = (() => {
   function nextQ() { Q.i++; Q.pk = null; drawQ(); }
 
   function phaseName() { return phaseOf(moonAge())[1]; }
-  return { phaseName, render, setSec, sayMoon, mansion, planet, star, quiz, ans, nextQ, moonSVG, moonAge };
+  return { planetSVG: (i, s) => planetSVG(PL[i], s), phaseName, render, setSec, sayMoon, mansion, planet, star, quiz, ans, nextQ, moonSVG, moonAge };
 })();

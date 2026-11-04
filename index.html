@@ -557,6 +557,35 @@ body.nt .hd3l{background:#ffffff14;border-color:#ffffff26}
 .clock #season.season{color:#fff}.clock #season.season.summer{color:#5A3A00}
 body.nt[data-pal]{background:linear-gradient(180deg,#1E2348 0%,#2C2F5C 45%,#4A3F6B 100%)}
 body.nt[data-pal]:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#433760 0 45%,transparent 46%)}
+
+/* ================= v3.4 قمر كبير بلا مربع، مع نجوم وسحاب وزحل ================= */
+.hd3{align-items:center;margin:0 0 10px}
+.hd3l{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0;gap:4px;margin-left:-8px}
+.clock{align-items:flex-end;text-align:left}
+.clock b{font-size:26px;font-weight:800}
+.clock small{font-size:15px;font-weight:800;color:#2F3754;direction:ltr}
+.season{white-space:nowrap;font-size:14px;padding:4px 12px 4px 30px;margin-top:6px;position:relative;box-shadow:0 6px 14px #E0782A40}
+.season em{position:absolute;left:-10px;top:50%;transform:translateY(-50%) rotate(-12deg);font-style:normal;font-size:26px;filter:drop-shadow(0 2px 2px #0002)}
+.moonbtn{width:128px!important;height:128px!important;position:relative;filter:none;animation:none;overflow:visible}
+.moonbtn:after{content:none}
+.moonbtn .mn{position:absolute;inset:10px;animation:moonpulse 6s ease-in-out infinite}
+.moonbtn .mn svg{width:108px!important;height:108px!important;filter:drop-shadow(0 0 16px #FFE9A8aa)}
+.moonbtn .spk{position:absolute;width:16px;height:16px;animation:spk 2.6s ease-in-out infinite}
+.moonbtn .spk svg{width:100%;height:100%}
+.moonbtn .cld{position:absolute;left:-18px;right:-14px;bottom:-10px;width:auto;height:52px;pointer-events:none}
+.moonbtn .sat{position:absolute;left:-10px;bottom:2px;width:58px;animation:satb 5s ease-in-out infinite}
+.moonbtn .sat svg{width:58px;height:auto}
+@keyframes spk{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.1);opacity:1}}
+@keyframes satb{50%{transform:translateY(-4px) rotate(-4deg)}}
+@media (max-width:390px){.moonbtn{width:110px!important;height:110px!important}.moonbtn .mn svg{width:92px!important;height:92px!important}.clock b{font-size:22px}.brand3 b{font-size:34px}}
+body.nt .clock small{color:#D9D5F2}
+body.nt .moonbtn .cld{opacity:.25}
+
+html,body{overflow-x:hidden;max-width:100%}
+.brand3{flex:1;min-width:0}.brand3 small{max-width:none}
+.hd3l{flex:none}
+@media (max-width:440px){.moonbtn{width:112px!important;height:112px!important}.moonbtn .mn{inset:8px}.moonbtn .mn svg{width:96px!important;height:96px!important}.moonbtn .sat,.moonbtn .sat svg{width:50px}.season{font-size:13px;padding:3px 10px 3px 26px}.season em{font-size:22px}}
+@media (max-width:390px){.moonbtn{width:100px!important;height:100px!important}.moonbtn .mn svg{width:84px!important;height:84px!important}.brand3 b{font-size:32px}.brand3 img{width:28px;height:28px}}
 </style>
 </head>
 <body>
@@ -627,7 +656,7 @@ body.nt[data-pal]:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55
 <section id="home" class="screen">
   <header class="hd3">
     <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""></b><small id="hello">حكاية الليلة</small></div>
-    <div class="hd3l"><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button><div class="clock"><b id="clk"></b><small id="dt"></small><span id="season" class="season"></span></div></div>
+    <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small><span id="season" class="season"></span></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
   </header>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
     <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
@@ -827,18 +856,18 @@ body.nt[data-pal]:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.3"></script>
-<script src="sync.js?v=3.3"></script>
-<script src="art.js?v=3.3"></script>
-<script src="stories.js?v=3.3"></script>
-<script src="stories-2.js?v=3.3"></script>
-<script src="stories-3.js?v=3.3"></script>
-<script src="stories-4.js?v=3.3"></script>
-<script src="play.js?v=3.3"></script>
-<script src="english-2.js?v=3.3"></script>
-<script src="english.js?v=3.3"></script>
-<script src="space.js?v=3.3"></script>
-<script src="app.js?v=3.3"></script>
-<script src="wamd-stats.js?v=3.3" data-app="siraj"></script>
+<script src="config.js?v=3.4"></script>
+<script src="sync.js?v=3.4"></script>
+<script src="art.js?v=3.4"></script>
+<script src="stories.js?v=3.4"></script>
+<script src="stories-2.js?v=3.4"></script>
+<script src="stories-3.js?v=3.4"></script>
+<script src="stories-4.js?v=3.4"></script>
+<script src="play.js?v=3.4"></script>
+<script src="english-2.js?v=3.4"></script>
+<script src="english.js?v=3.4"></script>
+<script src="space.js?v=3.4"></script>
+<script src="app.js?v=3.4"></script>
+<script src="wamd-stats.js?v=3.4" data-app="siraj"></script>
 </body>
 </html>

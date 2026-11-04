@@ -384,7 +384,7 @@ const App = (() => {
     const d = new Date(); if (!$('clk')) return;
     $('clk').textContent = d.toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long' });
     $('dt').textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-    const se = season(d); $('season').textContent = se[0]; $('season').className = 'season ' + se[1];
+    const se = season(d); $('season').innerHTML = se[0] + '<em>' + se[2] + '</em>'; $('season').className = 'season ' + se[1];
     document.body.dataset.pal = S.pal || 'sky';
     const th = S.theme || 'light';
     document.body.classList.toggle('nt', th === 'dark' || (th === 'auto' && isNight()));
@@ -392,7 +392,15 @@ const App = (() => {
   /* الفصول الفلكية (نصف الكرة الشمالي) */
   function season(d) {
     const v = (d.getMonth() + 1) * 100 + d.getDate();
-    return v >= 320 && v < 621 ? ['🌸 فصل الربيع', 'spring'] : v >= 621 && v < 923 ? ['☀️ فصل الصيف', 'summer'] : v >= 923 && v < 1221 ? ['🍂 فصل الخريف', 'autumn'] : ['❄️ فصل الشتاء', 'winter'];
+    return v >= 320 && v < 621 ? ['فصل الربيع', 'spring', '🌸'] : v >= 621 && v < 923 ? ['فصل الصيف', 'summer', '☀️'] : v >= 923 && v < 1221 ? ['فصل الخريف', 'autumn', '🍂'] : ['فصل الشتاء', 'winter', '❄️'];
+  }
+  /* القمر الكبير بالرأس: نجوم تلمع وسحاب وزحل صغير */
+  function moonDeco() {
+    const star = '<svg viewBox="0 0 20 20"><path d="M10 0 C11 7 13 9 20 10 C13 11 11 13 10 20 C9 13 7 11 0 10 C7 9 9 7 10 0Z" fill="#FFE27A"/></svg>';
+    const spk = [[4, 4, 0, 16], [74, -2, -.8, 18], [82, 40, -1.6, 12], [62, 76, -2.2, 11], [-2, 52, -1.1, 11]]
+      .map(([l, t, dl, w]) => `<i class="spk" style="left:${l}%;top:${t}%;width:${w}px;height:${w}px;animation-delay:${dl}s">${star}</i>`).join('');
+    const cld = '<svg class="cld" viewBox="0 0 150 44" preserveAspectRatio="none"><g fill="#fff" opacity=".9"><ellipse cx="30" cy="32" rx="30" ry="12"/><ellipse cx="58" cy="26" rx="24" ry="14"/><ellipse cx="92" cy="32" rx="30" ry="11"/><ellipse cx="124" cy="34" rx="24" ry="9"/></g></svg>';
+    return `<i class="mn">${Space.moonSVG(Space.moonAge(), 108, true)}</i>${cld}${spk}<i class="sat">${Space.planetSVG(5, 58)}</i>`;
   }
   function setTheme(t) { S.theme = t; save(); tickClock(); renderSettings(); }
   function setPal(p) { S.pal = p; save(); tickClock(); renderSettings(); }
@@ -406,7 +414,7 @@ const App = (() => {
   }
   function renderTop(ks) {
     tickClock();
-    if (typeof Space !== 'undefined') $('moonBtn').innerHTML = Space.moonSVG(Space.moonAge(), 78, true);
+    if (typeof Space !== 'undefined') $('moonBtn').innerHTML = moonDeco();
     const k = ks[0], x = k ? kidNights(k) : { month: 0, streak: 0 };
     $('chStars').innerHTML = `⭐ <em>${AR(x.month)}</em> ${x.month === 1 ? 'نجمة' : 'نجوم'} هالشهر`;
     $('chStreak').innerHTML = `🔥 <em>${AR(x.streak)}</em> ${x.streak === 1 ? 'ليلة' : 'ليالٍ'} متتالية`;
