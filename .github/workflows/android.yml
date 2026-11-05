@@ -1,0 +1,79 @@
+# سِراج — بناء تطبيق الأندرويد
+# يشتغل فقط على فرع android (أو يدويًا من تبويب Actions). ما يلمس نسخة الويب ولا GitHub Pages.
+# الناتج: ملف APK للتجربة على جوالك، وملف AAB موقّع للرفع على Google Play (إذا أضفت أسرار التوقيع).
+name: Android build
+
+on:
+  push:
+    branches: [android]
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - uses: android-actions/setup-android@v3
+
+      - name: تجهيز ملفات التطبيق
+        run: |
+          npm ci
+          node scripts/build-www.mjs
+          npx cap sync android
+
+      - name: فك مفتاح التوقيع (إذا موجود)
+        env:
+          KEYSTORE_B64: ${{ secrets.SIRAJ_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/siraj-upload.jks"
+            echo "SIRAJ_KEYSTORE_PATH=$RUNNER_TEMP/siraj-upload.jks" >> "$GITHUB_ENV"
+          else
+            echo "::notice::ما فيه مفتاح توقيع — بيطلع APK للتجربة فقط"
+          fi
+
+      - name: بناء APK للتجربة
+        working-directory: native/android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: بناء AAB موقّع لـ Google Play
+        if: env.SIRAJ_KEYSTORE_PATH != ''
+        working-directory: native/android
+        env:
+          SIRAJ_KEYSTORE_PASSWORD: ${{ secrets.SIRAJ_KEYSTORE_PASSWORD }}
+          SIRAJ_KEY_ALIAS: ${{ secrets.SIRAJ_KEY_ALIAS }}
+          SIRAJ_KEY_PASSWORD: ${{ secrets.SIRAJ_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon bundleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: siraj-apk-test-${{ github.run_number }}
+          path: native/android/app/build/outputs/apk/debug/*.apk
+
+      - uses: actions/upload-artifact@v4
+        if: env.SIRAJ_KEYSTORE_PATH != ''
+        with:
+          name: siraj-aab-play-${{ github.run_number }}
+          path: native/android/app/build/outputs/bundle/release/*.aab

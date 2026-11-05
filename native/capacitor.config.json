@@ -1,0 +1,16 @@
+{
+  "appId": "com.wamdarc.siraj",
+  "appName": "سِراج",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_siraj",
+      "iconColor": "#5B4BDB"
+    }
+  }
+}
