@@ -601,6 +601,36 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 .clubs svg{width:38px;height:34px}
 .seg.lg button{font-size:13px;padding:7px 9px}
 .enlv button .ei{display:block;font-size:22px;line-height:1.2}.enlv button b{display:block;font-size:15px}
+
+/* v3.7 أذكار النوم وأصوات النوم والمكافأة والرسالة */
+.qtiles{grid-template-columns:repeat(3,1fr)}
+.adk{text-align:center}.adk h2{margin:6px 0}
+.adprog{display:flex;gap:5px;justify-content:center;margin-bottom:6px}.adprog i{width:22px;height:6px;border-radius:6px;background:#E6E0F5}.adprog i.ok{background:#4CD97B}.adprog i.now{background:var(--orange)}
+.adx{font-size:21px;line-height:2.1;background:#FFFBF2;border-radius:16px;padding:12px 14px;margin:10px 0;color:var(--ink);text-align:center;max-height:46vh;overflow:auto}
+.adsrc{font-size:12px;color:var(--soft);margin:10px 0 0}
+.tsb{width:150px;height:150px;border-radius:50%;margin:8px auto;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#FFC37A,#F2851E);color:#fff;box-shadow:0 10px 24px #F2851E55,inset 0 -6px 0 #0000001a}
+.tsb:active{transform:scale(.95)}.tsb b{font-size:46px;line-height:1}.tsb small{font-size:14px;opacity:.9}
+.tsrow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.tsrow span{font-size:13px;border-radius:999px;padding:3px 10px;background:#F2EFFA;color:var(--soft)}.tsrow .ok{background:#DDF5E5;color:#1E8E4A}.tsrow .now{background:#FFF0E0;color:#C9650C}
+.snd{text-align:center}
+.snd-sky{position:relative;height:110px;border-radius:18px;background:linear-gradient(180deg,#141838,#2D2A66);overflow:hidden;margin-bottom:10px}
+.snd-sky i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;animation:spk 2.6s ease-in-out infinite}
+.snd-moon{position:absolute;top:18px;left:24px;font-size:48px;animation:moonpulse 6s ease-in-out infinite}
+.sndg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sndg button{border-radius:16px;background:#F4F1FF;padding:10px 2px;display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:700;color:var(--ink);border:2px solid transparent}
+.sndg button span{font-size:28px}.sndg button.on{border-color:var(--orange);background:#FFF4E8}
+.snd-left{font-weight:800;color:var(--orange);margin:12px 0 6px}
+.rwd{padding:12px 14px;margin-bottom:12px}
+.rwd-h{display:flex;gap:10px;align-items:center;margin-bottom:6px}.rwd-h>span{font-size:34px}.rwd-h small{display:block;color:var(--soft);font-size:12px;font-weight:700}.rwd-h b{font-size:17px}
+.rwd-k{display:flex;align-items:center;gap:8px;padding:4px 0;font-weight:700;font-size:14px}.rwd-k>span{min-width:52px}
+.rwd-s{flex:1;display:flex;gap:2px;flex-wrap:wrap}.rwd-s i{font-style:normal;font-size:16px;filter:grayscale(1);opacity:.3}.rwd-s i.on{filter:none;opacity:1}
+.rwd-k em{font-style:normal;font-size:12.5px;color:var(--orange);font-weight:800;white-space:nowrap}
+.msg{display:flex;gap:10px;align-items:center;padding:12px 14px;margin-bottom:12px;background:linear-gradient(135deg,#FFE3EF,#FFF4E8)!important;animation:msgin .6s ease both}
+.msg>span{font-size:34px}.msg small{display:block;font-size:12px;color:#C2296B;font-weight:800}.msg p{margin:2px 0 0;font-size:16px;font-weight:700;line-height:1.6;color:var(--ink)}.msg>div{flex:1}
+.msg button{font-size:24px;background:#fff;border-radius:50%;width:44px;height:44px;flex:none;box-shadow:0 3px 8px #0001}
+.msg.mine{opacity:.85}
+@keyframes msgin{from{opacity:0;transform:translateY(-10px)}}
+.donebtns{display:flex;gap:8px;margin-top:10px}.donebtns .btn{flex:1;font-size:15px;padding:10px 6px}
+#msgText{letter-spacing:normal;font-family:inherit;font-size:16px;text-align:right;direction:rtl;resize:none}
 </style>
 </head>
 <body>
@@ -678,9 +708,11 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
   <div class="modebar" id="modeBar" style="display:none"></div>
   <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
+    <div id="msgCard"></div>
     <div class="card kidsbar"><div class="kids" id="kids"></div><span class="klbl">أبطال الليلة<small>أول من تختاره هو البطل ⭐</small></span></div>
     <div class="card tonight" id="tonightCard"></div>
     <div class="card bedbar" id="bedBar"></div>
+    <div id="rewardCard"></div>
     <div class="qtiles" id="qtiles"></div>
   </div>
   <div id="paneSky" style="display:none"><div id="sky"></div></div>
@@ -774,6 +806,21 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
     <button class="btn" onclick="App.hardRefresh()">🔄 حدّث هذا الجهاز الآن</button>
     <button class="btn alt" id="pushAllBtn" style="margin-top:10px" onclick="App.refreshAll()">📲 حدّث كل أجهزة العيال</button>
     <p class="muted" id="verNote" style="margin:8px 0 0"></p>
+  </div>
+  <div class="card">
+    <h2>💌 رسالة للعيال</h2>
+    <p class="muted">تظهر لهم فوق قصة الليلة لين يضغطون ❤️</p>
+    <textarea class="inp" id="msgText" rows="2" maxlength="140" placeholder="مثلًا: فخور فيكم اليوم يا أبطال ❤️"></textarea>
+    <label>لمين؟</label><div class="seg wrap" id="msgTo"></div>
+    <label>من؟</label><div class="seg" id="msgFrom"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" onclick="App.sendMsg()">إرسال 💌</button><button class="btn alt" onclick="App.clearMsg()">مسح الرسالة</button></div>
+  </div>
+  <div class="card">
+    <h2>🎁 مكافأة الأسبوع</h2>
+    <p class="muted">كل ليلة يقرون فيها قصة = نجمة. لما يوصلون العدد يكسبون المكافأة اللي تحددها.</p>
+    <label>المكافأة</label><input class="inp" id="rwText" maxlength="60" placeholder="مثلًا: طلعة للحديقة 🎡">
+    <label>كم نجمة؟</label><div class="seg" id="rwStars"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" onclick="App.saveReward()">حفظ</button><button class="btn alt" onclick="App.clearReward()">إيقاف المكافأة</button></div>
   </div>
   <div class="card">
     <h2>الليل والنوم 🌙</h2>
@@ -884,18 +931,19 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.6"></script>
-<script src="sync.js?v=3.6"></script>
-<script src="art.js?v=3.6"></script>
-<script src="stories.js?v=3.6"></script>
-<script src="stories-2.js?v=3.6"></script>
-<script src="stories-3.js?v=3.6"></script>
-<script src="stories-4.js?v=3.6"></script>
-<script src="play.js?v=3.6"></script>
-<script src="english-2.js?v=3.6"></script>
-<script src="english.js?v=3.6"></script>
-<script src="space.js?v=3.6"></script>
-<script src="app.js?v=3.6"></script>
-<script src="wamd-stats.js?v=3.6" data-app="siraj"></script>
+<script src="config.js?v=3.7"></script>
+<script src="sync.js?v=3.7"></script>
+<script src="art.js?v=3.7"></script>
+<script src="stories.js?v=3.7"></script>
+<script src="stories-2.js?v=3.7"></script>
+<script src="stories-3.js?v=3.7"></script>
+<script src="stories-4.js?v=3.7"></script>
+<script src="play.js?v=3.7"></script>
+<script src="english-2.js?v=3.7"></script>
+<script src="english.js?v=3.7"></script>
+<script src="space.js?v=3.7"></script>
+<script src="night.js?v=3.7"></script>
+<script src="app.js?v=3.7"></script>
+<script src="wamd-stats.js?v=3.7" data-app="siraj"></script>
 </body>
 </html>

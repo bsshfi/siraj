@@ -385,7 +385,7 @@ const App = (() => {
     $('tonightCard').innerHTML = hs.length ? `${ART.page(st.scene, done ? '🌙' : st.occ ? '🎉' : isPro(st) ? '📖' : '✨', artHs(st, hs))}
       <div class="info">${done ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">خلّصتوا قصص الليلة 🌙 (${n}/${allow})</span>` : (st.occ ? '<span class="tag" style="background:#E5FBEA;color:#1E8E4A">قصة المناسبة 🎉</span> ' : '') + (allow > 1 ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">${lbl} · ${n + 1}/${allow}</span>` : '')}
       <p class="title">${esc(fill(st.title, hs))}</p><p class="tmeta">${AR(st.pages.length)} صفحات · ${AR(Math.max(2, Math.round(st.pages.length * .7)))} دقائق · صور متحركة ✨</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
-      ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا بكرة مع قصة جديدة ✨ تقدرون تعيدون قصة من «مكتبتي».</p><button class="btn alt" style="margin-top:12px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
+      ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا بكرة مع قصة جديدة ✨ تقدرون تعيدون قصة من «مكتبتي».</p><div class="donebtns"><button class="btn" onclick="Night.adhkar()">🤲 أذكار النوم</button><button class="btn alt" onclick="Night.sounds()">🌧️ أصوات النوم</button></div><button class="btn ghost" style="margin-top:6px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
         : `<button class="btn" style="margin-top:14px" onclick="App.openStory('${st.id}')">ابدأ ${lbl} ✨</button>`}</div>`
       : '<div class="info"><p class="muted">اختر بطلًا واحدًا على الأقل</p></div>';
     $('tabPlay').classList.toggle('dim', isNight()); $('tabEng').classList.toggle('dim', isNight());
@@ -425,6 +425,20 @@ const App = (() => {
   function devKid() { return S.role === 'child' && (S.devKids || []).length ? kidById(S.devKids[0]) : null; }
   function appPrefs() { const k = devKid(), a = (k && k.app) || {}; return k ? { pal: a.pal || 'sky', theme: a.theme || 'light' } : { pal: S.pal || 'sky', theme: S.theme || 'light' }; }
   function setPref(key, v) { const k = devKid(); if (k) { k.app = { ...(k.app || {}), [key]: v }; famChanged(); } else { S[key] = v; save(); } tickClock(); renderSettings(); }
+  let msgTo = null, msgFrom = null, rwStars = null;
+  function msgSegs() {
+    const fam = S.fam;
+    $('msgTo').innerHTML = [['all', 'الكل'], ...fam.kids.map((k) => [k.id, k.name])].map(([v, t]) => `<button class="${(msgTo === 'all' ? v === 'all' : Array.isArray(msgTo) && msgTo.includes(v)) ? 'on' : ''}" onclick="App.msgPick('${v}')">${esc(t)}</button>`).join('');
+    $('msgFrom').innerHTML = [fam.dad || 'بابا', fam.mom || 'ماما'].map((v) => `<button class="${msgFrom === v ? 'on' : ''}" onclick="App.msgFromPick('${esc(v)}')">${esc(v)}</button>`).join('');
+    $('rwStars').innerHTML = [3, 4, 5, 6, 7].map((n) => `<button class="${rwStars === n ? 'on' : ''}" onclick="App.rwPick(${n})">${AR(n)} ⭐</button>`).join('');
+  }
+  function msgPick(v) { if (v === 'all') msgTo = 'all'; else { let a = Array.isArray(msgTo) ? msgTo.slice() : []; a = a.includes(v) ? a.filter((x) => x !== v) : [...a, v]; msgTo = a.length ? a : 'all'; } msgSegs(); }
+  function msgFromPick(v) { msgFrom = v; msgSegs(); }
+  function rwPick(n) { rwStars = n; msgSegs(); }
+  function sendMsg() { const t = $('msgText').value.trim(); if (!t) return toast('اكتب الرسالة'); S.fam.msg = { t, at: Date.now(), to: msgTo || 'all', from: msgFrom || S.fam.dad || 'بابا' }; famChanged(); toast('وصلت الرسالة للعيال 💌'); }
+  function clearMsg() { delete S.fam.msg; $('msgText').value = ''; famChanged(); toast('انمسحت الرسالة'); renderSettings(); }
+  function saveReward() { const t = $('rwText').value.trim(); if (!t) return toast('اكتب المكافأة'); S.fam.reward = { text: t, stars: rwStars || 5 }; famChanged(); toast('تم حفظ المكافأة 🎁'); }
+  function clearReward() { delete S.fam.reward; famChanged(); toast('توقفت المكافأة'); renderSettings(); }
   function setTheme(t) { setPref('theme', t); }
   function setPal(p) { setPref('pal', p); }
   const PALS = [['sky', 'سماوي', '#7FBFEF,#EEF6FD'], ['pink', 'وردي', '#F3A6C8,#FFF3F8'], ['green', 'أخضر', '#86D2AE,#F1FBF6'], ['sand', 'رملي', '#93AECF,#EFE5D6']];
@@ -449,8 +463,10 @@ const App = (() => {
     $('bedBar').innerHTML = isNight() ? `🌙 وقت النوم الحين <div class="bar"><i style="width:100%"></i></div><em>تصبحون على خير 😴</em>`
       : `🌙 وقت النوم <b>${t12}</b><div class="bar"><i style="width:${pct}%"></i></div><em>${left > 0 && left < 720 ? 'باقي ' + (left >= 60 ? AR(Math.floor(left / 60)) + ' س ' : '') + AR(left % 60) + ' د' : ''}</em>`;
     const ph = typeof Space !== 'undefined' ? Space.phaseName() : '';
-    $('qtiles').innerHTML = [['sky', '⭐', 'سمائي', AR(x.month) + ' نجوم'], ['space', '🪐', 'الكواكب', ph ? 'القمر: ' + ph : 'جديد'], ['play', '🎨', 'ألعاب', 'لوّن ورتّب'], ['eng', '🔤', 'English', 'تعلّم والعب']]
-      .map(([t, i, n, sm]) => `<button onclick="App.tab('${t}')"><span>${i}</span>${n}<small>${sm}</small></button>`).join('');
+    $('qtiles').innerHTML = [['App.tab(\'sky\')', '⭐', 'سمائي', AR(x.month) + ' نجوم'], ['App.tab(\'space\')', '🪐', 'الكواكب', ph ? 'القمر: ' + ph : 'جديد'], ['Night.adhkar()', '🤲', 'أذكار النوم', S.adkDay === dateKey(new Date()) ? 'تمّت ✓' : 'قبل النوم'],
+      ['Night.sounds()', '🌧️', 'أصوات النوم', 'مطر وموج'], ['App.tab(\'play\')', '🎨', 'ألعاب', 'لوّن ورتّب'], ['App.tab(\'eng\')', '🔤', 'English', 'تعلّم والعب']]
+      .map(([t, i, n, sm]) => `<button onclick="${t}"><span>${i}</span>${n}<small>${sm}</small></button>`).join('');
+    if (typeof Night !== 'undefined') { $('msgCard').innerHTML = Night.msgCard(ks); $('rewardCard').innerHTML = Night.rewardCard(S.role === 'parent' ? S.fam.kids : ks); }
   }
   function tonightRows(hs, n, allow) {
     const L = tonightList().slice(0, allow);
@@ -833,6 +849,10 @@ const App = (() => {
     const ex = S.fam.extra && S.fam.extra.d === nightKey() ? S.fam.extra.n : 0;
     $('extraNote').textContent = ex ? 'الليلة: ' + AR(allowedTonight()) + ' قصص (منها ' + AR(ex) + ' إضافية)' : '';
     $('storyCount').textContent = STORIES.length;
+    const fam = S.fam, m = fam.msg || {}, r = fam.reward || {};
+    $('msgText').value = m.t || ''; $('rwText').value = r.text || '';
+    msgTo = m.to || 'all'; msgFrom = m.from || fam.dad || 'بابا'; rwStars = r.stars || 5;
+    msgSegs();
     $('themeSeg').innerHTML = [['auto', '🌗 تلقائي'], ['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${appPrefs().theme === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
     $('palSeg').innerHTML = PALS.map(([v, t, g]) => `<button class="${appPrefs().pal === v ? 'on' : ''}" onclick="App.setPal('${v}')"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
     $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
@@ -1060,7 +1080,7 @@ const App = (() => {
     ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
-    setTheme, setPal, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
+    setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
 
