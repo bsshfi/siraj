@@ -71,7 +71,7 @@ const EN = (() => {
         <div class="sents">${SENT.map((x, i) => `<button class="sn" onclick="EN.sent(${i})"><span>${x[2]}</span><div><b dir="ltr">${c.esc(nm(x[0]))}</b><small>${c.esc(nm(x[1]))}</small></div></button>`).join('')}</div>
         <div class="row" style="margin-top:12px"><button class="btn" onclick="EN.game('mean')">❓ وش معناها؟</button><button class="btn alt" onclick="EN.game('build')">🧱 رتّب الجملة</button></div></div>`;
     }
-    $('eng').innerHTML = `<div class="seg enlv">${lv.map(([v, t, a]) => `<button class="${v === level ? 'on' : ''}" onclick="EN.setLevel('${v}')">${t}<small>${a}</small></button>`).join('')}</div>${body}`;
+    $('eng').innerHTML = `<div class="seg enlv">${lv.map(([v, t, a]) => `<button class="${v === level ? 'on' : ''}" onclick="EN.setLevel('${v}')"><span class="ei">${t.split(' ')[0]}</span><b>${t.split(' ').slice(1).join(' ')}</b><small>${a}</small></button>`).join('')}</div>${body}`;
   }
   /* ---- المستوى المتقدّم ---- */
   const SUBS = [['read', '📖 قراءة'], ['vocab', '🧠 مفردات'], ['gram', '📐 قواعد'], ['dlg', '💬 محادثات'], ['spell', '🎧 إملاء']];

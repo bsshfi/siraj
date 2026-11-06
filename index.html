@@ -590,6 +590,17 @@ body.nt .moonbtn .cld{opacity:.25}
 /* v3.5: منع تحديد النص (يمنع بحث قوقل في التابلت) ومنع التكبير بالضغط المزدوج */
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
+
+/* v3.6 غرفة الملابس */
+.wtabs{display:flex;gap:6px;margin:14px 0 4px}
+.wtabs button{flex:1;border-radius:14px;padding:9px 4px;font-size:14px;font-weight:800;background:#F2EFFA;color:var(--soft)}
+.wtabs button.on{background:var(--orange);color:#fff}
+.clubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:8px}
+.clubs button{border-radius:14px;background:#fff;border:2px solid #EEE;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.clubs button.on{border-color:var(--orange);box-shadow:0 0 0 3px #F2851E33}
+.clubs svg{width:38px;height:34px}
+.seg.lg button{font-size:13px;padding:7px 9px}
+.enlv button .ei{display:block;font-size:22px;line-height:1.2}.enlv button b{display:block;font-size:15px}
 </style>
 </head>
 <body>
@@ -811,14 +822,25 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
     <label>🎨 لون التطبيق على جهازه</label><div class="pals" id="kidPal"></div>
     <label>المظهر على جهازه</label><div class="seg" id="kidTheme"><button data-v="light">☀️ فاتح</button><button data-v="auto">🌗 تلقائي</button><button data-v="dark">🌙 داكن</button></div>
   </div>
+  <div class="wtabs" id="wTabs"><button data-t="face" class="on">😊 الشكل والشعر</button><button data-t="wear">👕 اللبس</button><button data-t="shoe">👟 الأحذية</button></div>
+  <div class="wsec" data-s="face">
   <label>لون البشرة</label><div class="swatches" id="kidSkin"></div>
   <label>غطاء الرأس</label><div class="seg wrap" id="kidHead"></div>
   <div id="hcRow"><label>لون الحجاب</label><div class="swatches" id="kidHC"></div></div>
   <div id="hairRow"><label>تسريحة الشعر</label><div class="seg wrap" id="kidStyle"></div>
   <label>لون الشعر</label><div class="swatches" id="kidHair"></div></div>
+  </div>
+  <div class="wsec" data-s="wear" style="display:none">
   <label>اللبس</label><div class="seg wrap" id="kidOutfit"></div>
+  <div id="clubRow"><label>⚽ اختر ناديك</label><div class="seg wrap lg" id="kidLeague"></div><div class="clubs" id="kidClub"></div>
+  <label>رقم القميص</label><div class="seg wrap" id="kidNum"></div></div>
   <div id="shirtRow"><label>لون اللبس</label><div class="swatches" id="kidShirt"></div></div>
   <div id="pantsRow"><label>لون البنطلون</label><div class="swatches" id="kidPants"></div></div>
+  </div>
+  <div class="wsec" data-s="shoe" style="display:none">
+  <label>نوع الحذاء</label><div class="seg wrap" id="kidShoe"></div>
+  <label>لون الحذاء</label><div class="swatches" id="kidShoeC"></div>
+  </div>
   <div class="row" style="margin-top:16px"><button class="btn" onclick="App.saveKid()">حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div>
 </div></div>
 
@@ -862,18 +884,18 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.5"></script>
-<script src="sync.js?v=3.5"></script>
-<script src="art.js?v=3.5"></script>
-<script src="stories.js?v=3.5"></script>
-<script src="stories-2.js?v=3.5"></script>
-<script src="stories-3.js?v=3.5"></script>
-<script src="stories-4.js?v=3.5"></script>
-<script src="play.js?v=3.5"></script>
-<script src="english-2.js?v=3.5"></script>
-<script src="english.js?v=3.5"></script>
-<script src="space.js?v=3.5"></script>
-<script src="app.js?v=3.5"></script>
-<script src="wamd-stats.js?v=3.5" data-app="siraj"></script>
+<script src="config.js?v=3.6"></script>
+<script src="sync.js?v=3.6"></script>
+<script src="art.js?v=3.6"></script>
+<script src="stories.js?v=3.6"></script>
+<script src="stories-2.js?v=3.6"></script>
+<script src="stories-3.js?v=3.6"></script>
+<script src="stories-4.js?v=3.6"></script>
+<script src="play.js?v=3.6"></script>
+<script src="english-2.js?v=3.6"></script>
+<script src="english.js?v=3.6"></script>
+<script src="space.js?v=3.6"></script>
+<script src="app.js?v=3.6"></script>
+<script src="wamd-stats.js?v=3.6" data-app="siraj"></script>
 </body>
 </html>

@@ -289,7 +289,9 @@ const App = (() => {
       </div>`).join('') : '<p class="muted" style="text-align:center">لا يوجد أطفال بعد</p>';
   }
   let selfEdit = false;
+  let wTab = 'face', wLeague = null;
   function editKid(id, self) {
+    wTab = 'face'; wLeague = null;
     const k = kidById(id);
     selfEdit = !!(self && k);
     editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { ...ART.DEFAULTS.m } };
@@ -317,8 +319,21 @@ const App = (() => {
     const head = ART.headOf(a, G === 'f');
     $('hcRow').style.display = head === 'hijab' ? '' : 'none';
     $('hairRow').style.display = head ? 'none' : '';
-    $('shirtRow').style.display = a.outfit === 'thobe' ? 'none' : '';
-    $('pantsRow').style.display = ['thobe', 'dress'].includes(a.outfit) ? 'none' : '';
+    $('shirtRow').style.display = ['thobe', 'jersey', 'space', 'bisht'].includes(a.outfit) ? 'none' : '';
+    $('pantsRow').style.display = ['thobe', 'dress', 'sport', 'jersey', 'pj', 'space', 'bisht', 'party'].includes(a.outfit) ? 'none' : '';
+    // الأندية والأحذية
+    wLeague = wLeague || ((ART.CLUBS.find((c) => c[0] === a.club) || ART.CLUBS[0])[2]);
+    $('clubRow').style.display = a.outfit === 'jersey' ? '' : 'none';
+    $('kidLeague').innerHTML = ART.LEAGUES.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join('');
+    seg('kidLeague', wLeague, (v) => (wLeague = v));
+    $('kidClub').innerHTML = ART.CLUBS.filter((c) => c[2] === wLeague).map((c) => `<button type="button" class="${(a.club || 'hilal') === c[0] ? 'on' : ''}" data-c="${c[0]}"><svg viewBox="26 68 48 50">${ART.avatar({ ...a, outfit: 'jersey', club: c[0] }, e.g).replace(/<g>/, '<g>')}</svg>${c[1]}</button>`).join('');
+    $('kidClub').querySelectorAll('button').forEach((b) => (b.onclick = () => { a.club = b.dataset.c; buildKidForm(); }));
+    $('kidNum').innerHTML = [7, 9, 10, 11, 17, 19, 20].map((n) => `<button data-v="${n}">${n}</button>`).join('');
+    seg('kidNum', a.num || 10, (v) => (a.num = +v));
+    opts('kidShoe', ART.SHOES); seg('kidShoe', a.shoe || 'sneaker', (v) => (a.shoe = v));
+    sw('kidShoeC', ART.SHOEC, 'shoeC');
+    $('wTabs').querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b.dataset.t === wTab); b.onclick = () => { wTab = b.dataset.t; buildKidForm(); }; });
+    document.querySelectorAll('#kidModal .wsec').forEach((x) => (x.style.display = x.dataset.s === wTab ? '' : 'none'));
     $('kidPreview').innerHTML = ART.avatarSVG(a, e.g, 110);
   }
   function saveKid() {

@@ -5,7 +5,7 @@ const ART = (() => {
   const SHIRT = ['#FF6B6B', '#FF9F1C', '#FFD93D', '#4CD97B', '#4DB8F0', '#9B6BF2', '#FF7AB6', '#1ABC9C', '#2B2350', '#FFFFFF', '#8B5A2B', '#E84393'];
   const HEADC = ['#FF7AB6', '#9B6BF2', '#4DB8F0', '#2B2350', '#FFFFFF', '#1ABC9C', '#FFD93D', '#8B5A2B'];
   // خيارات الشكل (يختارها الطفل بنفسه)
-  const STYLES = { m: ['قصير', 'منكوش', 'كيرلي', 'محلوق'], f: ['طويل', 'ذيل حصان', 'ضفائر', 'قصير'] };
+  const STYLES = { m: ['قصير', 'منكوش', 'كيرلي', 'محلوق', 'جانبي', 'سبايكي', 'مموّج'], f: ['طويل', 'ذيل حصان', 'ضفائر', 'قصير', 'كعكة', 'غُرّة', 'كيرلي', 'ذيلين'] };
   const HEADS = { m: [['', 'بدون'], ['shmagh', 'شماغ'], ['ghutra', 'غترة'], ['taqiya', 'طاقية']], f: [['', 'بدون'], ['hijab', 'حجاب']] };
   const OUTFITS = { m: [['tee', 'تيشيرت'], ['thobe', 'ثوب'], ['hoodie', 'هودي']], f: [['tee', 'تيشيرت'], ['dress', 'فستان'], ['hoodie', 'هودي']] };
 
@@ -16,6 +16,24 @@ const ART = (() => {
     m: { skin: 0, hair: 0, style: 0, head: 'shmagh', outfit: 'tee', shirt: 10, pants: 1 }
   };
   OUTFITS.m.push(['overalls', 'صدرية']); OUTFITS.f.push(['overalls', 'صدرية']);
+  // v3.6 الخزانة: لبس جديد للكل + لبس العيد
+  [['sport', 'بدلة رياضية'], ['jersey', 'قميص نادي ⚽'], ['jacket', 'جاكيت'], ['pj', 'بيجامة نوم'], ['space', 'رائد فضاء'], ['doctor', 'طبيب']].forEach((o) => { OUTFITS.m.push(o); OUTFITS.f.push(o); });
+  OUTFITS.m.push(['bisht', 'بشت العيد']); OUTFITS.f.push(['party', 'فستان مناسبة']);
+  const SHOES = [['sneaker', 'رياضي'], ['boot', 'بوت'], ['sandal', 'صندل'], ['slipper', 'نعال'], ['rain', 'جزمة مطر']];
+  const SHOEC = ['#FFFFFF', '#2B2350', '#FF6B6B', '#4DB8F0', '#FFD93D', '#4CD97B', '#FF7AB6', '#8B5A2B', '#9B6BF2'];
+  /* قمصان الأندية بألوانها وتصميمها، بدون شعارات */
+  const CLUBS = [
+    ['hilal', 'الهلال', 'sa', 'solid', '#1A4DA1', '#FFFFFF'], ['nassr', 'النصر', 'sa', 'solid', '#FFE01B', '#1D3B8F'], ['ittihad', 'الاتحاد', 'sa', 'stripes', '#FFD200', '#111111'],
+    ['ahli', 'الأهلي', 'sa', 'solid', '#00843D', '#FFFFFF'], ['shabab', 'الشباب', 'sa', 'solid', '#FFFFFF', '#F58220'],
+    ['liverpool', 'ليفربول', 'en', 'solid', '#C8102E', '#FFFFFF'], ['mancity', 'مانشستر سيتي', 'en', 'solid', '#6CABDD', '#FFFFFF'],
+    ['realmadrid', 'ريال مدريد', 'es', 'solid', '#FFFFFF', '#D4AF37'], ['barca', 'برشلونة', 'es', 'stripes', '#A50044', '#004D98'],
+    ['juve', 'يوفنتوس', 'it', 'stripes', '#FFFFFF', '#111111'], ['milan', 'ميلان', 'it', 'stripes', '#E00A12', '#111111'],
+    ['bayern', 'بايرن ميونخ', 'de', 'solid', '#DC052D', '#FFFFFF'], ['bvb', 'دورتموند', 'de', 'solid', '#FDE100', '#111111'],
+    ['psg', 'باريس سان جيرمان', 'fr', 'band', '#0B2A5B', '#DA291C'], ['om', 'مارسيليا', 'fr', 'solid', '#FFFFFF', '#2FAEE0'],
+    ['benfica', 'بنفيكا', 'pt', 'solid', '#E20E0E', '#FFFFFF'], ['porto', 'بورتو', 'pt', 'stripes', '#FFFFFF', '#0055A4'],
+    ['ajax', 'أياكس', 'nl', 'band', '#FFFFFF', '#D2122E'], ['psv', 'آيندهوفن', 'nl', 'stripes', '#FFFFFF', '#E3001B']
+  ];
+  const LEAGUES = [['sa', '🇸🇦 السعودية'], ['en', '🏴 إنجلترا'], ['es', '🇪🇸 إسبانيا'], ['it', '🇮🇹 إيطاليا'], ['de', '🇩🇪 ألمانيا'], ['fr', '🇫🇷 فرنسا'], ['pt', '🇵🇹 البرتغال'], ['nl', '🇳🇱 هولندا']];
 
   function headOf(av, girl) { const h = av.head != null ? av.head : (av.hijab ? 'hijab' : ''); return girl ? (h === 'hijab' ? 'hijab' : '') : (['shmagh', 'ghutra', 'taqiya'].includes(h) ? h : ''); }
   const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = (v) => Math.max(0, Math.min(255, Math.round(v * k))); return '#' + [n >> 16, (n >> 8) & 255, n & 255].map((v) => f(v).toString(16).padStart(2, '0')).join(''); };
@@ -46,17 +64,30 @@ const ART = (() => {
       if (st === 1) { hairBack = `<path d="M70 18 Q100 22 92 66 Q88 52 76 44Z" fill="${hair}" ${sw}/>`; front = fringe + `<circle cx="74" cy="20" r="5" fill="${bow}" ${sw}/>`; }
       else if (st === 2) { hairBack = [20, 80].map((x) => `<path d="M${x} 42 q-7 11 0 20 q7 9 0 18 q-6 9 0 16" fill="none" stroke="${line}" stroke-width="12.5" stroke-linecap="round"/><path d="M${x} 42 q-7 11 0 20 q7 9 0 18 q-6 9 0 16" fill="none" stroke="${hair}" stroke-width="9.5" stroke-linecap="round"/><circle cx="${x}" cy="97" r="4.5" fill="${bow}" ${sw}/>`).join(''); front = fringe; }
       else if (st === 3) { hairBack = `<path d="M16 46 Q12 6 50 6 Q88 6 84 46 Q84 62 74 64 L26 64 Q16 62 16 46Z" fill="${hair}" ${sw}/>`; front = fringe; }
+      else if (st === 4) { hairBack = `<circle cx="50" cy="6" r="13" fill="${hair}" ${sw}/><path d="M38 10 Q50 16 62 10" stroke="${bow}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`; front = fringe; }
+      else if (st === 5) { hairBack = `<path d="M15 44 Q13 5 50 5 Q87 5 85 44 L86 80 Q70 84 66 66 L34 66 Q30 84 14 80Z" fill="${hair}" ${sw}/>`; front = `<path d="M19 42 Q18 8 50 8 Q82 8 81 42 L81 30 Q50 34 19 30Z" fill="${hair}" ${sw}/>`; }
+      else if (st === 6) { hairBack = [16, 24, 76, 84, 14, 86].map((x, i) => `<circle cx="${x}" cy="${[50, 64, 64, 50, 36, 36][i]}" r="10" fill="${hair}" ${sw}/>`).join('') + `<path d="M16 46 Q12 6 50 6 Q88 6 84 46 L80 68 L20 68Z" fill="${hair}"/>`; front = [26, 38, 50, 62, 74].map((x) => `<circle cx="${x}" cy="16" r="9" fill="${hair}" ${sw}/>`).join('') + `<path d="M20 40 Q22 18 50 16 Q78 18 80 40 Q66 26 50 28 Q34 26 20 40Z" fill="${hair}"/>`; }
+      else if (st === 7) { hairBack = [14, 86].map((x) => `<path d="M${x} 30 Q${x < 50 ? x - 14 : x + 14} 44 ${x < 50 ? x - 6 : x + 6} 70 Q${x} 60 ${x} 44Z" fill="${hair}" ${sw}/><circle cx="${x}" cy="30" r="4.5" fill="${bow}" ${sw}/>`).join(''); front = fringe; }
       else { hairBack = `<path d="M15 44 Q13 5 50 5 Q87 5 85 44 L88 92 Q70 98 66 70 L34 70 Q30 98 12 92Z" fill="${hair}" ${sw}/>`; front = fringe + `<circle cx="76" cy="22" r="5.5" fill="${bow}" ${sw}/>`; }
     } else {
       if (st === 1) front = `<path d="M20 42 Q18 10 50 9 Q82 10 80 42 L75 26 L68 34 L62 18 L55 30 L48 15 L42 30 L35 18 L29 32 L24 24Z" fill="${hair}" ${sw}/>`;
       else if (st === 2) front = [24, 34, 44, 56, 66, 76, 29, 39, 50, 61, 71].map((x, i) => `<circle cx="${x}" cy="${i < 6 ? 22 : 13}" r="${i < 6 ? 8.5 : 7.5}" fill="${hair}" ${sw}/>`).join('') + `<path d="M20 42 Q20 24 30 22 L70 22 Q80 24 80 42 Q72 30 50 28 Q28 30 20 42Z" fill="${hair}"/>`;
       else if (st === 3) front = `<path d="M23 34 Q25 12 50 12 Q75 12 77 34 Q64 24 50 24 Q36 24 23 34Z" fill="${hair}" opacity=".55"/>`;
+      else if (st === 4) front = `<path d="M19 42 Q17 7 50 7 Q83 7 81 42 Q80 26 70 22 Q50 14 22 30 Z" fill="${hair}" ${sw}/><path d="M30 22 Q50 12 74 20" stroke="${shade(hair, 1.5)}" stroke-width="2" fill="none" opacity=".6"/>`;
+      else if (st === 5) front = `<path d="M20 42 Q18 14 30 12 L34 0 L40 12 L46 -2 L52 11 L59 -1 L63 12 L71 2 L72 14 Q82 18 80 42 Q70 26 50 26 Q30 26 20 42Z" fill="${hair}" ${sw}/>`;
+      else if (st === 6) front = `<path d="M19 42 Q16 8 50 6 Q84 8 81 42 Q78 30 70 32 Q72 22 62 24 Q60 16 50 20 Q42 14 36 24 Q26 22 28 32 Q22 30 19 42Z" fill="${hair}" ${sw}/>`;
       else front = `<path d="M19 42 Q17 7 50 7 Q83 7 81 42 Q76 22 60 24 Q50 16 38 24 Q26 24 19 42Z" fill="${hair}" ${sw}/>`;
     }
     /* ----- الجسم واللبس (تحت الراس) ----- */
     const arm = (x, sleeve) => `<path d="M${x} 84 q${x < 50 ? -9 : 9} 6 ${x < 50 ? -8 : 8} 22" stroke="${line}" stroke-width="10" stroke-linecap="round" fill="none"/><path d="M${x} 84 q${x < 50 ? -9 : 9} 6 ${x < 50 ? -8 : 8} 22" stroke="${sleeve}" stroke-width="7.4" stroke-linecap="round" fill="none"/><circle cx="${x < 50 ? x - 8 : x + 8}" cy="107" r="4.4" fill="${skin}" ${sw}/>`;
     const legs = (c) => `<rect x="36" y="112" width="11" height="24" rx="5" fill="${c}" ${sw}/><rect x="53" y="112" width="11" height="24" rx="5" fill="${c}" ${sw}/>`;
-    const shoes = `<path d="M33 136 h15 v4 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="#FFFFFF" ${sw}/><path d="M52 136 h15 v4 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="#FFFFFF" ${sw}/><path d="M33 141 h15 M52 141 h15" stroke="${shirt === '#FFFFFF' ? '#9B6BF2' : shirt}" stroke-width="2"/>`;
+    const sc = SHOEC[av.shoeC ?? 0] || SHOEC[0], stype = av.shoe || 'sneaker', sAcc = sc === '#FFFFFF' ? (shirt === '#FFFFFF' ? '#9B6BF2' : shirt) : '#FFFFFF';
+    const shoes = stype === 'boot' ? [33, 52].map((x) => `<path d="M${x + 1} 126 h13 v14 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="${sc}" ${sw}/><path d="M${x + 1} 130 h13" stroke="${shade(sc === '#FFFFFF' ? '#DDDDDD' : sc, .75)}" stroke-width="2"/>`).join('')
+      : stype === 'rain' ? [33, 52].map((x) => `<path d="M${x + 1} 122 h13 v18 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="${sc}" ${sw}/><circle cx="${x + 8}" cy="130" r="2" fill="#fff" opacity=".8"/>`).join('')
+      : stype === 'sandal' ? [33, 52].map((x) => `<path d="M${x} 141 h15 q0 3 -3 3 h-9 q-3 0 -3 -3z" fill="${shade(sc === '#FFFFFF' ? '#C9A27A' : sc, .9)}" ${sw}/><path d="M${x + 3} 138 L${x + 12} 141 M${x + 12} 137 L${x + 3} 141" stroke="${sc === '#FFFFFF' ? '#8B5A2B' : sc}" stroke-width="2.4" stroke-linecap="round"/>`).join('')
+      : stype === 'slipper' ? [33, 52].map((x) => `<path d="M${x} 141 h15 q0 3 -3 3 h-9 q-3 0 -3 -3z" fill="${sc === '#FFFFFF' ? '#2B2350' : sc}" ${sw}/><path d="M${x + 2} 139 Q${x + 7.5} 134 ${x + 13} 139" stroke="${sc === '#FFFFFF' ? '#2B2350' : sc}" stroke-width="3.4" fill="none" stroke-linecap="round"/>`).join('')
+      : `<path d="M33 136 h15 v4 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="${sc}" ${sw}/><path d="M52 136 h15 v4 q0 4 -4 4 h-9 q-4 0 -4 -4z" fill="${sc}" ${sw}/><path d="M33 141 h15 M52 141 h15" stroke="${sAcc}" stroke-width="2"/>`;
+    const torso = 'M30 80 L36 75 Q50 70 64 75 L70 80 L66 88 L66 114 L34 114 L34 88Z';
     let body = '';
     if (outfit === 'thobe') {
       body = arm(34, '#FAFAF5') + arm(66, '#FAFAF5') + `<path d="M34 76 Q50 70 66 76 L70 138 L30 138Z" fill="#FAFAF5" ${sw}/><path d="M50 74 V100" stroke="#D8D5CC" stroke-width="1.6"/><circle cx="50" cy="82" r="1.6" fill="#BDB9AE"/><circle cx="50" cy="90" r="1.6" fill="#BDB9AE"/>` + shoes.replace(/#FFFFFF/g, '#5A3B2A');
@@ -66,8 +97,30 @@ const ART = (() => {
       body = arm(34, shirt) + arm(66, shirt) + legs(pants) + `<path d="M34 76 Q50 70 66 76 L67 114 L33 114Z" fill="${shirt}" ${sw}/><path d="M38 88 H62 V114 H38Z" fill="${pants}" ${sw}/><path d="M38 88 L36 76 M62 88 L64 76" stroke="${pants}" stroke-width="4"/><circle cx="41" cy="92" r="1.8" fill="#FFD93D"/><circle cx="59" cy="92" r="1.8" fill="#FFD93D"/><rect x="45" y="96" width="10" height="8" rx="2" fill="none" stroke="${line}" stroke-width="1.2"/>` + shoes;
     } else if (outfit === 'hoodie') {
       body = arm(34, shirt) + arm(66, shirt) + legs(pants) + `<path d="M33 76 Q50 70 67 76 L68 114 L32 114Z" fill="${shirt}" ${sw}/><path d="M38 76 Q50 88 62 76" fill="none" stroke="${dark}" stroke-width="4"/><rect x="40" y="100" width="20" height="10" rx="4" fill="${dark}"/><path d="M46 82 v9 M54 82 v9" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>` + shoes;
+    } else if (outfit === 'sport') {
+      body = arm(34, shirt) + arm(66, shirt) + legs(shirt) + `<path d="M38 112 v24 M62 112 v24" stroke="#fff" stroke-width="2"/><path d="M33 76 Q50 70 67 76 L68 114 L32 114Z" fill="${shirt}" ${sw}/><path d="M50 74 V114" stroke="${dark}" stroke-width="2"/><path d="M36 78 V112 M64 78 V112" stroke="#fff" stroke-width="2.4"/><path d="M44 74 L50 80 L56 74" fill="none" stroke="#fff" stroke-width="2"/>` + shoes;
+    } else if (outfit === 'jersey') {
+      const c = CLUBS.find((x) => x[0] === av.club) || CLUBS[0], [, , , pat, c1, c2] = c, idc = 'kc' + c[0];
+      const fill = pat === 'stripes' ? `url(#${idc})` : c1;
+      const defs = pat === 'stripes' ? `<defs><pattern id="${idc}" width="8" height="10" patternUnits="userSpaceOnUse"><rect width="8" height="10" fill="${c1}"/><rect width="4" height="10" fill="${c2}"/></pattern></defs>` : '';
+      const band = pat === 'band' ? `<rect x="45" y="72" width="10" height="42" fill="${c2}"/>` : '';
+      body = defs + arm(34, skin) + arm(66, skin) + legs(c2 === '#FFFFFF' ? '#FFFFFF' : shade(c1 === '#FFFFFF' ? c2 : c1, .7)) + `<path d="${torso}" fill="${fill}" ${sw}/>${band}<path d="M30 80 L36 75 L38 84 L32 86Z M70 80 L64 75 L62 84 L68 86Z" fill="${c2}" opacity=".9"/><path d="M43 74 Q50 80 57 74" fill="none" stroke="${c2}" stroke-width="2.6"/><text x="50" y="104" text-anchor="middle" font-size="12" font-weight="800" font-family="Arial,sans-serif" fill="${pat === 'stripes' ? '#FFFFFF' : c1 === '#FFFFFF' ? c2 : '#FFFFFF'}" stroke="${pat === 'stripes' ? '#111' : line}" stroke-width="${pat === 'stripes' ? 1.6 : .4}" paint-order="stroke">${av.num || 10}</text><path d="${torso}" fill="none" ${sw}/>` + shoes;
+    } else if (outfit === 'jacket') {
+      body = arm(34, shirt) + arm(66, shirt) + legs(pants) + `<path d="${torso}" fill="#FFFFFF" ${sw}/><path d="M30 80 L36 75 Q42 72 46 74 L46 114 L34 114 L34 88Z" fill="${shirt}" ${sw}/><path d="M70 80 L64 75 Q58 72 54 74 L54 114 L66 114 L66 88Z" fill="${shirt}" ${sw}/><path d="M46 74 V114 M54 74 V114" stroke="${dark}" stroke-width="1.6"/><rect x="38" y="96" width="6" height="2" fill="${dark}"/><rect x="56" y="96" width="6" height="2" fill="${dark}"/>` + shoes;
+    } else if (outfit === 'pj') {
+      const pid = 'pj' + (av.shirt ?? 0);
+      body = `<defs><pattern id="${pid}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${shirt}"/><path d="M4 3 l1 2 2 .3 -1.5 1.4 .4 2 -1.9 -1 -1.9 1 .4 -2 -1.5 -1.4 2 -.3z" fill="#fff" opacity=".8"/><circle cx="10" cy="9" r="1" fill="#fff" opacity=".7"/></pattern></defs>`
+        + arm(34, shirt) + arm(66, shirt) + legs(`url(#${pid})`) + `<path d="M33 76 Q50 70 67 76 L68 114 L32 114Z" fill="url(#${pid})" ${sw}/><path d="M42 74 Q50 82 58 74" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="50" cy="90" r="1.6" fill="#fff"/><circle cx="50" cy="100" r="1.6" fill="#fff"/>` + shoes;
+    } else if (outfit === 'space') {
+      body = arm(34, '#F4F4F8') + arm(66, '#F4F4F8') + legs('#F4F4F8') + `<path d="M33 76 Q50 70 67 76 L68 114 L32 114Z" fill="#F4F4F8" ${sw}/><rect x="40" y="84" width="20" height="14" rx="3" fill="#4DB8F0" ${sw}/><circle cx="45" cy="91" r="2" fill="#FF6B6B"/><circle cx="52" cy="91" r="2" fill="#FFD93D"/><circle cx="58" cy="91" r="1.5" fill="#4CD97B"/><rect x="33" y="102" width="34" height="5" fill="${shirt === '#FFFFFF' ? '#FF9F1C' : shirt}"/><path d="M36 136 v-6 M64 136 v-6" stroke="${shirt === '#FFFFFF' ? '#FF9F1C' : shirt}" stroke-width="3"/>` + shoes.replace(/fill="#FFFFFF"/g, 'fill="#B8BCC8"');
+    } else if (outfit === 'doctor') {
+      body = arm(34, '#FFFFFF') + arm(66, '#FFFFFF') + legs(pants) + `<path d="${torso}" fill="${shirt}" ${sw}/><path d="M32 78 L40 74 L46 100 L44 122 L32 122Z" fill="#FFFFFF" ${sw}/><path d="M68 78 L60 74 L54 100 L56 122 L68 122Z" fill="#FFFFFF" ${sw}/><path d="M40 80 Q38 96 46 98 Q52 98 52 92" stroke="#5A6079" stroke-width="1.8" fill="none"/><circle cx="52" cy="91" r="2.4" fill="#B8BCC8" ${sw}/><rect x="58" y="96" width="7" height="6" rx="1" fill="none" stroke="#4DB8F0" stroke-width="1.2"/>` + shoes;
+    } else if (outfit === 'bisht') {
+      body = arm(34, '#FAFAF5') + arm(66, '#FAFAF5') + `<path d="M34 76 Q50 70 66 76 L70 138 L30 138Z" fill="#FAFAF5" ${sw}/><path d="M30 78 L42 74 L44 140 L24 140Z" fill="#3A2A1E" ${sw}/><path d="M70 78 L58 74 L56 140 L76 140Z" fill="#3A2A1E" ${sw}/><path d="M42 74 L44 140 M58 74 L56 140" stroke="#E2B13C" stroke-width="2.6"/>` + shoes.replace(/fill="#FFFFFF"/g, 'fill="#5A3B2A"');
+    } else if (outfit === 'party') {
+      body = arm(34, skin) + arm(66, skin) + legs(skin) + `<path d="M36 76 Q50 70 64 76 L66 92 L82 126 Q50 136 18 126 L34 92Z" fill="${shirt}" ${sw}/><path d="M24 116 Q50 126 76 116" stroke="#E2B13C" stroke-width="2.4" fill="none"/><path d="M34 92 Q50 98 66 92" fill="none" stroke="#E2B13C" stroke-width="3"/>${[30, 42, 54, 66].map((x) => `<circle cx="${x}" cy="${110 + (x % 3)}" r="1.4" fill="#fff"/>`).join('')}<circle cx="50" cy="80" r="2.4" fill="#E2B13C"/>` + shoes;
     } else {
-      body = arm(34, skin) + arm(66, skin) + legs(pants) + `<path d="M30 80 L36 75 Q50 70 64 75 L70 80 L66 88 L66 114 L34 114 L34 88Z" fill="${shirt}" ${sw}/><path d="M43 74 Q50 80 57 74" fill="none" stroke="${dark}" stroke-width="2"/>` + shoes;
+      body = arm(34, skin) + arm(66, skin) + legs(pants) + `<path d="${torso}" fill="${shirt}" ${sw}/><path d="M43 74 Q50 80 57 74" fill="none" stroke="${dark}" stroke-width="2"/>` + shoes;
     }
     const cape = av.acc === 'cape' ? `<path d="M34 78 Q16 112 20 140 L80 140 Q84 112 66 78Z" fill="#FF6B6B" ${sw}/>` : '';
     const face = `<circle cx="50" cy="40" r="30" fill="${skin}" ${sw}/><circle cx="20" cy="44" r="5" fill="${skin}" ${sw}/><circle cx="80" cy="44" r="5" fill="${skin}" ${sw}/><circle cx="50" cy="40" r="28.6" fill="${skin}"/>`;
@@ -287,5 +340,5 @@ const ART = (() => {
   }
 
   page.n = 0;
-  return { avatar, avatarSVG, page, SKIN, HAIR, SHIRT, PANTS, DEFAULTS, HEADC, STYLES, HEADS, OUTFITS, headOf, ACC, SCENES: Object.keys(SCENES) };
+  return { avatar, avatarSVG, page, SKIN, HAIR, SHIRT, PANTS, DEFAULTS, HEADC, STYLES, HEADS, OUTFITS, SHOES, SHOEC, CLUBS, LEAGUES, headOf, ACC, SCENES: Object.keys(SCENES) };
 })();
