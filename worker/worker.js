@@ -143,6 +143,18 @@ export default {
     }
     for (const r of due) await env.DB.prepare('UPDATE subs SET last_bed=? WHERE eid=?').bind(r._day, r.eid).run();
     if (due.length) ctx.waitUntil(deliver(env, due, { t: 'bed' }));
+    /* كل جمعة ٥ العصر: تنبيه «تقرير الأسبوع» لأجهزة أولياء الأمور (التقرير نفسه يُحسب على الجهاز) */
+    try {
+      const ps = (await env.DB.prepare("SELECT eid, endpoint, pending, tz, last_week FROM subs WHERE role='parent'").all()).results || [];
+      const wk = [];
+      for (const r of ps) {
+        const local = new Date(Date.now() + (r.tz || 0) * 60000), day = local.toISOString().slice(0, 10);
+        const hm = String(local.getUTCHours()).padStart(2, '0') + ':' + String(local.getUTCMinutes()).padStart(2, '0');
+        if (local.getUTCDay() === 5 && hm === '17:00' && r.last_week !== day) { wk.push(r); r._day = day; }
+      }
+      for (const r of wk) await env.DB.prepare('UPDATE subs SET last_week=? WHERE eid=?').bind(r._day, r.eid).run();
+      if (wk.length) ctx.waitUntil(deliver(env, wk, { t: 'week' }));
+    } catch (e) {}
   }
 };
 
@@ -157,6 +169,7 @@ async function ensureSchema(env) {
     env.DB.prepare('CREATE INDEX IF NOT EXISTS subs_fam ON subs (fam)'),
     env.DB.prepare('CREATE TABLE IF NOT EXISTS messages (n INTEGER PRIMARY KEY AUTOINCREMENT, created INTEGER, title TEXT, body TEXT, total INTEGER)')
   ]);
+  try { await env.DB.prepare('ALTER TABLE subs ADD COLUMN last_week TEXT').run(); } catch (e) {}
   schemaReady = true;
 }
 

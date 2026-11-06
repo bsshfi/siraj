@@ -647,7 +647,7 @@ const App = (() => {
         const t = new Date(e.t);
         return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
       }).join('');
-      el.innerHTML = familyStrip('parent') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
+      el.innerHTML = familyStrip('parent') + (typeof Honors !== 'undefined' ? Honors.reportBtn() + Honors.board() : '') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
         `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>` +
         ((S.log.length || (S.act || []).length) ? `<div class="card"><h2>قراءات هذا الجوال</h2><p class="muted">قصص وألعاب انحسبت من جوالك (${S.log.length} قصة · ${(S.act || []).length} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.</p><button class="btn alt" onclick="App.clearMine()">مسح قراءات هذا الجوال</button></div>` : '');
     };
@@ -1117,6 +1117,11 @@ const App = (() => {
     if (updated) setTimeout(() => toast('تم التحديث ✨ الإصدار ' + CONFIG.VERSION), 500);
     setupSW(); save();
     try { indexedDB.deleteDatabase('siraj-rec'); } catch (e) {} // تسجيلات تجريبية من 1.7
+    try {
+      const openReport = () => { if (S.role === 'parent' && typeof Honors !== 'undefined') { tab('dash'); setTimeout(() => Honors.report(), 400); } };
+      if (/[?&]report=1/.test(location.search)) { history.replaceState(null, '', location.pathname); setTimeout(openReport, 800); }
+      if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.open === 'report') openReport(); });
+    } catch (e) {}
     checkLock(); setInterval(checkLock, 30000); setInterval(tickClock, 20000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) checkLock(); });
     syncNow().then(() => {

@@ -1,8 +1,8 @@
 /* سِراج | SIRAJ — يشغّل التطبيق بدون إنترنت، ويحدّثه تلقائيًا، ويعرض الإشعارات
    مع كل تحديث: غيّر CACHE هنا و VERSION في config.js و ?v= في index.html */
 importScripts('config.js');
-const CACHE = 'siraj-v3.8';
-const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'stories-4.js', 'stories-5.js', 'play.js', 'english-2.js', 'english.js', 'english-3.js', 'space.js', 'night.js', 'manifest.webmanifest', 'wamd-stats.js',
+const CACHE = 'siraj-v3.9';
+const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'stories-4.js', 'stories-5.js', 'play.js', 'english-2.js', 'english.js', 'english-3.js', 'space.js', 'night.js', 'honors.js', 'manifest.webmanifest', 'wamd-stats.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -63,6 +63,9 @@ async function onPush() {
       const verb = list.length > 1 ? 'خلّصوا' : list[0] && list[0].g === 'f' ? 'خلّصت' : 'خلّص';
       title = '✅ قصة الليلة';
       body = list.length ? `${joinNames(list)} ${verb} قصة الليلة 🌙` : 'خلّص الأطفال قصة الليلة 🌙';
+    } else if (it.t === 'week') {
+      title = '📊 تقرير الأسبوع جاهز';
+      body = 'شوف وش سوّوا ' + (Object.keys(kids).length ? joinNames(Object.values(kids)) : 'العيال') + ' هالأسبوع، ومين كسب لوحة الشرف 🏆';
     } else {
       title = it.title || title; body = it.body || '';
     }
@@ -75,7 +78,8 @@ self.addEventListener('push', (e) => e.waitUntil(onPush()));
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-    for (const c of list) if ('focus' in c) return c.focus();
-    return self.clients.openWindow('./');
+    const url = e.notification.data && e.notification.data.t === 'week' ? './?report=1' : './';
+    for (const c of list) if ('focus' in c) { if (url !== './') c.postMessage({ open: 'report' }); return c.focus(); }
+    return self.clients.openWindow(url);
   }));
 });
