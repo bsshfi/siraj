@@ -67,6 +67,9 @@ const App = (() => {
   }
   /* قصص الأنبياء: كل اثنين وجمعة بالترتيب من آدم إلى محمد ﷺ */
   const isPro = (s) => s && s.cat === 'pro';
+  const isSah = (s) => s && s.cat === 'sahaba';
+  const isNarr = (s) => isPro(s) || isSah(s);
+  const laterPart = (s) => s && s.ser && s.part > 1;
   const isProDay = (d) => d.getDay() === 1 || d.getDay() === 5;
   function proOfDay(d) {
     const pros = STORIES.filter(isPro); if (!pros.length) return null;
@@ -77,7 +80,17 @@ const App = (() => {
   function storyOfDay(d = new Date()) {
     const occ = occasion(d); if (occ) return occ;
     if (isProDay(d)) { const p = proOfDay(d); if (p) return p; }
-    const pool = STORIES.filter((s) => !s.occ && !isPro(s));
+    if (d.getDay() === 3) { const sh = STORIES.filter(isSah); if (sh.length) { let n = 0; for (let x = new Date(2026, 0, 1); x <= d; x.setDate(x.getDate() + 1)) if (x.getDay() === 3) n++; return sh[(n - 1) % sh.length]; } }
+    // السلاسل: إذا قروا جزء قبل اليوم، الجزء اللي بعده يصير قصة اليوم
+    try {
+      const today = dateKey(d), logs = allLogs().filter((e) => e.d < today);
+      const last = logs.find((e) => { const s = STORIES.find((x) => x.id === e.s); return s && s.ser; });
+      if (last) {
+        const s = STORIES.find((x) => x.id === last.s), nx = STORIES.find((x) => x.ser === s.ser && x.part === s.part + 1);
+        if (nx && !logs.some((e) => e.s === nx.id)) return nx;
+      }
+    } catch (e) {}
+    const pool = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s));
     const seed = S.code || S.fam.kids.map((k) => k.name.trim()).sort().join('|');
     const order = pool.map((_, i) => i);
     const r = rng(hash(seed + '#' + d.getFullYear()));
@@ -88,6 +101,9 @@ const App = (() => {
   /* ---------- التصنيفات: تظهر تحت اسم كل قصة ---------- */
   const CATS = [
     ['pro', '🕌', 'قصص الأنبياء', null],
+    ['sahaba', '🌟', 'قصص الصحابة', null],
+    ['choose', '🧭', 'اختر الطريق', null],
+    ['series', '📚', 'سلاسل', null],
     ['occ', '🎉', 'المناسبات', null],
     ['truth', '🤝', 'الصدق والأمانة', /الصدق|الأمانة|الوفاء|الوعد/],
     ['share', '🎁', 'المشاركة والعطاء', /المشاركة|العطاء|التعاون|الكرم|ضيف|مساعدة|نصرة|التطوعي|الصدقة|العاملين|الإيثار/],
@@ -102,6 +118,9 @@ const App = (() => {
   ];
   function catOf(s) {
     if (isPro(s)) return CATS[0];
+    if (isSah(s)) return CATS[1];
+    if (s.cat2 === 'choose') return CATS[2];
+    if (s.ser) return CATS[3];
     if (s.occ) return CATS[1];
     return CATS.find((c) => c[3] && c[3].test(s.value)) || CATS[CATS.length - 1];
   }
@@ -110,7 +129,7 @@ const App = (() => {
     return `<div class="cats"><span class="cat c-${c[0]}">${c[1]} ${c[2]}</span>${withVal && s.value !== c[2] ? `<span class="val">${esc(s.value)}</span>` : ''}</div>`;
   }
   /* في قصص الأنبياء: ما نرسم الأطفال إلا في صفحة البداية وهم يسمعون */
-  const artHs = (st, hs, pg) => (isPro(st) ? (pg && pg.k ? hs : []) : hs);
+  const artHs = (st, hs, pg) => (isNarr(st) ? (pg && pg.k ? hs : []) : hs);
 
   /* ---------- محرّك القوالب ---------- */
   function fill(str, heroes) {
@@ -289,9 +308,33 @@ const App = (() => {
       </div>`).join('') : '<p class="muted" style="text-align:center">لا يوجد أطفال بعد</p>';
   }
   let selfEdit = false;
-  let wTab = 'face', wLeague = null;
+  let wTab = 'face', wLeague = null, parentEdit = null;
+  /* شخصيات بابا وماما */
+  function pAv(who) {
+    S.fam.pav = S.fam.pav || {};
+    return S.fam.pav[who] || (who === 'dad' ? { ...ART.DEFAULTS.m, outfit: 'thobe', head: 'shmagh' } : { ...ART.DEFAULTS.f, head: 'hijab', hc: 3, outfit: 'dress', shirt: 8 });
+  }
+  function family() {
+    return [{ id: 'dad', name: S.fam.dad || 'بابا', g: 'm', av: pAv('dad'), parent: 1 }, { id: 'mom', name: S.fam.mom || 'ماما', g: 'f', av: pAv('mom'), parent: 1 }, ...S.fam.kids];
+  }
+  function familyStrip(mode) {
+    const me = S.role === 'child' ? (S.devKids || []) : [];
+    return `<div class="card famstrip"><h3>👨‍👩‍👧‍👦 عائلتي</h3><div class="fams">${family().map((m) => {
+      const n = m.parent ? '' : kidNights(m).month;
+      const can = mode === 'parent' || me.includes(m.id);
+      const act = mode === 'parent' ? (m.parent ? `App.editParent('${m.id}')` : `App.editKid('${m.id}')`) : can ? `App.editKid('${m.id}', true)` : '';
+      return `<button class="fm ${can ? 'can' : ''} ${me.includes(m.id) ? 'me' : ''}" ${act ? `onclick="${act}"` : 'disabled'}>${ART.avatarSVG(m.av, m.g, 64)}<b>${esc(m.name)}</b>${m.parent ? '<small>' + (m.id === 'dad' ? '👨' : '👩') + '</small>' : `<small>⭐ ${AR(n)}</small>`}${can ? '<i>✏️</i>' : ''}</button>`;
+    }).join('')}</div>${mode === 'parent' ? '<p class="muted" style="margin:6px 0 0;font-size:12.5px">اضغط أي شخصية تعدّلها. النجوم = ليالي القراءة هالشهر.</p>' : '<p class="muted" style="margin:6px 0 0;font-size:12.5px">تقدر تغيّر شكلك أنت ✏️</p>'}</div>`;
+  }
+  function editParent(who) {
+    parentEdit = who; wTab = 'face'; wLeague = null; selfEdit = true;
+    editing = { id: 'p-' + who, name: who === 'dad' ? S.fam.dad : S.fam.mom, g: who === 'dad' ? 'm' : 'f', age: 0, av: JSON.parse(JSON.stringify(pAv(who))) };
+    $('kidTitle').textContent = 'شخصية ' + (editing.name || (who === 'dad' ? 'بابا' : 'ماما')) + ' ✨';
+    $('kidBasics').style.display = 'none'; $('kidName').value = editing.name || '';
+    buildKidForm(); $('kidModal').classList.add('on');
+  }
   function editKid(id, self) {
-    wTab = 'face'; wLeague = null;
+    wTab = 'face'; wLeague = null; parentEdit = null;
     const k = kidById(id);
     selfEdit = !!(self && k);
     editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { ...ART.DEFAULTS.m } };
@@ -337,6 +380,11 @@ const App = (() => {
     $('kidPreview').innerHTML = ART.avatarSVG(a, e.g, 110);
   }
   function saveKid() {
+    if (parentEdit) {
+      S.fam.pav = S.fam.pav || {}; S.fam.pav[parentEdit] = editing.av; parentEdit = null;
+      closeModal('kidModal'); famChanged(); toast('تم حفظ الشخصية ✨'); if ($('paneDash').style.display !== 'none') renderDash(); renderHome();
+      return;
+    }
     if (selfEdit) {
       const k = kidById(editing.id); if (k) k.av = editing.av;
       closeModal('kidModal'); famChanged(); toast('شكلك الجديد يجنن ✨');
@@ -599,7 +647,7 @@ const App = (() => {
         const t = new Date(e.t);
         return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
       }).join('');
-      el.innerHTML = (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
+      el.innerHTML = familyStrip('parent') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
         `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>` +
         ((S.log.length || (S.act || []).length) ? `<div class="card"><h2>قراءات هذا الجوال</h2><p class="muted">قصص وألعاب انحسبت من جوالك (${S.log.length} قصة · ${(S.act || []).length} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.</p><button class="btn alt" onclick="App.clearMine()">مسح قراءات هذا الجوال</button></div>` : '');
     };
@@ -622,7 +670,7 @@ const App = (() => {
   function nightKey() { const d = new Date(); if (nowMin() < MORNING) d.setDate(d.getDate() - 1); return dateKey(d); }
   function allowedTonight() { const x = S.fam.extra; return (S.fam.perNight || 1) + (x && x.d === nightKey() ? x.n : 0); }
   function tonightList() {
-    const first = storyOfDay(), pool = STORIES.filter((s) => !s.occ && !isPro(s) && s.id !== first.id);
+    const first = storyOfDay(), pool = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s) && s.id !== first.id);
     const today = new Set([dateKey(), nightKey()]);
     const read = new Set(allLogs().filter((e) => !today.has(e.d)).map((e) => e.s)); // اللي انقرت قبل الليلة بس، عشان ما تتغير القائمة أثناء الليل
     const r = rng(hash((S.code || 'x') + '#extra#' + nightKey()));
@@ -662,7 +710,7 @@ const App = (() => {
     const hs = heroes();
     if (!hs.length) return toast('اختر بطل القصة أولًا');
     const st = STORIES.find((s) => s.id === id);
-    R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec) };
+    R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec), hist: [] };
     show('reader'); renderPage();
   }
   function recKey() { return R.st.id + ':' + R.i; }
@@ -698,7 +746,8 @@ const App = (() => {
       const p = st.pages[i], txt = fill(p.t, hs);
       html = (i === 0 ? `<h2 style="text-align:center;color:var(--yellow);margin:0 0 6px">${esc(fill(st.title, hs))}</h2><div style="text-align:center;margin-bottom:8px">${catChip(st)}</div>` : '') + ART.page(p.s, p.p, artHs(st, hs, p), i === 0 ? 'enter' : i === st.pages.length - 1 ? 'jump' : '') + dots + `<p class="ptext anim" id="ptext" data-t="${esc(txt)}">${txt.split(/\s+/).map((w) => `<span class="w">${esc(w)}</span>`).join(' ')}</p>`;
       say = (i === 0 ? fill(st.title, hs) + '. ' : '') + txt;
-      nav = `${i > 0 ? '<button class="btn alt" onclick="App.step(-1)">→ السابق</button>' : ''}<button class="btn" onclick="App.step(1)">التالي ←</button>`;
+      nav = p.ch ? `<div class="choices"><p>🧭 أنت تقرّر:</p>${p.ch.map(([l, to]) => `<button class="btn" onclick="App.choose(${to})">${esc(fill(l, hs))}</button>`).join('')}</div>`
+        : `${i > 0 ? '<button class="btn alt" onclick="App.step(-1)">→ السابق</button>' : ''}<button class="btn" onclick="App.step(1)">التالي ←</button>`;
     } else if (i === st.pages.length) {
       const q = fill(st.q, hs);
       html = ART.page('night', '💭', hs) + dots + `<p class="ptext" style="text-align:center;color:var(--yellow);margin-bottom:8px">سؤال قبل النوم</p><div class="q anim">${esc(q)}</div>${st.src ? `<p class="src">📚 المصدر: ${esc(st.src)}</p>` : ''}`;
@@ -743,7 +792,14 @@ const App = (() => {
     S.progDirty = true; save();
     if (S.code && Sync.online()) { syncNow(); Sync.event(S.code, S.dev, e.k, e.s).catch(() => {}); }
   }
-  function step(d) { R.i = Math.max(0, Math.min(R.total - 1, R.i + d)); window.scrollTo(0, 0); renderPage(); }
+  function step(d) {
+    const p = R.st.pages[R.i];
+    if (d > 0 && R.st.pages.some((x) => x.ch)) { R.hist.push(R.i); R.i = p && p.end ? R.st.pages.length : R.i + 1; }
+    else if (d < 0 && R.hist && R.hist.length) R.i = R.hist.pop();
+    else R.i = R.i + d;
+    R.i = Math.max(0, Math.min(R.total - 1, R.i)); window.scrollTo(0, 0); renderPage();
+  }
+  function choose(to) { R.hist.push(R.i); R.i = to; window.scrollTo(0, 0); renderPage(); }
   function closeReader() {
     stopSpeak(); Play.stopPlay(); Play.stopRec(); clearTimeout(sleepTimer); $('sleep').classList.remove('on'); R = null;
     if (pendingReload) { try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {} location.reload(); return; }
@@ -1072,7 +1128,7 @@ const App = (() => {
   }
 
   function ctx() {
-    return { speak, counts, allActs, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
+    return { familyStrip, speak, counts, allActs, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
       renderHomeKids: () => { if ($('home').classList.contains('on')) renderHome(); } };
   }
 
@@ -1080,7 +1136,7 @@ const App = (() => {
     ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
-    setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
+    choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
 

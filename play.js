@@ -95,7 +95,7 @@ const Play = (() => {
   }
   function renderSky() {
     const c = C(), kids = c.myKids();
-    $('sky').innerHTML = kids.map((k) => {
+    $('sky').innerHTML = (c.S().role === 'child' ? c.familyStrip('kid') : c.familyStrip('parent')) + kids.map((k) => {
       const info = skyInfo(k), name = CONST[info.done % CONST.length], ev = kidEvents(k); ev.kid = k.id;
       const f = k.g === 'f', left = 7 - info.cur;
       const chips = Array.from({ length: info.done }, (_, i) => `<span class="cchip">✨ ${CONST[i % CONST.length]}</span>`).join('');

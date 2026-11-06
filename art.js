@@ -24,7 +24,7 @@ const ART = (() => {
   /* قمصان الأندية بألوانها وتصميمها، بدون شعارات */
   const CLUBS = [
     ['hilal', 'الهلال', 'sa', 'solid', '#1A4DA1', '#FFFFFF'], ['nassr', 'النصر', 'sa', 'solid', '#FFE01B', '#1D3B8F'], ['ittihad', 'الاتحاد', 'sa', 'stripes', '#FFD200', '#111111'],
-    ['ahli', 'الأهلي', 'sa', 'solid', '#00843D', '#FFFFFF'], ['shabab', 'الشباب', 'sa', 'solid', '#FFFFFF', '#F58220'],
+    ['ahli', 'الأهلي', 'sa', 'solid', '#00843D', '#FFFFFF'], ['shabab', 'الشباب', 'sa', 'stripes', '#FFFFFF', '#111111', '#F58220'],
     ['liverpool', 'ليفربول', 'en', 'solid', '#C8102E', '#FFFFFF'], ['mancity', 'مانشستر سيتي', 'en', 'solid', '#6CABDD', '#FFFFFF'],
     ['realmadrid', 'ريال مدريد', 'es', 'solid', '#FFFFFF', '#D4AF37'], ['barca', 'برشلونة', 'es', 'stripes', '#A50044', '#004D98'],
     ['juve', 'يوفنتوس', 'it', 'stripes', '#FFFFFF', '#111111'], ['milan', 'ميلان', 'it', 'stripes', '#E00A12', '#111111'],
@@ -100,11 +100,11 @@ const ART = (() => {
     } else if (outfit === 'sport') {
       body = arm(34, shirt) + arm(66, shirt) + legs(shirt) + `<path d="M38 112 v24 M62 112 v24" stroke="#fff" stroke-width="2"/><path d="M33 76 Q50 70 67 76 L68 114 L32 114Z" fill="${shirt}" ${sw}/><path d="M50 74 V114" stroke="${dark}" stroke-width="2"/><path d="M36 78 V112 M64 78 V112" stroke="#fff" stroke-width="2.4"/><path d="M44 74 L50 80 L56 74" fill="none" stroke="#fff" stroke-width="2"/>` + shoes;
     } else if (outfit === 'jersey') {
-      const c = CLUBS.find((x) => x[0] === av.club) || CLUBS[0], [, , , pat, c1, c2] = c, idc = 'kc' + c[0];
+      const c = CLUBS.find((x) => x[0] === av.club) || CLUBS[0], [, , , pat, c1, c2, trim] = c, idc = 'kc' + c[0], tc = trim || c2;
       const fill = pat === 'stripes' ? `url(#${idc})` : c1;
       const defs = pat === 'stripes' ? `<defs><pattern id="${idc}" width="8" height="10" patternUnits="userSpaceOnUse"><rect width="8" height="10" fill="${c1}"/><rect width="4" height="10" fill="${c2}"/></pattern></defs>` : '';
       const band = pat === 'band' ? `<rect x="45" y="72" width="10" height="42" fill="${c2}"/>` : '';
-      body = defs + arm(34, skin) + arm(66, skin) + legs(c2 === '#FFFFFF' ? '#FFFFFF' : shade(c1 === '#FFFFFF' ? c2 : c1, .7)) + `<path d="${torso}" fill="${fill}" ${sw}/>${band}<path d="M30 80 L36 75 L38 84 L32 86Z M70 80 L64 75 L62 84 L68 86Z" fill="${c2}" opacity=".9"/><path d="M43 74 Q50 80 57 74" fill="none" stroke="${c2}" stroke-width="2.6"/><text x="50" y="104" text-anchor="middle" font-size="12" font-weight="800" font-family="Arial,sans-serif" fill="${pat === 'stripes' ? '#FFFFFF' : c1 === '#FFFFFF' ? c2 : '#FFFFFF'}" stroke="${pat === 'stripes' ? '#111' : line}" stroke-width="${pat === 'stripes' ? 1.6 : .4}" paint-order="stroke">${av.num || 10}</text><path d="${torso}" fill="none" ${sw}/>` + shoes;
+      body = defs + arm(34, skin) + arm(66, skin) + legs(c2 === '#FFFFFF' ? '#FFFFFF' : shade(c1 === '#FFFFFF' ? c2 : c1, .7)) + `<path d="${torso}" fill="${fill}" ${sw}/>${band}<path d="M30 80 L36 75 L38 84 L32 86Z M70 80 L64 75 L62 84 L68 86Z" fill="${tc}" opacity=".9"/><path d="M43 74 Q50 80 57 74" fill="none" stroke="${tc}" stroke-width="2.6"/>${trim ? `<path d="M34 108 H66" stroke="${trim}" stroke-width="2"/>` : ''}<text x="50" y="104" text-anchor="middle" font-size="12" font-weight="800" font-family="Arial,sans-serif" fill="${pat === 'stripes' ? '#FFFFFF' : c1 === '#FFFFFF' ? c2 : '#FFFFFF'}" stroke="${pat === 'stripes' ? '#111' : line}" stroke-width="${pat === 'stripes' ? 1.6 : .4}" paint-order="stroke">${av.num || 10}</text><path d="${torso}" fill="none" ${sw}/>` + shoes;
     } else if (outfit === 'jacket') {
       body = arm(34, shirt) + arm(66, shirt) + legs(pants) + `<path d="${torso}" fill="#FFFFFF" ${sw}/><path d="M30 80 L36 75 Q42 72 46 74 L46 114 L34 114 L34 88Z" fill="${shirt}" ${sw}/><path d="M70 80 L64 75 Q58 72 54 74 L54 114 L66 114 L66 88Z" fill="${shirt}" ${sw}/><path d="M46 74 V114 M54 74 V114" stroke="${dark}" stroke-width="1.6"/><rect x="38" y="96" width="6" height="2" fill="${dark}"/><rect x="56" y="96" width="6" height="2" fill="${dark}"/>` + shoes;
     } else if (outfit === 'pj') {

@@ -58,12 +58,15 @@ const EN = (() => {
     if (level === 'letters') {
       body = `<div class="card"><h2>حروف الإنجليزي 🔤</h2><p class="muted">اضغط الحرف واسمعه</p>
         <div class="letters">${LETTERS.map((l, i) => `<button class="lt" onclick="EN.letter(${i})"><b>${l[0]}<small>${l[0].toLowerCase()}</small></b><span>${l[3]}</span></button>`).join('')}</div>
-        <button class="btn" style="margin-top:12px" onclick="EN.game('letters')">🎯 لعبة: وين الحرف؟</button></div>`;
+        <button class="btn" style="margin-top:12px" onclick="EN.game('letters')">🎯 لعبة: وين الحرف؟</button>
+        <div class="row" style="margin-top:8px"><button class="btn alt" onclick="EN2.phonics()">🗣️ أصوات الحروف</button><button class="btn alt" onclick="EN2.trace(0)">✍️ تتبّع الحرف</button></div></div>`;
     } else if (level === 'words') {
       body = `<div class="card"><h2>كلمات إنجليزي 🧩</h2>
         <div class="chips libchips">${Object.keys(WORDS).map((k) => `<button class="chip ${k === cat ? 'on' : ''}" onclick="EN.setCat('${k}')">${k}</button>`).join('')}</div>
         <div class="words">${WORDS[cat].map((w, i) => `<button class="wd" onclick="EN.word(${i})"><span>${w[2]}</span><b>${w[0]}</b><small>${w[1]}</small></button>`).join('')}</div>
-        <button class="btn" style="margin-top:12px" onclick="EN.game('words')">🎧 لعبة: اسمع واختار</button></div>`;
+        <button class="btn" style="margin-top:12px" onclick="EN.game('words')">🎧 لعبة: اسمع واختار</button>
+        <div class="row" style="margin-top:8px"><button class="btn alt" onclick="EN2.families()">👪 عائلات الكلمات</button><button class="btn alt" onclick="EN2.sight()">👀 كلمات سريعة</button></div>
+        <div class="row" style="margin-top:8px"><button class="btn alt" onclick="EN2.trace(0)">✍️ تتبّع الحرف</button><button class="btn alt" onclick="EN2.phonics()">🗣️ أصوات الحروف</button></div></div>`;
     } else if (level === 'adv') {
       body = advBody(c);
     } else {
@@ -71,10 +74,11 @@ const EN = (() => {
         <div class="sents">${SENT.map((x, i) => `<button class="sn" onclick="EN.sent(${i})"><span>${x[2]}</span><div><b dir="ltr">${c.esc(nm(x[0]))}</b><small>${c.esc(nm(x[1]))}</small></div></button>`).join('')}</div>
         <div class="row" style="margin-top:12px"><button class="btn" onclick="EN.game('mean')">❓ وش معناها؟</button><button class="btn alt" onclick="EN.game('build')">🧱 رتّب الجملة</button></div></div>`;
     }
+    if (level !== 'letters' && typeof EN2 !== 'undefined') body = EN2.weekly() + body;
     $('eng').innerHTML = `<div class="seg enlv">${lv.map(([v, t, a]) => `<button class="${v === level ? 'on' : ''}" onclick="EN.setLevel('${v}')"><span class="ei">${t.split(' ')[0]}</span><b>${t.split(' ').slice(1).join(' ')}</b><small>${a}</small></button>`).join('')}</div>${body}`;
   }
   /* ---- المستوى المتقدّم ---- */
-  const SUBS = [['read', '📖 قراءة'], ['vocab', '🧠 مفردات'], ['gram', '📐 قواعد'], ['dlg', '💬 محادثات'], ['spell', '🎧 إملاء']];
+  const SUBS = [['read', '📖 قراءة'], ['speak', '🎤 نطق'], ['vocab', '🧠 مفردات'], ['gram', '📐 قواعد'], ['dlg', '💬 محادثات'], ['spell', '🎧 إملاء']];
   const LV = ['', '⭐', '⭐⭐', '⭐⭐⭐'];
   const q1 = (t) => t.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
   function advBody(c) {
@@ -91,6 +95,7 @@ const EN = (() => {
       `<button class="btn" onclick="EN.game('gram', -1)">🏆 اختبار شامل في القواعد</button>`;
     if (sub === 'dlg') x = `<p class="muted">محادثات يومية، وأنت{|ِ} أحد الشخصيات! اضغط أي جملة واسمعها</p>
       <div class="rlist">${A.DLG.map((d, i) => `<button class="rcard" onclick="EN.dialog(${i})"><span>${d.e}</span><b>${c.esc(d.t)}</b><small>${d.l.length} جمل</small></button>`).join('')}</div>`;
+    if (sub === 'speak') x = EN2.speakList();
     if (sub === 'spell') x = `<p class="muted">تسمع الكلمة وتكتبها بالإنجليزي. فيه تلميح لو احتجت 💡</p>
       <div class="row"><button class="btn" onclick="EN.game('spell')">🎧 ابدأ الإملاء</button></div>`;
     const k = c.heroes()[0] || c.myKids()[0], f = k && k.g === 'f';
