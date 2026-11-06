@@ -8,12 +8,14 @@
 
 const ORIGINS = ['https://siraj.wamdarc.com', 'https://admin.wamdarc.com', 'https://bsshfi.github.io'];
 const MAX_BLOB = 300000;
+const PUSH_HOSTS = [/\.push\.apple\.com$/, /^fcm\.googleapis\.com$/, /^updates\.push\.services\.mozilla\.com$/, /^push\.services\.mozilla\.com$/, /\.notify\.windows\.com$/];
+const okPush = (u) => { try { const x = new URL(u); return x.protocol === 'https:' && PUSH_HOSTS.some((r) => r.test(x.hostname)); } catch (e) { return false; } };
 
 export default {
   async fetch(req, env, ctx) {
     const origin = req.headers.get('Origin') || '';
     // لوحة الإدارة تفتح أحيانًا عبر http أو bsshfi.github.io قبل ما يجهز HTTPS، فنسمح لأي نطاق من wamdarc.com
-    const allow = ORIGINS.includes(origin) || /^https?:\/\/([a-z0-9-]+\.)?wamdarc\.com$/.test(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ? origin : ORIGINS[0];
+    const allow = ORIGINS.includes(origin) || /^https:\/\/([a-z0-9-]+\.)?wamdarc\.com$/.test(origin) ? origin : ORIGINS[0];
     const cors = {
       'Access-Control-Allow-Origin': allow,
       'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -69,7 +71,7 @@ export default {
       /* ----- الاشتراك في الإشعارات ----- */
       if (p === '/sub' && req.method === 'POST') {
         const { endpoint, fam, dev, role, bedtime, tz, off } = body;
-        if (typeof endpoint !== 'string' || !/^https:\/\//.test(endpoint) || endpoint.length > 1000) return json({ error: 'bad' }, 400);
+        if (typeof endpoint !== 'string' || !okPush(endpoint) || endpoint.length > 1000) return json({ error: 'bad' }, 400);
         const eid = await sha(endpoint);
         if (off) { await env.DB.prepare('DELETE FROM subs WHERE eid=?').bind(eid).run(); return json({ ok: true }); }
         const bt = typeof bedtime === 'string' && /^\d{2}:\d{2}$/.test(bedtime) ? bedtime : '';
@@ -101,7 +103,7 @@ export default {
       /* ----- الإدارة (لوحة admin.wamdarc.com) ----- */
       if (p === '/broadcast' && req.method === 'POST') {
         if (!env.ADMIN_KEY) return json({ error: 'no-key' }, 503);
-        if (!isAdmin(req, env)) return json({ error: 'unauthorized' }, 401);
+        { const g = await adminGate(req, env.DB, () => isAdmin(req, env)); if (g !== 'ok') return json({ error: g === 'locked' ? 'locked' : 'unauthorized' }, g === 'locked' ? 429 : 401); }
         const src = body.ar || body;
         const title = String(src.title || 'سِراج 🌙').trim().slice(0, 80), text = String(src.body || '').trim().slice(0, 300);
         if (!title && !text) return json({ error: 'missing' }, 400);
@@ -113,7 +115,7 @@ export default {
       }
       if (p === '/stats' && req.method === 'GET') {
         if (!env.ADMIN_KEY) return json({ error: 'no-key' }, 503);
-        if (!isAdmin(req, env)) return json({ error: 'unauthorized' }, 401);
+        { const g = await adminGate(req, env.DB, () => isAdmin(req, env)); if (g !== 'ok') return json({ error: g === 'locked' ? 'locked' : 'unauthorized' }, g === 'locked' ? 429 : 401); }
         const f = await env.DB.prepare('SELECT COUNT(*) n FROM families').first();
         const d = await env.DB.prepare('SELECT COUNT(*) n, SUM(updated > ?) active FROM progress').bind(now - 7 * 864e5).first();
         const s = await env.DB.prepare("SELECT COUNT(*) n, SUM(role='parent') parents, SUM(role='child') kids FROM subs").first();
@@ -123,7 +125,8 @@ export default {
 
       return json({ error: 'notfound' }, 404);
     } catch (e) {
-      return json({ error: 'server', detail: String(e && e.message || e) }, 500);
+      console.error(e);
+      return json({ error: 'server' }, 500);
     }
   },
 
@@ -210,3 +213,32 @@ async function sha(s) {
 }
 function b64uEnc(bytes) { let s = ''; bytes.forEach((b) => (s += String.fromCharCode(b))); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function b64uDec(str) { const s = atob(str.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((str.length + 3) % 4)); return Uint8Array.from(s, (c) => c.charCodeAt(0)); }
+
+/* ---------- حماية مفتاح الإدارة من التخمين ----------
+   ٢٠ محاولة خاطئة من نفس الشبكة خلال ساعة ← قفل ٣٠ دقيقة لهذه الشبكة
+   ١٠٠ محاولة خاطئة من أي مكان خلال ساعة ← قفل الإدارة كاملة ١٥ دقيقة (يحمي من التخمين الموزّع)
+   الدخول الصحيح يصفّر عدّاد الشبكة. */
+const AF = { ipMax: 20, ipLock: 30 * 60e3, allMax: 100, allLock: 15 * 60e3, win: 36e5 };
+async function adminGate(req, db, check) {
+  const now = Date.now();
+  const raw = (req.headers.get('X-Admin-Key') || req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  if (!raw) return 'bad';
+  const ipb = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('af:' + (req.headers.get('CF-Connecting-IP') || 'local'))));
+  const ip = [...ipb.slice(0, 12)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  await db.prepare('CREATE TABLE IF NOT EXISTS afail (ip TEXT PRIMARY KEY, n INTEGER, last INTEGER, lock INTEGER)').run();
+  const rows = (await db.prepare("SELECT ip, n, last, lock FROM afail WHERE ip IN (?, '*')").bind(ip).all()).results || [];
+  if (rows.some((r) => r.lock > now)) return 'locked';
+  if (await check()) {
+    if (rows.some((r) => r.ip === ip)) await db.prepare('DELETE FROM afail WHERE ip=?').bind(ip).run();
+    return 'ok';
+  }
+  const st = [];
+  for (const [k, max, lock] of [[ip, AF.ipMax, AF.ipLock], ['*', AF.allMax, AF.allLock]]) {
+    const r = rows.find((x) => x.ip === k);
+    const n = (r && r.last > now - AF.win ? r.n : 0) + 1;
+    st.push(db.prepare('INSERT INTO afail (ip, n, last, lock) VALUES (?,?,?,?) ON CONFLICT(ip) DO UPDATE SET n=excluded.n, last=excluded.last, lock=excluded.lock')
+      .bind(k, n >= max ? 0 : n, now, n >= max ? now + lock : 0));
+  }
+  await db.batch(st);
+  return 'bad';
+}
