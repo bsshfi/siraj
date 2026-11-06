@@ -13,7 +13,7 @@ const App = (() => {
   let installEvt = null, pendingReload = false, remote = [], sleepTimer = null;
 
   /* ---------- التخزين ---------- */
-  function freshFam() { return { kids: [], pin: '', dad: 'بابا', mom: 'ماما', bedtime: '20:30', remind: true, perNight: 1, lockOn: true, lock: '21:30', extra: null }; }
+  function freshFam() { return { kids: [], pin: '', dad: 'بابا', mom: 'ماما', bedtime: '20:30', remind: true, perNight: 1, shortKids: true, lockOn: true, lock: '21:30', extra: null }; }
   function fresh() { return { v: 2, role: '', code: '', dev: uid(), rev: 0, dirty: false, progDirty: false, fam: freshFam(), log: [], fav: [], voice: true, voiceV: 1, sel: [], notif: false, devKids: [], beat: 0, act: [], unlockUntil: 0 }; }
   function load() {
     let s; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
@@ -141,6 +141,29 @@ const App = (() => {
     s = s.replace(/\{([^{}|]*)\|([^{}|]*)\}/g, (_, a, b) => (g ? b : a));
     return s.replace(/\{n\}/g, hero.name).replace(/\{fr\}/g, names(rest))
       .replace(/\{dad\}/g, S.fam.dad || 'بابا').replace(/\{mom\}/g, S.fam.mom || 'ماما');
+  }
+
+  /* ---------- طول القصة حسب العمر ----------
+     ٣-٥ سنوات: نسخة قصيرة مكتوبة لكل قصة (st.y = [[رقم الصفحة الأصلية، نص قصير]…] من young.js)
+     قصص الأنبياء والصحابة: الصغار يبدؤون من القصة مباشرة بدون صفحة المقدمة
+     ٦-١٢: القصة كاملة. وإذا يقرون مع بعض يمشي على عمر الأصغر. */
+  function storyLevel(hs) {
+    const ag = (hs || []).map((k) => k.age).filter((a) => a > 0);
+    if (S.fam.shortKids === false || !ag.length) return 3;
+    return Math.min(...ag);
+  }
+  function youngPages(st) {
+    if (st.y && st.y.length) return st.y.map(([i, t]) => Object.assign({}, st.pages[i], { t, ch: undefined, end: undefined }));
+    if (isNarr(st)) return st.pages.filter((p) => !p.k);
+    return null;
+  }
+  const canShort = (st) => !st.pages.some((p) => p.ch) && !!youngPages(st);
+  const readerPages = () => (R.short ? youngPages(R.st) : R.st.pages);
+  function toggleFull() { R.short = !R.short; R.i = 0; R.total = readerPages().length + 2; renderPage(); toast(R.short ? 'النسخة القصيرة ✂️' : 'النسخة الكاملة 📖'); }
+  function setShortKids() { S.fam.shortKids = $('shortKids').checked; famChanged(); toast(S.fam.shortKids ? 'القصص تقصر للصغار (٣-٥) ✂️' : 'كل القصص كاملة 📖'); }
+  function shortChip() {
+    if (R.lvl > 1 || !canShort(R.st)) return '';
+    return `<div class="shortchip"><button onclick="App.toggleFull()">${R.short ? '✂️ نسخة قصيرة للصغار · <u>اعرض الكاملة</u>' : '📖 النسخة الكاملة · <u>رجّع القصيرة</u>'}</button></div>`;
   }
 
   /* ---------- التنقل ---------- */
@@ -432,7 +455,7 @@ const App = (() => {
     const lbl = ['قصة الليلة', 'القصة الثانية الليلة', 'القصة الثالثة الليلة', 'القصة الرابعة الليلة'][n] || 'قصة إضافية';
     $('tonightCard').innerHTML = hs.length ? `${ART.page(st.scene, done ? '🌙' : st.occ ? '🎉' : isPro(st) ? '📖' : '✨', artHs(st, hs))}
       <div class="info">${done ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">خلّصتوا قصص الليلة 🌙 (${n}/${allow})</span>` : (st.occ ? '<span class="tag" style="background:#E5FBEA;color:#1E8E4A">قصة المناسبة 🎉</span> ' : '') + (allow > 1 ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">${lbl} · ${n + 1}/${allow}</span>` : '')}
-      <p class="title">${esc(fill(st.title, hs))}</p><p class="tmeta">${AR(st.pages.length)} صفحات · ${AR(Math.max(2, Math.round(st.pages.length * .7)))} دقائق · صور متحركة ✨</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
+      <p class="title">${esc(fill(st.title, hs))}</p><p class="tmeta">${(() => { const sh = storyLevel(hs) === 1 && canShort(st), n = sh ? youngPages(st).length : st.pages.length; return AR(n) + ' صفحات · ' + AR(Math.max(sh ? 1 : 2, Math.round(n * (sh ? .5 : .7)))) + ' دقائق · ' + (sh ? 'نسخة قصيرة للصغار ✂️' : 'صور متحركة ✨'); })()}</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
       ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا بكرة مع قصة جديدة ✨ تقدرون تعيدون قصة من «مكتبتي».</p><div class="donebtns"><button class="btn" onclick="Night.adhkar()">🤲 أذكار النوم</button><button class="btn alt" onclick="Night.sounds()">🌧️ أصوات النوم</button></div><button class="btn ghost" style="margin-top:6px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
         : `<button class="btn" style="margin-top:14px" onclick="App.openStory('${st.id}')">ابدأ ${lbl} ✨</button>`}</div>`
       : '<div class="info"><p class="muted">اختر بطلًا واحدًا على الأقل</p></div>';
@@ -710,7 +733,8 @@ const App = (() => {
     const hs = heroes();
     if (!hs.length) return toast('اختر بطل القصة أولًا');
     const st = STORIES.find((s) => s.id === id);
-    R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec), hist: [] };
+    R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec), hist: [], lvl: storyLevel(hs) };
+    R.short = R.lvl === 1 && canShort(st); R.total = readerPages().length + 2;
     show('reader'); renderPage();
   }
   function recKey() { return R.st.id + ':' + R.i; }
@@ -735,20 +759,20 @@ const App = (() => {
     toast(R.rec ? 'وضع التسجيل: اقرأ كل صفحة بصوتك 🎙️' : 'انتهى وضع التسجيل'); renderRecBar();
   }
   function renderPage() {
-    const { st, hs, i, total } = R;
+    const { st, hs, i, total } = R, PG = readerPages();
     clearTimeout(sleepTimer); $('sleep').classList.remove('on');
     $('favBtn').textContent = S.fav.includes(st.id) ? '⭐' : '☆';
     $('viewTag').style.display = counts() ? 'none' : '';
     $('voiceBtn').textContent = S.voice ? '🔊' : '🔈';
     const dots = `<div class="dots">${Array.from({ length: total - 1 }, (_, k) => `<i class="${k === Math.min(i, total - 2) ? 'on' : ''}"></i>`).join('')}</div>`;
     let html = '', nav = '', say = '';
-    if (i < st.pages.length) {
-      const p = st.pages[i], txt = fill(p.t, hs);
-      html = (i === 0 ? `<h2 style="text-align:center;color:var(--yellow);margin:0 0 6px">${esc(fill(st.title, hs))}</h2><div style="text-align:center;margin-bottom:8px">${catChip(st)}</div>` : '') + ART.page(p.s, p.p, artHs(st, hs, p), i === 0 ? 'enter' : i === st.pages.length - 1 ? 'jump' : '') + dots + `<p class="ptext anim" id="ptext" data-t="${esc(txt)}">${txt.split(/\s+/).map((w) => `<span class="w">${esc(w)}</span>`).join(' ')}</p>`;
+    if (i < PG.length) {
+      const p = PG[i], txt = fill(p.t, hs);
+      html = (i === 0 ? `<h2 style="text-align:center;color:var(--yellow);margin:0 0 6px">${esc(fill(st.title, hs))}</h2><div style="text-align:center;margin-bottom:8px">${catChip(st)}</div>${shortChip()}` : '') + ART.page(p.s, p.p, artHs(st, hs, p), i === 0 ? 'enter' : i === PG.length - 1 ? 'jump' : '') + dots + `<p class="ptext anim" id="ptext" data-t="${esc(txt)}">${txt.split(/\s+/).map((w) => `<span class="w">${esc(w)}</span>`).join(' ')}</p>`;
       say = (i === 0 ? fill(st.title, hs) + '. ' : '') + txt;
       nav = p.ch ? `<div class="choices"><p>🧭 أنت تقرّر:</p>${p.ch.map(([l, to]) => `<button class="btn" onclick="App.choose(${to})">${esc(fill(l, hs))}</button>`).join('')}</div>`
         : `${i > 0 ? '<button class="btn alt" onclick="App.step(-1)">→ السابق</button>' : ''}<button class="btn" onclick="App.step(1)">التالي ←</button>`;
-    } else if (i === st.pages.length) {
+    } else if (i === PG.length) {
       const q = fill(st.q, hs);
       html = ART.page('night', '💭', hs) + dots + `<p class="ptext" style="text-align:center;color:var(--yellow);margin-bottom:8px">سؤال قبل النوم</p><div class="q anim">${esc(q)}</div>${st.src ? `<p class="src">📚 المصدر: ${esc(st.src)}</p>` : ''}`;
       say = 'سؤال قبل النوم. ' + q;
@@ -901,6 +925,7 @@ const App = (() => {
     $('notifBtn').style.display = !CONFIG.VAPID || (S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted') ? 'none' : '';
     $('remindNote').textContent = S.role === 'child' ? 'التذكير يوصل لهذا الجهاز في الوقت المحدد.' : 'التذكير يوصل لأجهزة الأطفال المربوطة، وأنت يوصلك إشعار لما يخلصون القصة.';
     $('perNight').innerHTML = [1, 2, 3].map((v) => `<button class="${(S.fam.perNight || 1) === v ? 'on' : ''}" onclick="App.setPerNight(${v})">${AR(v)}</button>`).join('');
+    $('shortKids').checked = S.fam.shortKids !== false;
     $('lockOn').checked = !!S.fam.lockOn; setTime('lockTime', S.fam.lock || '21:30');
     const ex = S.fam.extra && S.fam.extra.d === nightKey() ? S.fam.extra.n : 0;
     $('extraNote').textContent = ex ? 'الليلة: ' + AR(allowedTonight()) + ' قصص (منها ' + AR(ex) + ' إضافية)' : '';
@@ -1138,7 +1163,7 @@ const App = (() => {
   }
 
   return {
-    ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, isNight, isLocked,
+    ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, toggleFull, setShortKids, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S

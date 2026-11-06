@@ -141,6 +141,7 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .tlr i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#EFEAFF;color:#5B4BDB;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
 .tlr span{flex:1;font-weight:700;font-size:14.5px}.tlr .cat{font-size:11px;padding:2px 7px}
 .tlr.now{border-color:var(--bg1)}.tlr.done{opacity:.6}.tlr.done i{background:#DDF5E5;color:#1E8E4A}
+.shortchip{text-align:center;margin:-2px 0 8px}.shortchip button{border:0;background:#ffffff1f;color:inherit;font:inherit;font-size:13px;padding:5px 12px;border-radius:99px;cursor:pointer}
 .src{text-align:center;color:#ffffffaa;font-size:13.5px;margin:12px 0 0}
 .ensub{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:4px 0 10px}
 .ensub .chip{white-space:nowrap;font-size:14.5px;padding:6px 12px}
@@ -867,6 +868,8 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
     <p class="muted" style="margin-top:8px">بعد القصة الأولى يظهر لهم زر «القصة التالية» لين يوصلون العدد.</p>
     <button class="btn alt" onclick="App.giveExtra()">✨ قصة إضافية الليلة بس</button>
     <p class="muted" id="extraNote" style="margin:6px 0 0"></p>
+    <label class="toggle" style="margin-top:16px"><b>✂️ قصص قصيرة للصغار (٣-٥)</b><input type="checkbox" class="switch" id="shortKids" onchange="App.setShortKids()"></label>
+    <p class="muted" style="margin:0">لعمر ٣-٥: نسخة قصيرة مكتوبة لكل قصة (٣-٤ صفحات بجمل بسيطة). ٦ سنوات وفوق: القصة كاملة. إذا يقرون مع بعض يمشي على عمر الأصغر، وفي القصة زر «اعرض الكاملة».</p>
     <label class="toggle" style="margin-top:16px"><b>قفل التطبيق وقت النوم</b><input type="checkbox" class="switch" id="lockOn"></label>
     <input type="hidden" id="lockTime" value="21:30">
     <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('lockTime',-15)" aria-label="أبكر">−</button><div class="tv" id="lockTimeView"></div><button type="button" class="tbtn" onclick="App.bumpTime('lockTime',15)" aria-label="أأخر">+</button></div>
@@ -969,22 +972,24 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=3.9"></script>
-<script src="sync.js?v=3.9"></script>
-<script src="art.js?v=3.9"></script>
-<script src="stories.js?v=3.9"></script>
-<script src="stories-2.js?v=3.9"></script>
-<script src="stories-3.js?v=3.9"></script>
-<script src="stories-4.js?v=3.9"></script>
-<script src="stories-5.js?v=3.9"></script>
-<script src="play.js?v=3.9"></script>
-<script src="english-2.js?v=3.9"></script>
-<script src="english.js?v=3.9"></script>
-<script src="english-3.js?v=3.9"></script>
-<script src="space.js?v=3.9"></script>
-<script src="night.js?v=3.9"></script>
-<script src="honors.js?v=3.9"></script>
-<script src="app.js?v=3.9"></script>
-<script src="wamd-stats.js?v=3.9" data-app="siraj"></script>
+<script src="config.js?v=4.0"></script>
+<script src="sync.js?v=4.0"></script>
+<script src="art.js?v=4.0"></script>
+<script src="stories.js?v=4.0"></script>
+<script src="stories-2.js?v=4.0"></script>
+<script src="stories-3.js?v=4.0"></script>
+<script src="stories-4.js?v=4.0"></script>
+<script src="stories-5.js?v=4.0"></script>
+<script src="stories-6.js?v=4.0"></script>
+<script src="young.js?v=4.0"></script>
+<script src="play.js?v=4.0"></script>
+<script src="english-2.js?v=4.0"></script>
+<script src="english.js?v=4.0"></script>
+<script src="english-3.js?v=4.0"></script>
+<script src="space.js?v=4.0"></script>
+<script src="night.js?v=4.0"></script>
+<script src="honors.js?v=4.0"></script>
+<script src="app.js?v=4.0"></script>
+<script src="wamd-stats.js?v=4.0" data-app="siraj"></script>
 </body>
 </html>
