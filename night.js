@@ -59,7 +59,10 @@ const Night = (() => {
     for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; if (color === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w; }
     const s = c.createBufferSource(); s.buffer = b; s.loop = true; return s;
   }
+  let wl = null;
   function stop(silent) {
+    if (wl) { try { wl.release(); } catch (e) {} wl = null; }
+    if (cur && App.now) App.now.clear();
     clearTimeout(tmr); clearInterval(tick);
     nodes.forEach((n) => { try { n.stop ? n.stop() : n.disconnect(); } catch (e) {} }); nodes = []; cur = null;
     if (ctx) { try { ctx.close(); } catch (e) {} ctx = null; }
@@ -90,12 +93,16 @@ const Night = (() => {
       chirp();
     }
     nodes.push(out);
+    const nm = (SOUNDS.find((x) => x[0] === kind) || [])[2] || '';
+    App.now.set('أصوات النوم: ' + nm, (SOUNDS.find((x) => x[0] === kind) || [])[1] || '🎵', () => stop(), endAt && endAt > Date.now() ? endAt : 0);
+    // نخلي الشاشة صاحية بهدوء عشان الصوت ما يوقف (ويوقف لو طلعوا من التطبيق)
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then((x) => (wl = x)).catch(() => {}); } catch (e) {}
     drawS();
   }
   function setTimer(min) {
     clearTimeout(tmr); clearInterval(tick); endAt = Date.now() + min * 6e4;
     tmr = setTimeout(() => { if (!ctx) return; const g = nodes[nodes.length - 1]; try { g.gain.linearRampToValueAtTime(0, ctx.currentTime + 8); } catch (e) {} setTimeout(() => stop(), 8500); }, min * 6e4 - 8000);
-    tick = setInterval(drawS, 15000); drawS();
+    tick = setInterval(drawS, 15000); if (App.now) App.now.end(endAt); drawS();
   }
   function sounds() {
     $('gameModal').classList.add('on'); $('gameBody').innerHTML = '<div id="snd"></div>';
@@ -134,6 +141,9 @@ const Night = (() => {
     const c = C(), S = c.S(), m = S.fam.msg; if (!m || !m.t) return '';
     if (S.role === 'parent' && S.parentMode !== 'kids') return `<div class="card msg mine"><span>💌</span><div><small>رسالتك للعيال (تظهر لهم فوق)</small><p>${c.esc(m.t)}</p></div></div>`;
     if ((S.msgSeen || 0) >= m.at) return '';
+    if (Date.now() - m.at > 24 * 36e5) return '';
+    if (!S.msgFirst || S.msgFirst.at !== m.at) { S.msgFirst = { at: m.at, shown: Date.now() }; c.save(); }
+    if (Date.now() - S.msgFirst.shown > 36e5) return '';
     if (m.to && m.to !== 'all' && !ks.some((k) => m.to.includes(k.id))) return '';
     return `<div class="card msg"><span>💌</span><div><small>رسالة من ${c.esc(m.from || S.fam.dad || 'بابا')}</small><p>${c.esc(m.t)}</p></div><button onclick="Night.seen()" aria-label="تم">❤️</button></div>`;
   }

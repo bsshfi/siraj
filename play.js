@@ -95,7 +95,8 @@ const Play = (() => {
   }
   function renderSky() {
     const c = C(), kids = c.myKids();
-    $('sky').innerHTML = (c.S().role === 'child' ? c.familyStrip('kid') : c.familyStrip('parent')) + (typeof Honors !== 'undefined' ? Honors.board() : '') + kids.map((k) => {
+    const ach = c.S().role === 'child' && typeof Honors !== 'undefined' ? kids.map((k) => Honors.achCard(k)).join('') : '';
+    $('sky').innerHTML = ach + (c.S().role === 'child' ? c.familyStrip('kid') : c.familyStrip('parent')) + (typeof Honors !== 'undefined' ? Honors.board() : '') + kids.map((k) => {
       const info = skyInfo(k), name = CONST[info.done % CONST.length], ev = kidEvents(k); ev.kid = k.id;
       const f = k.g === 'f', left = 7 - info.cur;
       const chips = Array.from({ length: info.done }, (_, i) => `<span class="cchip">✨ ${CONST[i % CONST.length]}</span>`).join('');

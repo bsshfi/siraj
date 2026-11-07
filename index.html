@@ -670,9 +670,39 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 .rp{text-align:right}.rpk{background:#FBFAFF;border-radius:16px;padding:10px;margin:8px 0}.rph{display:flex;gap:10px;align-items:center}.rph svg{width:46px;height:48px;border-radius:50%;background:#fff}.rph b{font-size:17px}
 .rps{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:8px 0}.rps div{background:#fff;border-radius:10px;padding:6px 2px;text-align:center}.rps b{display:block;font-size:18px;color:var(--orange)}.rps small{font-size:10.5px;color:var(--soft)}
 .rpd{font-size:13px;font-weight:700;margin:0}
+
+/* v4.1 محرّر الشخصية: الشخصية والحفظ دايم ظاهرين */
+#kidModal .card.ked{max-width:760px;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;background:#fff}
+.kedHead{display:flex;gap:12px;align-items:center;padding:12px 14px;background:linear-gradient(180deg,#F6F2FF,#fff);border-bottom:1.5px solid #EEE9F8;flex:none}
+.kedHead .preview{flex:none;width:96px;height:120px;margin:0;border-radius:18px;background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 4px 12px #5B4BDB1f}
+.kedHead .preview svg{width:100px;height:auto}
+.kedSide{flex:1;min-width:0}.kedSide h2{margin:0 0 8px;font-size:18px}
+.kedBtns{display:flex;gap:8px}.kedBtns .btn{flex:1;padding:10px 6px;font-size:16px}
+.kedBody{overflow:auto;padding:4px 16px 18px;flex:1}
+@media (min-width:640px){
+  #kidModal .card.ked{flex-direction:row}
+  .kedHead{flex-direction:column;width:250px;border-bottom:0;border-left:1.5px solid #EEE9F8;justify-content:flex-start;padding:18px}
+  .kedHead .preview{width:200px;height:260px}.kedHead .preview svg{width:210px}
+  .kedSide{width:100%;text-align:center}.kedBtns{flex-direction:column}
+}
+/* v4.1 شريط الصوت (مثل الواتساب) */
+.nowbar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;gap:10px;padding:calc(6px + env(safe-area-inset-top)) 14px 8px;background:linear-gradient(90deg,#2A2D66,#4B3B8F);color:#fff;font-weight:700;font-size:14.5px;box-shadow:0 4px 14px #0003}
+.nowbar .nb-ic{font-size:20px;animation:moonpulse 1.6s ease-in-out infinite}.nowbar .nb-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nowbar .nb-s{font-variant-numeric:tabular-nums;color:#FFE9A8;direction:ltr}
+.nowbar button{background:#ffffff26;color:#fff;border-radius:50%;width:32px;height:32px;font-size:16px;flex:none}
+body.hasnow{padding-top:46px}
+/* v4.1 إنجازاتي */
+.ach{padding:14px;background:linear-gradient(160deg,#2A2D66,#5B3FA8)!important;color:#fff;border:0!important;position:relative;overflow:hidden}
+.ach h3{margin:0 0 2px;font-size:18px;color:#FFE9A8}.ach>p{margin:0 0 10px;font-size:13px;color:#D9D5F2}
+.achg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.achg div{background:#ffffff1c;border-radius:14px;padding:8px 2px;text-align:center}.achg b{display:block;font-size:22px;color:#FFE9A8}.achg span{font-size:22px;display:block}.achg small{font-size:11px;color:#E4E0FF}
+.achnext{margin-top:10px;background:#ffffff14;border-radius:14px;padding:8px 10px;font-size:13px}.achnext i{display:block;height:8px;border-radius:8px;background:#ffffff22;margin-top:6px;overflow:hidden}.achnext i b{display:block;height:100%;background:linear-gradient(90deg,#FFD93D,#FF9F1C);border-radius:8px}
+.achtrophy{position:absolute;left:-6px;top:-6px;font-size:70px;opacity:.18;transform:rotate(-14deg)}
+.achbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:8px}.achbar span{flex:none;background:#ffffff22;border-radius:999px;padding:3px 10px;font-size:12.5px}
 </style>
 </head>
 <body>
+<div id="nowBar" class="nowbar" style="display:none"></div>
 
 <!-- الترحيب وإضافة التطبيق للشاشة الرئيسية -->
 <section id="welcome" class="screen">
@@ -748,6 +778,7 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
   <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
     <div id="msgCard"></div>
+    <div id="achHome"></div>
     <div class="card kidsbar"><div class="kids" id="kids"></div><span class="klbl">أبطال الليلة<small>أول من تختاره هو البطل ⭐</small></span></div>
     <div class="card tonight" id="tonightCard"></div>
     <div class="card bedbar" id="bedBar"></div>
@@ -900,9 +931,10 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 </section>
 
 <!-- نافذة: تعديل طفل -->
-<div class="modal" id="kidModal"><div class="card" style="max-height:92vh;overflow:auto">
-  <h2 id="kidTitle">طفل جديد</h2>
-  <div class="preview" id="kidPreview"></div>
+<div class="modal" id="kidModal"><div class="card ked">
+  <div class="kedHead"><div class="preview" id="kidPreview"></div><div class="kedSide"><h2 id="kidTitle">طفل جديد</h2>
+    <div class="kedBtns"><button class="btn" onclick="App.saveKid()">✓ حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div></div></div>
+  <div class="kedBody">
   <div id="kidBasics">
     <label>الاسم</label><input class="inp" id="kidName" maxlength="20" placeholder="اسم الطفل">
     <label>ولد أو بنت</label><div class="seg" id="kidG"><button data-v="m">ولد</button><button data-v="f">بنت</button></div>
@@ -929,7 +961,7 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
   <label>نوع الحذاء</label><div class="seg wrap" id="kidShoe"></div>
   <label>لون الحذاء</label><div class="swatches" id="kidShoeC"></div>
   </div>
-  <div class="row" style="margin-top:16px"><button class="btn" onclick="App.saveKid()">حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div>
+  </div>
 </div></div>
 
 <!-- نافذة: رمز وليّ الأمر -->
@@ -972,24 +1004,24 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=4.0"></script>
-<script src="sync.js?v=4.0"></script>
-<script src="art.js?v=4.0"></script>
-<script src="stories.js?v=4.0"></script>
-<script src="stories-2.js?v=4.0"></script>
-<script src="stories-3.js?v=4.0"></script>
-<script src="stories-4.js?v=4.0"></script>
-<script src="stories-5.js?v=4.0"></script>
-<script src="stories-6.js?v=4.0"></script>
-<script src="young.js?v=4.0"></script>
-<script src="play.js?v=4.0"></script>
-<script src="english-2.js?v=4.0"></script>
-<script src="english.js?v=4.0"></script>
-<script src="english-3.js?v=4.0"></script>
-<script src="space.js?v=4.0"></script>
-<script src="night.js?v=4.0"></script>
-<script src="honors.js?v=4.0"></script>
-<script src="app.js?v=4.0"></script>
-<script src="wamd-stats.js?v=4.0" data-app="siraj"></script>
+<script src="config.js?v=4.1"></script>
+<script src="sync.js?v=4.1"></script>
+<script src="art.js?v=4.1"></script>
+<script src="stories.js?v=4.1"></script>
+<script src="stories-2.js?v=4.1"></script>
+<script src="stories-3.js?v=4.1"></script>
+<script src="stories-4.js?v=4.1"></script>
+<script src="stories-5.js?v=4.1"></script>
+<script src="stories-6.js?v=4.1"></script>
+<script src="young.js?v=4.1"></script>
+<script src="play.js?v=4.1"></script>
+<script src="english-2.js?v=4.1"></script>
+<script src="english.js?v=4.1"></script>
+<script src="english-3.js?v=4.1"></script>
+<script src="space.js?v=4.1"></script>
+<script src="night.js?v=4.1"></script>
+<script src="honors.js?v=4.1"></script>
+<script src="app.js?v=4.1"></script>
+<script src="wamd-stats.js?v=4.1" data-app="siraj"></script>
 </body>
 </html>

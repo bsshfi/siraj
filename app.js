@@ -260,6 +260,16 @@ const App = (() => {
     finally { $('joinBtn').disabled = false; $('joinBtn').textContent = 'ربط'; }
   }
 
+  /* دمج العائلة: لو جهازين عدّلوا بنفس الوقت، كل شخصية تاخذ آخر تعديل لها (ما يضيع شكل أحد) */
+  function mergeFam(local, remoteFam) {
+    const base = S.role === 'parent' ? JSON.parse(JSON.stringify(local)) : Object.assign(freshFam(), JSON.parse(JSON.stringify(remoteFam)));
+    const other = S.role === 'parent' ? remoteFam : local;
+    (base.kids || []).forEach((k) => { const o = (other.kids || []).find((x) => x.id === k.id); if (o && (o.avAt || 0) > (k.avAt || 0)) { k.av = o.av; k.avAt = o.avAt; } });
+    ['dad', 'mom'].forEach((w) => { const a = (other.pavAt || {})[w] || 0, b = (base.pavAt || {})[w] || 0; if (a > b) { base.pav = { ...(base.pav || {}), [w]: other.pav[w] }; base.pavAt = { ...(base.pavAt || {}), [w]: a }; } });
+    if (S.role !== 'parent') (local.kids || []).forEach((k) => { const b = base.kids.find((x) => x.id === k.id); if (b && (S.devKids || []).includes(k.id) && (k.avAt || 0) > (b.avAt || 0)) { b.av = k.av; b.avAt = k.avAt; } });
+    return base;
+  }
+
   /* ---------- المزامنة ---------- */
   let syncing = false;
   async function syncNow() {
@@ -269,6 +279,7 @@ const App = (() => {
       const r = await Sync.pullFamily(S.code);
       let changed = false;
       if (S.dirty) {
+        if (r && r.rev > S.rev) { S.fam = mergeFam(S.fam, r.fam); changed = true; }
         const rev = Math.max(S.rev, r ? r.rev : 0) + 1;
         const res = await Sync.pushFamily(S.code, S.fam, rev);
         if (res.ok) { S.rev = rev; S.dirty = false; }
@@ -283,7 +294,7 @@ const App = (() => {
       save();
       registerSub();
       loadRemote();
-      if (changed && $('home').classList.contains('on')) renderHome();
+      if (changed && $('home').classList.contains('on')) { renderHome(); refreshPane(); }
       if (changed) checkLock();
       if (S.fam.forceAt && S.fam.forceAt > (S.forceSeen || 0)) { S.forceSeen = S.fam.forceAt; save(); hardRefresh(true); }
     } catch (e) {}
@@ -404,12 +415,12 @@ const App = (() => {
   }
   function saveKid() {
     if (parentEdit) {
-      S.fam.pav = S.fam.pav || {}; S.fam.pav[parentEdit] = editing.av; parentEdit = null;
+      S.fam.pav = S.fam.pav || {}; S.fam.pav[parentEdit] = editing.av; S.fam.pavAt = { ...(S.fam.pavAt || {}), [parentEdit]: Date.now() }; parentEdit = null;
       closeModal('kidModal'); famChanged(); toast('تم حفظ الشخصية ✨'); if ($('paneDash').style.display !== 'none') renderDash(); renderHome();
       return;
     }
     if (selfEdit) {
-      const k = kidById(editing.id); if (k) k.av = editing.av;
+      const k = kidById(editing.id); if (k) { k.av = editing.av; k.avAt = Date.now(); }
       closeModal('kidModal'); famChanged(); toast('شكلك الجديد يجنن ✨');
       renderHome(); if ($('paneSky').style.display !== 'none') Play.renderSky();
       return;
@@ -537,6 +548,7 @@ const App = (() => {
     $('qtiles').innerHTML = [['App.tab(\'sky\')', '⭐', 'سمائي', AR(x.month) + ' نجوم'], ['App.tab(\'space\')', '🪐', 'الكواكب', ph ? 'القمر: ' + ph : 'جديد'], ['Night.adhkar()', '🤲', 'أذكار النوم', S.adkDay === dateKey(new Date()) ? 'تمّت ✓' : 'قبل النوم'],
       ['Night.sounds()', '🌧️', 'أصوات النوم', 'مطر وموج'], ['App.tab(\'play\')', '🎨', 'ألعاب', 'لوّن ورتّب'], ['App.tab(\'eng\')', '🔤', 'English', 'تعلّم والعب']]
       .map(([t, i, n, sm]) => `<button onclick="${t}"><span>${i}</span>${n}<small>${sm}</small></button>`).join('');
+    if (typeof Honors !== 'undefined' && $('achHome')) $('achHome').innerHTML = S.role === 'child' && ks[0] ? Honors.achCard(ks[0], true) : '';
     if (typeof Night !== 'undefined') { $('msgCard').innerHTML = Night.msgCard(ks); $('rewardCard').innerHTML = Night.rewardCard(S.role === 'parent' ? S.fam.kids : ks); }
   }
   function tonightRows(hs, n, allow) {
@@ -559,6 +571,7 @@ const App = (() => {
     if (t === 'play') Play.renderPlay();
     if (t === 'eng') EN.render();
     if (t === 'space') Space.render();
+    if (t === 'sky' || t === 'dash') syncNow();
     if ($('dashBtn')) $('dashBtn').classList.toggle('on', t === 'dash');
     window.scrollTo(0, 0);
     if (t !== 'dash') loadRemote(true);
@@ -842,6 +855,30 @@ const App = (() => {
     const v = speechSynthesis.getVoices();
     return v.find((x) => /^ar[-_]SA/i.test(x.lang)) || v.find((x) => /^ar/i.test(x.lang));
   }
+  /* شريط «يشتغل الآن» مثل الواتساب: يطلع فوق في كل مكان، فيه الوقت وزر إيقاف */
+  const Now = (() => {
+    let cur = null, t = null;
+    const bar = () => $('nowBar');
+    const fmt = (ms) => { const s = Math.max(0, Math.round(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+    function draw() {
+      if (!cur) { bar().style.display = 'none'; document.body.classList.remove('hasnow'); return; }
+      const el = Date.now() - cur.at, rem = cur.endAt ? cur.endAt - Date.now() : 0;
+      bar().innerHTML = `<span class="nb-ic">${cur.icon}</span><span class="nb-t">${esc(cur.label)}</span><span class="nb-s">${cur.endAt ? '⏳ ' + fmt(rem) : fmt(el)}</span><button onclick="App.now.stop()" aria-label="إيقاف">✕</button>`;
+      bar().style.display = 'flex'; document.body.classList.add('hasnow');
+    }
+    return {
+      set(label, icon, stop, endAt) { cur = { label, icon, stop, at: Date.now(), endAt }; clearInterval(t); t = setInterval(draw, 1000); draw(); },
+      end(endAt) { if (cur) { cur.endAt = endAt; draw(); } },
+      clear() { cur = null; clearInterval(t); draw(); },
+      stop() { const c = cur; cur = null; clearInterval(t); draw(); if (c && c.stop) try { c.stop(); } catch (e) {} },
+      on: () => !!cur
+    };
+  })();
+  function stopAllSound() { stopSpeak(); try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} if (typeof Night !== 'undefined') Night.stop(true); Now.clear(); }
+  // أي صوت يوقف لو الطفل طلع من التطبيق أو قفله
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopAllSound(); });
+  window.addEventListener('pagehide', stopAllSound);
+
   /* القراءة بصوت + تلوين الكلمة اللي تنقرأ (إذا الجهاز يدعم، وإلا تقدير بالوقت) */
   let kTimer = null;
   function speak(text, force, wordsEl) {
@@ -859,9 +896,11 @@ const App = (() => {
       u.onstart = () => { setTimeout(() => { if (got) return; let k = 0; const per = 430 / u.rate; clearInterval(kTimer); kTimer = setInterval(() => { mark(k++); if (k > ws.length) clearInterval(kTimer); }, per); }, base > 0 ? 1400 : 300); };
       u.onend = () => { clearInterval(kTimer); mark(-1); };
     }
+    u.addEventListener('start', () => Now.set('يقرأ بصوت…', '🔊', stopSpeak));
+    u.addEventListener('end', () => { if (!speechSynthesis.pending) Now.clear(); });
     speechSynthesis.speak(u);
   }
-  function stopSpeak() { clearInterval(kTimer); if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+  function stopSpeak() { clearInterval(kTimer); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (Now.on() && /يقرأ/.test(($('nowBar') || {}).textContent || '')) Now.clear(); }
   function toggleVoice() {
     S.voice = !S.voice; save(); $('voiceBtn').textContent = S.voice ? '🔊' : '🔈';
     if (S.voice) { if (!arVoice() && 'speechSynthesis' in window) toast('ما فيه صوت عربي على هذا الجهاز، نزّله من إعدادات تحويل النص إلى كلام'); renderPage(); } else stopSpeak();
@@ -1166,7 +1205,7 @@ const App = (() => {
     ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, toggleFull, setShortKids, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
-    choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
+    now: Now, stopAllSound, choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
 

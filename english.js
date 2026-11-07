@@ -42,6 +42,7 @@ const EN = (() => {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text), v = enVoice();
     if (v) u.voice = v; u.lang = v ? v.lang : 'en-US'; u.rate = 0.8; u.pitch = 1.1;
+    if (text.length > 40 && App.now) { u.onstart = () => App.now.set('Reading in English…', '🔊', () => speechSynthesis.cancel()); u.onend = () => App.now.clear(); }
     speechSynthesis.speak(u);
   }
 

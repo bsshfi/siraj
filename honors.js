@@ -84,5 +84,18 @@ const Honors = (() => {
   }
   function reportBtn() { return '<button class="card rpbtn" onclick="Honors.report()"><span>📊</span><div><b>تقرير الأسبوع</b><small>وش سوّوا العيال آخر ٧ أيام · يوصلك إشعار كل جمعة</small></div><em>←</em></button>'; }
 
-  return { board, badges, report, reportBtn, stats };
+  /* إنجازاتي: كرت محفّز للطفل */
+  function achCard(k, compact) {
+    const c = C(), all = stats(k, 0), ev = Play.kidEvents(k), sk = Play.skyInfo(k);
+    const rare = ev.filter((e) => e.st[1] !== 'c').length, bdg = badgesOf(k).filter((b) => b[2]).length;
+    const { out } = titlesFor(c.S().fam.kids, weekStart()), titles = out[k.id] || [];
+    const left = 7 - sk.cur;
+    return `<div class="card ach"><span class="achtrophy">🏆</span><h3>🌟 إنجازات ${c.esc(k.name)}</h3><p>${titles.length ? 'هذا الأسبوع أنت ' + titles.map((t) => t[1]).join(' و') + '! 🎉' : 'كل قصة تقراها تقرّبك من هدية جديدة ✨'}</p>
+      <div class="achg"><div><span>⭐</span><b>${AR(all.nights)}</b><small>نجمة</small></div><div><span>🎁</span><b>${AR(ev.length)}</b><small>ملصق${rare ? ' · ' + AR(rare) + ' نادر' : ''}</small></div>
+        <div><span>🛡️</span><b>${AR(sk.unlocked.length)}</b><small>هدية</small></div><div><span>🎖️</span><b>${AR(bdg)}</b><small>شارة</small></div></div>
+      <div class="achnext">🎯 باقي ${AR(left)} ${left === 1 ? 'قصة' : 'قصص'} وتكتمل كوكبة جديدة وتفتح هدية 🎁<i><b style="width:${Math.round(sk.cur / 7 * 100)}%"></b></i></div>
+      ${!compact && titles.length ? `<div class="achbar">${titles.map(([i, t]) => `<span>${i} ${t}</span>`).join('')}</div>` : ''}
+      ${compact ? `<button class="btn alt" style="margin-top:10px;width:100%" onclick="App.tab('sky')">شوف سمائي وهداياي ✨</button>` : `<button class="btn alt" style="margin-top:10px;width:100%" onclick="Honors.badges()">🎖️ كل الشارات</button>`}</div>`;
+  }
+  return { board, badges, report, reportBtn, stats, achCard };
 })();
