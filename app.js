@@ -77,7 +77,21 @@ const App = (() => {
     for (let x = new Date(a); x <= d; x.setDate(x.getDate() + 1)) if (isProDay(x)) n++;
     return pros[(Math.max(n, 1) - 1) % pros.length];
   }
-  function storyOfDay(d = new Date()) {
+  function storyOfDay(d) { return d ? storyOfDate(d) : (tonightList()[0] || storyOfDate(new Date())); }
+  /* القصص بالدور: ترتيب ثابت لكل عائلة، ومتى ما فتحوا التطبيق ياخذون اللي عليها الدور، فما تضيع ولا قصة */
+  function storyQueue() {
+    const r = rng(hash((S.code || 'x') + '#queue'));
+    const reg = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s)).map((s) => [r(), s]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+    const pro = STORIES.filter(isPro), sah = STORIES.filter(isSah), out = [];
+    let i = 0, p = 0, c = 0, turn = 0;
+    while (i < reg.length || p < pro.length || c < sah.length) {
+      for (let k = 0; k < 2 && i < reg.length; k++) out.push(reg[i++]);
+      if (turn % 2 === 0 ? p < pro.length : c >= sah.length) { if (p < pro.length) out.push(pro[p++]); } else if (c < sah.length) out.push(sah[c++]);
+      turn++;
+    }
+    return out;
+  }
+  function storyOfDate(d = new Date()) {
     const occ = occasion(d); if (occ) return occ;
     if (isProDay(d)) { const p = proOfDay(d); if (p) return p; }
     if (d.getDay() === 3) { const sh = STORIES.filter(isSah); if (sh.length) { let n = 0; for (let x = new Date(2026, 0, 1); x <= d; x.setDate(x.getDate() + 1)) if (x.getDay() === 3) n++; return sh[(n - 1) % sh.length]; } }
@@ -171,7 +185,7 @@ const App = (() => {
     document.querySelectorAll('.screen').forEach((s) => s.classList.remove('on'));
     $(id).classList.add('on');
     window.scrollTo(0, 0);
-    if (id === 'home') renderHome();
+    if (id === 'home') { renderHome(); if (!S.tourDone && S.role === 'child') setTimeout(() => tour(0), 600); }
     if (id === 'settings') renderSettings();
   }
 
@@ -288,7 +302,7 @@ const App = (() => {
       }
       if (S.progDirty || Date.now() - (S.beat || 0) > 6 * 3600000) {
         const notifOn = !!S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted';
-        await Sync.pushProgress(S.code, S.dev, { role: S.role, log: S.log.slice(-500), fav: S.fav, act: (S.act || []).slice(-300), kids: S.devKids || [], plat: platform(), ver: CONFIG.VERSION, notif: notifOn, seen: Date.now() });
+        await Sync.pushProgress(S.code, S.dev, { role: S.role, log: S.log.slice(-500), fav: S.fav, act: (S.act || []).slice(-300), trips: (S.trips || []).slice(-60), kids: S.devKids || [], plat: platform(), ver: CONFIG.VERSION, notif: notifOn, seen: Date.now() });
         S.progDirty = false; S.beat = Date.now();
       }
       save();
@@ -318,6 +332,7 @@ const App = (() => {
     if (on('paneSky')) Play.renderSky();
     else if (on('panePlay')) Play.renderPlay();
     else if (on('paneLib')) renderLib();
+    else if (on('paneTrips') && typeof Trips !== 'undefined') Trips.render();
     else if (on('paneTonight')) renderHome();
   }
   function allActs() {
@@ -466,14 +481,14 @@ const App = (() => {
     const lbl = ['قصة الليلة', 'القصة الثانية الليلة', 'القصة الثالثة الليلة', 'القصة الرابعة الليلة'][n] || 'قصة إضافية';
     $('tonightCard').innerHTML = hs.length ? `${ART.page(st.scene, done ? '🌙' : st.occ ? '🎉' : isPro(st) ? '📖' : '✨', artHs(st, hs))}
       <div class="info">${done ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">خلّصتوا قصص الليلة 🌙 (${n}/${allow})</span>` : (st.occ ? '<span class="tag" style="background:#E5FBEA;color:#1E8E4A">قصة المناسبة 🎉</span> ' : '') + (allow > 1 ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">${lbl} · ${n + 1}/${allow}</span>` : '')}
-      <p class="title">${esc(fill(st.title, hs))}</p><p class="tmeta">${(() => { const sh = storyLevel(hs) === 1 && canShort(st), n = sh ? youngPages(st).length : st.pages.length; return AR(n) + ' صفحات · ' + AR(Math.max(sh ? 1 : 2, Math.round(n * (sh ? .5 : .7)))) + ' دقائق · ' + (sh ? 'نسخة قصيرة للصغار ✂️' : 'صور متحركة ✨'); })()}</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
-      ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا بكرة مع قصة جديدة ✨ تقدرون تعيدون قصة من «مكتبتي».</p><div class="donebtns"><button class="btn" onclick="Night.adhkar()">🤲 أذكار النوم</button><button class="btn alt" onclick="Night.sounds()">🌧️ أصوات النوم</button></div><button class="btn ghost" style="margin-top:6px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
+      <p class="title">${esc(fill(st.title, hs))}</p>${S.resume && S.resume.id === st.id && Date.now() - S.resume.at < 12 * 36e5 ? `<span class="resume">📖 بتكمّل من الصفحة ${AR(S.resume.i + 1)}</span>` : ''}<p class="tmeta">${(() => { const sh = storyLevel(hs) === 1 && canShort(st), n = sh ? youngPages(st).length : st.pages.length; return AR(n) + ' صفحات · ' + AR(Math.max(sh ? 1 : 2, Math.round(n * (sh ? .5 : .7)))) + ' دقائق · ' + (sh ? 'نسخة قصيرة للصغار ✂️' : 'صور متحركة ✨'); })()}</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
+      ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا الجاية مع قصة جديدة ✨ تقدرون تعيدون أي قصة من «اكتشف ← مكتبة القصص».</p><div class="donebtns"><button class="btn" onclick="Night.adhkar()">🤲 أذكار النوم</button><button class="btn alt" onclick="Night.sounds()">🌧️ أصوات النوم</button></div><button class="btn ghost" style="margin-top:6px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
         : `<button class="btn" style="margin-top:14px" onclick="App.openStory('${st.id}')">ابدأ ${lbl} ✨</button>`}</div>`
       : '<div class="info"><p class="muted">اختر بطلًا واحدًا على الأقل</p></div>';
-    $('tabPlay').classList.toggle('dim', isNight()); $('tabEng').classList.toggle('dim', isNight());
+    $('tabLearn').classList.toggle('dim', isNight());
     renderTop(hs.length ? hs : shown.slice(0, 1));
     $('ver').textContent = 'v' + CONFIG.VERSION;
-    $('dashBtn').style.display = S.role === 'parent' ? '' : 'none';
+    $('tabParents').style.display = S.role === 'parent' ? '' : 'none';
     const mb = $('modeBar'), kidsMode = S.parentMode === 'kids';
     mb.style.display = S.role === 'parent' ? '' : 'none';
     mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">🔍 معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">📖 أقرأ مع العيال</button>`;
@@ -548,8 +563,8 @@ const App = (() => {
     $('qtiles').innerHTML = [['App.tab(\'sky\')', '⭐', 'سمائي', AR(x.month) + ' نجوم'], ['App.tab(\'space\')', '🪐', 'الكواكب', ph ? 'القمر: ' + ph : 'جديد'], ['Night.adhkar()', '🤲', 'أذكار النوم', S.adkDay === dateKey(new Date()) ? 'تمّت ✓' : 'قبل النوم'],
       ['Night.sounds()', '🌧️', 'أصوات النوم', 'مطر وموج'], ['App.tab(\'play\')', '🎨', 'ألعاب', 'لوّن ورتّب'], ['App.tab(\'eng\')', '🔤', 'English', 'تعلّم والعب']]
       .map(([t, i, n, sm]) => `<button onclick="${t}"><span>${i}</span>${n}<small>${sm}</small></button>`).join('');
-    if (typeof Honors !== 'undefined' && $('achHome')) $('achHome').innerHTML = S.role === 'child' && ks[0] ? Honors.achCard(ks[0], true) : '';
-    if (typeof Night !== 'undefined') { $('msgCard').innerHTML = Night.msgCard(ks); $('rewardCard').innerHTML = Night.rewardCard(S.role === 'parent' ? S.fam.kids : ks); }
+    if ($('adkState')) $('adkState').textContent = S.adkDay === dateKey(new Date()) ? 'تمّت ✓' : 'قبل النوم';
+    if (typeof Night !== 'undefined') $('msgCard').innerHTML = Night.msgCard(ks);
   }
   function tonightRows(hs, n, allow) {
     const L = tonightList().slice(0, allow);
@@ -561,11 +576,32 @@ const App = (() => {
     if (i >= 0) sel.splice(i, 1); else sel.push(id);
     S.sel = sel.slice(); save(); renderHome();
   }
+  /* جولة أول مرة (أجهزة العيال) */
+  const TOUR = [['🌙', 'الليلة', 'هنا قصة الليلة، وأذكار النوم، وأصوات المطر والموج.'], ['⭐', 'أنا', 'شخصيتك ونجومك وهداياك وشاراتك وعائلتك.'], ['🧭', 'اكتشف', 'سافر حول العالم ✈️، واكتشف الكواكب والقمر، ومكتبة القصص.'], ['🎨', 'العب وتعلّم', 'إنجليزي وألعاب تلوين وتركيب وأسئلة.']];
+  function tour(i) {
+    if (i >= TOUR.length) { S.tourDone = 1; save(); Play.closeGame(); return; }
+    const [e, t, d] = TOUR[i];
+    $('gameBody').innerHTML = `<div class="tour"><div class="big">${e}</div><h2>${t}</h2><p class="muted" style="font-size:16px">${d}</p><div class="dots">${TOUR.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+      <button class="btn" onclick="App.tour(${i + 1})">${i < TOUR.length - 1 ? 'التالي ←' : 'يلا نبدأ! 🚀'}</button></div>`;
+    $('gameModal').classList.add('on');
+  }
+  function goSet(id) { setTimeout(() => { const el = $(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80); }
+  const GROUP = { tonight: 'Tonight', sky: 'Me', trips: 'Explore', space: 'Explore', lib: 'Explore', eng: 'Learn', play: 'Learn', dash: 'Parents' };
   function tab(t) {
-    ['tonight', 'sky', 'space', 'play', 'eng', 'lib', 'dash'].forEach((x) => {
-      $('tab' + x[0].toUpperCase() + x.slice(1)).classList.toggle('on', x === t);
-      $('pane' + x[0].toUpperCase() + x.slice(1)).style.display = x === t ? '' : 'none';
+    if (t === 'explore') t = S.lastExplore || (typeof Trips !== 'undefined' ? 'trips' : 'space');
+    if (t === 'learn') t = S.lastLearn || 'eng';
+    if (t === 'dash' && S.role !== 'parent') t = 'tonight';
+    if (GROUP[t] === 'Explore') S.lastExplore = t; if (GROUP[t] === 'Learn') S.lastLearn = t;
+    ['tonight', 'sky', 'trips', 'space', 'play', 'eng', 'lib', 'dash'].forEach((x) => {
+      const p = $('pane' + x[0].toUpperCase() + x.slice(1)); if (p) p.style.display = x === t ? '' : 'none';
     });
+    ['Tonight', 'Me', 'Explore', 'Learn', 'Parents'].forEach((g) => $('tab' + g).classList.toggle('on', GROUP[t] === g));
+    $('subExplore').style.display = GROUP[t] === 'Explore' ? '' : 'none'; $('subLearn').style.display = GROUP[t] === 'Learn' ? '' : 'none';
+    document.querySelectorAll('.subnav button').forEach((b) => { b.classList.toggle('on', b.dataset.t === t); b.onclick = () => tab(b.dataset.t); });
+    if ($('subTrips')) $('subTrips').style.display = typeof Trips !== 'undefined' ? '' : 'none';
+    if (t === 'trips' && typeof Trips !== 'undefined') Trips.render();
+    if (t === 'lib') renderLib();
+    if (t === 'sky' && typeof Night !== 'undefined') $('rewardCard').innerHTML = Night.rewardCard(S.role === 'parent' ? S.fam.kids : heroes().length ? heroes() : myKids());
     if (t === 'dash') renderDash();
     if (t === 'sky') Play.renderSky();
     if (t === 'play') Play.renderPlay();
@@ -683,7 +719,7 @@ const App = (() => {
         const t = new Date(e.t);
         return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
       }).join('');
-      el.innerHTML = familyStrip('parent') + (typeof Honors !== 'undefined' ? Honors.reportBtn() + Honors.board() : '') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
+      el.innerHTML = `<div class="pgrid"><button class="card" onclick="App.askPin(App.openSettings)"><span>⚙️</span>الإعدادات</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sMsg')})"><span>💌</span>رسالة للعيال</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sRw')})"><span>🎁</span>المكافأة</button><button class="card" onclick="App.refreshAll()"><span>🔄</span>حدّث أجهزتهم</button></div>` + (typeof Trips !== 'undefined' ? `<button class="card rpbtn" onclick="App.tab('trips')"><span>✈️</span><div><b>رحلات العيال</b><small>${AR(Trips.allTrips().length)} رحلة حول العالم · شوف وين سافروا</small></div><em>←</em></button>` : '') + familyStrip('parent') + (typeof Honors !== 'undefined' ? Honors.reportBtn() + Honors.board() : '') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
         `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>` +
         ((S.log.length || (S.act || []).length) ? `<div class="card"><h2>قراءات هذا الجوال</h2><p class="muted">قصص وألعاب انحسبت من جوالك (${S.log.length} قصة · ${(S.act || []).length} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.</p><button class="btn alt" onclick="App.clearMine()">مسح قراءات هذا الجوال</button></div>` : '');
     };
@@ -706,13 +742,19 @@ const App = (() => {
   function nightKey() { const d = new Date(); if (nowMin() < MORNING) d.setDate(d.getDate() - 1); return dateKey(d); }
   function allowedTonight() { const x = S.fam.extra; return (S.fam.perNight || 1) + (x && x.d === nightKey() ? x.n : 0); }
   function tonightList() {
-    const first = storyOfDay(), pool = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s) && s.id !== first.id);
+    const hs = heroes(), ids = hs.length ? hs.map((h) => h.id) : null;
     const today = new Set([dateKey(), nightKey()]);
-    const read = new Set(allLogs().filter((e) => !today.has(e.d)).map((e) => e.s)); // اللي انقرت قبل الليلة بس، عشان ما تتغير القائمة أثناء الليل
-    const r = rng(hash((S.code || 'x') + '#extra#' + nightKey()));
-    const order = pool.map((s) => [r(), s]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
-    const fresh = order.filter((s) => !read.has(s.id)), rest = order.filter((s) => read.has(s.id));
-    return [first, ...fresh, ...rest].slice(0, 6);
+    const logs = allLogs().filter((e) => !ids || (e.k || []).some((k) => ids.includes(k)));
+    const before = logs.filter((e) => !today.has(e.d)).sort((a, b) => b.t - a.t); // اللي انقرت قبل الليلة بس، عشان ما تتغير القائمة أثناء الليل
+    const readB = new Set(before.map((e) => e.s)), list = [];
+    const occ = occasion(new Date()); if (occ) list.push(occ);
+    // السلاسل: إذا آخر قصة كانت جزء من سلسلة، الجزء اللي بعده أول
+    const lastSer = before.find((e) => { const s = STORIES.find((x) => x.id === e.s); return s && s.ser; });
+    if (lastSer) { const s = STORIES.find((x) => x.id === lastSer.s), nx = STORIES.find((x) => x.ser === s.ser && x.part === s.part + 1); if (nx && !readB.has(nx.id)) list.push(nx); }
+    const q = storyQueue();
+    let fresh = q.filter((s) => !readB.has(s.id) && !list.includes(s));
+    if (fresh.length < 6) fresh = fresh.concat(q.filter((s) => !fresh.includes(s) && !list.includes(s))); // خلصت كلها؟ نبدأ الدورة من جديد
+    return [...list, ...fresh].slice(0, 6);
   }
   function readTonight() {
     const day = new Set([dateKey(), nightKey()]);
@@ -747,6 +789,7 @@ const App = (() => {
     if (!hs.length) return toast('اختر بطل القصة أولًا');
     const st = STORIES.find((s) => s.id === id);
     R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec), hist: [], lvl: storyLevel(hs) };
+    const rs = S.resume; if (rs && rs.id === id && Date.now() - rs.at < 12 * 36e5 && rs.i > 0) { R.i = rs.i; R.hist = rs.hist || []; }
     R.short = R.lvl === 1 && canShort(st); R.total = readerPages().length + 2;
     show('reader'); renderPage();
   }
@@ -773,6 +816,8 @@ const App = (() => {
   }
   function renderPage() {
     const { st, hs, i, total } = R, PG = readerPages();
+    // «كمّل من وين وقفت»: نحفظ مكانه في القصة
+    try { if (i > 0 && i < st.pages.length) S.resume = { id: st.id, i, hist: R.hist, at: Date.now() }; else if (i >= st.pages.length && S.resume && S.resume.id === st.id) S.resume = null; save(); } catch (e) {}
     clearTimeout(sleepTimer); $('sleep').classList.remove('on');
     $('favBtn').textContent = S.fav.includes(st.id) ? '⭐' : '☆';
     $('viewTag').style.display = counts() ? 'none' : '';
@@ -1197,15 +1242,15 @@ const App = (() => {
   }
 
   function ctx() {
-    return { familyStrip, speak, counts, allActs, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory,
+    return { familyStrip, speak, counts, allActs, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory, remote: () => remote,
       renderHomeKids: () => { if ($('home').classList.contains('on')) renderHome(); } };
   }
 
   return {
-    ctx, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, toggleFull, setShortKids, isNight, isLocked,
+    ctx, family, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, toggleFull, setShortKids, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
     openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
-    now: Now, stopAllSound, choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
+    tour, goSet, now: Now, stopAllSound, choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
 

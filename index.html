@@ -699,6 +699,52 @@ body.hasnow{padding-top:46px}
 .achnext{margin-top:10px;background:#ffffff14;border-radius:14px;padding:8px 10px;font-size:13px}.achnext i{display:block;height:8px;border-radius:8px;background:#ffffff22;margin-top:6px;overflow:hidden}.achnext i b{display:block;height:100%;background:linear-gradient(90deg,#FFD93D,#FF9F1C);border-radius:8px}
 .achtrophy{position:absolute;left:-6px;top:-6px;font-size:70px;opacity:.18;transform:rotate(-14deg)}
 .achbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:8px}.achbar span{flex:none;background:#ffffff22;border-radius:999px;padding:3px 10px;font-size:12.5px}
+
+/* ================= v4.2 الهيكلة الجديدة ================= */
+.hchips{display:none!important}
+.hgear{font-size:16px;width:32px;height:32px;border-radius:50%;background:#ffffffa8;border:1.5px solid #fff;margin-right:4px;align-self:center}
+.nightbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.nightbtns button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 6px;color:var(--ink)}
+.nightbtns span{font-size:34px}.nightbtns b{font-size:16px}.nightbtns small{font-size:12px;color:var(--orange);font-weight:800}
+.subnav{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.subnav button{flex:1;white-space:nowrap;border-radius:16px;padding:11px 10px;font-size:15px;font-weight:800;background:var(--glass);border:1.5px solid var(--gline);color:var(--soft)}
+.subnav button.on{background:var(--orange);color:#fff;border-color:var(--orange);box-shadow:0 6px 14px #F2851E44}
+.bnav button{font-size:12.5px;min-width:60px}.bnav button span{font-size:24px}
+.setnav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:5;padding:8px 0;margin-bottom:6px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0))}
+.setnav button{flex:none;border-radius:999px;padding:8px 12px;font-size:13.5px;font-weight:800;background:#fff;border:1.5px solid #EEE;color:var(--ink)}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.pgrid button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 2px;font-size:12.5px;font-weight:800;color:var(--ink)}.pgrid span{font-size:26px}
+.resume{display:block;margin-top:8px;font-size:13px;color:var(--orange);font-weight:800}
+.tour{text-align:center}.tour .big{font-size:72px}.tour h2{margin:6px 0}.tour .dots{display:flex;gap:6px;justify-content:center;margin:12px 0}.tour .dots i{width:9px;height:9px;border-radius:50%;background:#E2DCF2}.tour .dots i.on{background:var(--orange);width:22px;border-radius:9px}
+
+/* v4.2 رحلات حول العالم */
+.trhero{text-align:center;background:linear-gradient(160deg,#E8F4FF,#fff 60%)}.trhero h2{margin:4px 0}.trhero p{margin:4px 0;color:var(--soft)}.trhero small{display:block;color:var(--soft);margin-bottom:12px}
+.trplane{font-size:54px;animation:trfl 3s ease-in-out infinite}@keyframes trfl{50%{transform:translate(-10px,-8px) rotate(-6deg)}}
+.trstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.trstats .card{display:flex;flex-direction:column;align-items:center;padding:14px 6px;margin-bottom:16px}.trstats span{font-size:34px}.trstats b{font-size:19px}.trstats small{color:var(--soft)}
+.trlog{display:flex;flex-direction:column;gap:8px}.trrow{display:flex;align-items:center;gap:10px;background:#F6F3FF;border-radius:16px;padding:10px 12px;text-align:right}.trrow>div{flex:1;min-width:0}.trrow b{display:block;font-size:18px}.trrow small{color:var(--soft);font-size:13px}.trrow i{display:flex;margin-top:2px}.trrow i svg{margin-left:-6px}.trrow em{font-style:normal;color:var(--soft)}
+.trflag{font-size:40px;line-height:1}
+.trw{text-align:center}.trw h2{margin:6px 0}.trdots{display:flex;justify-content:center;gap:8px;margin-bottom:6px}.trdots span{width:38px;height:38px;border-radius:50%;background:#F2EFFC;display:grid;place-items:center;opacity:.45}.trdots span.on{opacity:1;background:#FFE9D6}
+.trppl,.trtypes{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin:12px 0 16px}.trppl button,.trtypes button{position:relative;background:#F6F3FF;border-radius:18px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;border:3px solid transparent}.trppl button.on,.trtypes button.on{border-color:var(--orange);background:#FFF1E6}
+.trppl button.on::after{content:'✓';position:absolute;top:4px;left:8px;background:var(--orange);color:#fff;border-radius:50%;width:22px;height:22px;font-size:14px;line-height:22px}
+.trppl b,.trtypes b{font-size:15px;margin-top:2px}.trppl .add span{font-size:36px;height:58px;display:grid;place-items:center}.trppl i{position:absolute;top:4px;right:6px;font-style:normal;font-size:12px;background:#fff;border-radius:50%;width:22px;height:22px;line-height:22px;color:#c33}
+.trreg{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}.trreg .chip{white-space:nowrap;font-size:14.5px;padding:6px 12px}
+.trgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;max-height:46vh;overflow:auto;margin-top:6px}.trgrid button{position:relative;background:#F6F3FF;border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center}.trgrid span{font-size:38px;line-height:1.1}.trgrid b{font-size:13.5px;line-height:1.3}.trgrid i{position:absolute;top:2px;left:6px;font-style:normal;font-size:11px}
+.trdays{display:flex;justify-content:center;gap:6px;margin:10px 0 14px;flex-wrap:wrap}.trdays button{width:48px;height:48px;border-radius:50%;background:#F2EFFC;font-size:21px;font-weight:800}.trdays button.on{background:var(--orange);color:#fff}
+.bpass{background:#fff;border:2px dashed #CFC6F3;border-radius:20px;padding:12px;margin-bottom:14px}.bph{display:flex;justify-content:space-between;font-weight:700;color:var(--bg1);font-size:14px}.bpr{display:flex;align-items:center;justify-content:space-between;margin:8px 0}.bpr div{display:flex;flex-direction:column;align-items:center}.bpr b{font-family:Poppins,sans-serif;font-size:30px}.bpr small,.bpr em{color:var(--soft);font-style:normal;font-size:13px}.bpline{flex:1;border-top:2px dashed #CFC6F3;margin:0 10px;position:relative;top:4px}
+.bpf{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.bpf span{background:#F6F3FF;border-radius:10px;padding:3px 9px;font-size:13.5px}.bpp{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}.bpp span{display:flex;flex-direction:column;align-items:center;font-size:12px}
+.trart .art,.pcart .art{width:100%;border-radius:18px;display:block}
+.flight{position:relative;display:flex;align-items:center;justify-content:space-between;margin:14px 6px;height:56px}.flight>span:not(.pl){display:flex;flex-direction:column;align-items:center;font-size:30px;z-index:1}.flight small{font-size:12px;color:var(--soft)}.flight i{position:absolute;right:30px;left:30px;top:18px;border-top:3px dashed #CFC6F3}
+.flight .pl{position:absolute;right:28px;top:0;font-size:30px;transform:scaleX(1);transition:right 3s ease-in-out}.flight.go .pl{right:calc(100% - 60px);animation:trbob .6s ease-in-out infinite}@keyframes trbob{50%{top:-8px}}
+.trsay{font-weight:700;color:var(--bg1);min-height:24px}
+.arrive .bigflag,.tgame .bigflag{font-size:96px;line-height:1.1}.arrive .hi{font-size:18px}.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}.facts div{background:#F6F3FF;border-radius:14px;padding:8px;display:flex;flex-direction:column}.facts span{font-size:24px}.facts small{color:var(--soft)}.fact{background:#FFF6D9;border-radius:14px;padding:10px;font-weight:600}
+.trops{display:flex;flex-direction:column;gap:8px;margin:12px 0}.trops button{display:flex;align-items:center;gap:12px;background:#F6F3FF;border-radius:16px;padding:12px 14px;text-align:right;font-size:17px}.trops span{font-size:32px}
+.postcard{background:#fff;border-radius:20px;padding:10px;box-shadow:0 6px 18px #2b235022;margin-bottom:14px;transform:rotate(-1deg)}.postcard p{margin:8px 0 2px;font-size:17px}.postcard small{color:var(--soft)}.pcart{position:relative}.pcstamp{position:absolute;top:8px;left:8px;font-size:34px;background:#fff;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;border:3px dashed var(--orange);transform:rotate(-12deg)}
+.albm .postcard:nth-child(even){transform:rotate(1deg)}
+.stampnew{display:inline-flex;flex-direction:column;align-items:center;border:4px double #C8452B;color:#C8452B;border-radius:50%;width:140px;height:140px;justify-content:center;transform:rotate(-10deg);margin:10px;animation:stampin .6s cubic-bezier(.3,1.6,.5,1)}.stampnew span{font-size:44px;line-height:1}@keyframes stampin{from{transform:scale(2.4) rotate(-30deg);opacity:0}}
+.passport{background:linear-gradient(160deg,#0E6B3B,#0A4F2C);border-radius:22px;padding:14px;color:#fff;margin-bottom:14px}.pph{display:flex;flex-direction:column;align-items:center;font-size:36px}.pph b{font-size:20px}.pph small{opacity:.85;font-size:14px}
+.ppbar{display:block;height:10px;background:#ffffff33;border-radius:9px;margin:8px 0 12px;overflow:hidden}.ppbar b{display:block;height:100%;background:#FFD35C}
+.stamps{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;background:#FFF9EC;border-radius:16px;padding:12px;color:var(--ink)}.stamp{border:3px dashed #C8452B;border-radius:16px;padding:6px;display:flex;flex-direction:column;align-items:center;transform:rotate(var(--r));color:#8A2C1A}.stamp span{font-size:36px;line-height:1.1}.stamp b{font-size:13.5px}.stamp small{font-size:11.5px}
+.tops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.tops button{background:#F6F3FF;border-radius:16px;padding:14px 8px;font-size:17px;font-weight:700;border:3px solid transparent}.tops .ok{background:#DDF5E5;border-color:#2BB673}.tops .no{background:#FFE1E1;border-color:#E25555}.tops .dim{opacity:.45}
 </style>
 </head>
 <body>
@@ -769,7 +815,7 @@ body.hasnow{padding-top:46px}
 <!-- الرئيسية -->
 <section id="home" class="screen">
   <header class="hd3">
-    <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""></b><small id="hello">حكاية الليلة</small></div>
+    <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""><button class="hgear" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></b><small id="hello">حكاية الليلة</small></div>
     <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small><span id="season" class="season"></span></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
   </header>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
@@ -778,21 +824,26 @@ body.hasnow{padding-top:46px}
   <p class="modehint" id="modeHint"></p>
   <div id="paneTonight">
     <div id="msgCard"></div>
-    <div id="achHome"></div>
+
     <div class="card kidsbar"><div class="kids" id="kids"></div><span class="klbl">أبطال الليلة<small>أول من تختاره هو البطل ⭐</small></span></div>
     <div class="card tonight" id="tonightCard"></div>
     <div class="card bedbar" id="bedBar"></div>
-    <div id="rewardCard"></div>
-    <div class="qtiles" id="qtiles"></div>
+
+    <div class="nightbtns"><button class="card" onclick="Night.adhkar()"><span>🤲</span><b>أذكار النوم</b><small id="adkState">قبل النوم</small></button><button class="card" onclick="Night.sounds()"><span>🌧️</span><b>أصوات النوم</b><small>مطر · موج · صحراء</small></button></div>
+    <div id="qtiles" hidden></div>
   </div>
-  <div id="paneSky" style="display:none"><div id="sky"></div></div>
+  <div id="paneSky" style="display:none"><div id="rewardCard"></div><div id="sky"></div></div>
+  <div class="subnav" id="subExplore" style="display:none"><button data-t="trips" id="subTrips" style="display:none">✈️ رحلاتي</button><button data-t="space">🪐 الكواكب والقمر</button><button data-t="lib">📚 مكتبة القصص</button></div>
+  <div class="subnav" id="subLearn" style="display:none"><button data-t="eng">🔤 English</button><button data-t="play">🎨 ألعاب</button></div>
+  <div id="paneTrips" style="display:none"><div id="trips"></div></div>
   <div id="paneSpace" style="display:none"><div id="space"></div></div>
   <div id="panePlay" style="display:none"><div id="play"></div></div>
   <div id="paneEng" style="display:none"><div id="eng"></div></div>
   <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
   <div id="paneDash" style="display:none"><div id="dash"></div></div>
   <div class="foot">سِراج <span id="ver"></span> · <span class="pill">WAMD ARC</span></div>
-  <nav class="tabs bnav"><button id="tabTonight" class="on" onclick="App.tab('tonight')"><span>🌙</span>الليلة</button><button id="tabSky" onclick="App.tab('sky')"><span>⭐</span>سمائي</button><button id="tabSpace" onclick="App.tab('space')"><span>🪐</span>الكواكب</button><button id="tabPlay" onclick="App.tab('play')"><span>🎨</span>ألعاب</button><button id="tabEng" onclick="App.tab('eng')"><span>🔤</span>English</button><button id="tabLib" onclick="App.tab('lib')"><span>📚</span>مكتبتي</button><button id="tabDash" style="display:none!important" onclick="App.tab('dash')"></button></nav>
+  <nav class="tabs bnav"><button id="tabTonight" class="on" onclick="App.tab('tonight')"><span>🌙</span>الليلة</button><button id="tabMe" onclick="App.tab('sky')"><span>⭐</span>أنا</button><button id="tabExplore" onclick="App.tab('explore')"><span>🧭</span>اكتشف</button><button id="tabLearn" onclick="App.tab('learn')"><span>🎨</span>العب وتعلّم</button><button id="tabParents" onclick="App.tab('dash')"><span>👨‍👩‍👧</span>للوالدين</button></nav>
+  <div hidden><button id="tabSky"></button><button id="tabSpace"></button><button id="tabPlay"></button><button id="tabEng"></button><button id="tabLib"></button><button id="tabDash"></button><button id="tabTrips"></button><button id="dashBtn"></button></div>
 </section>
 
 <!-- قارئ القصة -->
@@ -832,8 +883,9 @@ body.hasnow{padding-top:46px}
     <div class="brand">⚙️ الإعدادات</div>
     <button class="iconbtn" onclick="App.show('home')" aria-label="رجوع">→</button>
   </div>
+  <div class="setnav"><button onclick="App.goSet('sFam')">👨‍👩‍👧 العائلة</button><button onclick="App.goSet('sKids')">🧒 الأطفال</button><button onclick="App.goSet('sNight')">📚 القصص والنوم</button><button onclick="App.goSet('sMsg')">💌 الرسائل والمكافأة</button><button onclick="App.goSet('sLook')">🎨 المظهر</button><button onclick="App.goSet('sNotif')">🔔 الإشعارات</button><button onclick="App.goSet('sUpd')">🔄 التحديث</button></div>
   <div class="card" id="famBox">
-    <h2>العائلة والنسخة الاحتياطية 👨‍👩‍👧</h2>
+    <h2 id="sFam">العائلة والنسخة الاحتياطية 👨‍👩‍👧</h2>
     <p class="muted">هذا الجهاز: <b id="devRole"></b></p>
     <p class="muted" style="margin-bottom:0">رمز العائلة هو نسختك الاحتياطية: به تربط جهاز طفل، وبه يرجع كل شيء لو حذفت التطبيق أو غيّرت الجوال. احفظه في مكانٍ آمن.</p>
     <button class="btn alt" id="whoRow" style="margin:6px 0 10px" onclick="App.openWho(false)">تغيير صاحب الجهاز 👤</button>
@@ -843,7 +895,7 @@ body.hasnow{padding-top:46px}
     <div class="row"><button class="btn" onclick="App.shareJoin()">إرسال رابط الربط</button><button class="btn alt" onclick="App.copyCode()">نسخ الرمز</button></div>
   </div>
   <div class="card">
-    <h2>الأطفال</h2>
+    <h2 id="sKids">الأطفال</h2>
     <div class="list" id="setKids"></div>
     <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
   </div>
@@ -853,7 +905,7 @@ body.hasnow{padding-top:46px}
     <label>الأم</label><div class="chips" id="setMom"></div>
   </div>
   <div class="card">
-    <h2>وقت القصة والإشعارات 🔔</h2>
+    <h2 id="sNotif">وقت القصة والإشعارات 🔔</h2>
     <p class="muted" id="notifState"></p>
     <button class="btn" id="notifBtn" onclick="App.enableNotif()">تفعيل الإشعارات على هذا الجهاز</button>
     <label class="toggle"><b>تذكير وقت القصة</b><input type="checkbox" class="switch" id="remindOn"></label>
@@ -864,21 +916,21 @@ body.hasnow{padding-top:46px}
     <button class="btn alt" onclick="App.setBed()">حفظ</button>
   </div>
   <div class="card">
-    <h2>المظهر 🎨</h2>
+    <h2 id="sLook">المظهر 🎨</h2>
     <p class="muted">فاتح هو الأساسي. «تلقائي» يخليه كحلي هادي من وقت النوم لين الصبح.</p>
     <div class="seg" id="themeSeg"></div>
     <p class="muted" style="margin:12px 0 6px">لون الخلفية في الوضع الفاتح:</p>
     <div class="pals" id="palSeg"></div>
   </div>
   <div class="card">
-    <h2>التحديث 🔄</h2>
+    <h2 id="sUpd">التحديث 🔄</h2>
     <p class="muted">التطبيق يتحدث لحاله، وهنا تقدر تحدّثه فورًا: آخر إصدار، والقصص، وشخصيات العيال وإعداداتهم.</p>
     <button class="btn" onclick="App.hardRefresh()">🔄 حدّث هذا الجهاز الآن</button>
     <button class="btn alt" id="pushAllBtn" style="margin-top:10px" onclick="App.refreshAll()">📲 حدّث كل أجهزة العيال</button>
     <p class="muted" id="verNote" style="margin:8px 0 0"></p>
   </div>
   <div class="card">
-    <h2>💌 رسالة للعيال</h2>
+    <h2 id="sMsg">💌 رسالة للعيال</h2>
     <p class="muted">تظهر لهم فوق قصة الليلة لين يضغطون ❤️</p>
     <textarea class="inp" id="msgText" rows="2" maxlength="140" placeholder="مثلًا: فخور فيكم اليوم يا أبطال ❤️"></textarea>
     <label>لمين؟</label><div class="seg wrap" id="msgTo"></div>
@@ -886,14 +938,14 @@ body.hasnow{padding-top:46px}
     <div class="row" style="margin-top:10px"><button class="btn" onclick="App.sendMsg()">إرسال 💌</button><button class="btn alt" onclick="App.clearMsg()">مسح الرسالة</button></div>
   </div>
   <div class="card">
-    <h2>🎁 مكافأة الأسبوع</h2>
+    <h2 id="sRw">🎁 مكافأة الأسبوع</h2>
     <p class="muted">كل ليلة يقرون فيها قصة = نجمة. لما يوصلون العدد يكسبون المكافأة اللي تحددها.</p>
     <label>المكافأة</label><input class="inp" id="rwText" maxlength="60" placeholder="مثلًا: طلعة للحديقة 🎡">
     <label>كم نجمة؟</label><div class="seg" id="rwStars"></div>
     <div class="row" style="margin-top:10px"><button class="btn" onclick="App.saveReward()">حفظ</button><button class="btn alt" onclick="App.clearReward()">إيقاف المكافأة</button></div>
   </div>
   <div class="card">
-    <h2>الليل والنوم 🌙</h2>
+    <h2 id="sNight">الليل والنوم 🌙</h2>
     <label>كم قصة الليلة؟</label>
     <div class="seg" id="perNight"></div>
     <p class="muted" style="margin-top:8px">بعد القصة الأولى يظهر لهم زر «القصة التالية» لين يوصلون العدد.</p>
@@ -909,7 +961,7 @@ body.hasnow{padding-top:46px}
     <button class="btn alt" onclick="App.setLock()">حفظ</button>
   </div>
   <div class="card">
-    <h2>مكتبة القصص <span class="count" id="storyCount"></span></h2>
+    <h2 id="sLib">مكتبة القصص <span class="count" id="storyCount"></span></h2>
     <p class="muted">اضغط أي قصة لمعاينتها بأسماء أطفالك.</p>
     <input class="search" id="storySearch" placeholder="🔍 ابحث باسم القصة أو القيمة" oninput="App.filterStories()">
     <div class="chips libchips" id="libChips"></div>
@@ -1004,24 +1056,26 @@ body.hasnow{padding-top:46px}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=4.1"></script>
-<script src="sync.js?v=4.1"></script>
-<script src="art.js?v=4.1"></script>
-<script src="stories.js?v=4.1"></script>
-<script src="stories-2.js?v=4.1"></script>
-<script src="stories-3.js?v=4.1"></script>
-<script src="stories-4.js?v=4.1"></script>
-<script src="stories-5.js?v=4.1"></script>
-<script src="stories-6.js?v=4.1"></script>
-<script src="young.js?v=4.1"></script>
-<script src="play.js?v=4.1"></script>
-<script src="english-2.js?v=4.1"></script>
-<script src="english.js?v=4.1"></script>
-<script src="english-3.js?v=4.1"></script>
-<script src="space.js?v=4.1"></script>
-<script src="night.js?v=4.1"></script>
-<script src="honors.js?v=4.1"></script>
-<script src="app.js?v=4.1"></script>
-<script src="wamd-stats.js?v=4.1" data-app="siraj"></script>
+<script src="config.js?v=4.2"></script>
+<script src="sync.js?v=4.2"></script>
+<script src="art.js?v=4.2"></script>
+<script src="stories.js?v=4.2"></script>
+<script src="stories-2.js?v=4.2"></script>
+<script src="stories-3.js?v=4.2"></script>
+<script src="stories-4.js?v=4.2"></script>
+<script src="stories-5.js?v=4.2"></script>
+<script src="stories-6.js?v=4.2"></script>
+<script src="young.js?v=4.2"></script>
+<script src="play.js?v=4.2"></script>
+<script src="english-2.js?v=4.2"></script>
+<script src="english.js?v=4.2"></script>
+<script src="english-3.js?v=4.2"></script>
+<script src="space.js?v=4.2"></script>
+<script src="night.js?v=4.2"></script>
+<script src="honors.js?v=4.2"></script>
+<script src="trips-data.js?v=4.2"></script>
+<script src="trips.js?v=4.2"></script>
+<script src="app.js?v=4.2"></script>
+<script src="wamd-stats.js?v=4.2" data-app="siraj"></script>
 </body>
 </html>
