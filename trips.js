@@ -27,11 +27,13 @@ const Trips = (() => {
   };
   function options(cn) {
     const inf = COUNTRY_INFO[cn.c];
-    const gen = [['جولة في العاصمة ' + cn.cap, cn.sc === 'sea' ? 'sea' : 'road', '🏙️'], ['نتمشى في الطبيعة', cn.sc === 'desert' ? 'desert' : cn.sc === 'sea' ? 'sea' : 'garden', cn.sc === 'sea' ? '🏖️' : '🌳'],
-      ['نزور المتحف الوطني', 'road', '🏛️'], ['نتسوّق من السوق الشعبي', 'souq', '🛍️'], ['نجرّب أكل البلد', 'market', '🍽️']];
-    if (!inf) return gen;
-    return [...inf.sights, ['نجرّب ' + inf.food, 'market', '🍽️'], gen[3]];
+    const nat = cn.sc === 'desert' ? ['رحلة في الصحراء', 'desert', '🐪'] : cn.sc === 'sea' ? ['يوم على الشاطئ', 'sea', '🏖️'] : cn.sc === 'mountain' ? ['نطلع الجبال', 'mountain', '⛰️'] : ['نتمشى في الطبيعة', 'garden', '🌳'];
+    const gen = [['جولة في العاصمة ' + cn.cap, cn.sc === 'sea' ? 'sea' : 'road', '🏙️'], nat, ['نزور المتحف الوطني', 'road', '🏛️'], ['نتسوّق من السوق الشعبي', 'souq', '🛍️'],
+      ['نصلي في أكبر مساجد البلد', 'mosque', '🕌'], ['نلعب في حديقة ألعاب', 'park', '🎢'], ['نزور حديقة الحيوان', 'garden', '🦁']];
+    const food = ['نجرّب ' + (inf ? inf.food : 'أكل البلد'), 'market', '🍽️'];
+    return inf ? [...inf.sights, food, ...gen.slice(1)] : [gen[0], food, ...gen.slice(1)];
   }
+  const REST = ['يوم راحة في الفندق والمسبح', 'home', '🏨'];
 
   /* ---------- الصفحة الرئيسية للرحلات ---------- */
   function render() {
@@ -151,15 +153,20 @@ const Trips = (() => {
   function stepDay() {
     const cn = byCode(T.c), used = T.picks.map((p) => p[0]);
     let ops = options(cn).filter((o) => !used.includes(o[0])); if (!ops.length) ops = options(cn);
-    open(`<h2>☀️ اليوم ${DAYN[T.d]} في ${cn.n}</h2><p class="muted">وش نسوي اليوم؟</p>
-      <div class="trops">${ops.map((o) => `<button onclick="Trips.doAct('${options(cn).indexOf(o)}')"><span>${o[2]}</span><b>${o[0]}</b></button>`).join('')}</div>`);
+    T.ops = [...ops.slice(0, 6), REST];
+    open(`<h2>☀️ اليوم ${DAYN[T.d]} في ${cn.n}</h2><p class="muted">وش نسوي اليوم؟ (باقي ${AR(T.days - T.d + 1)} ${T.days - T.d + 1 === 1 ? 'يوم' : 'أيام'})</p>
+      <div class="trops">${T.ops.map((o, i) => `<button class="${o === REST ? 'rest' : ''}" onclick="Trips.doAct(${i})"><span>${o[2]}</span><b>${o[0]}</b></button>`).join('')}</div>
+      ${T.d > 1 ? '<button class="btn alt" onclick="Trips.early()">🛬 نرجع الرياض الحين</button>' : ''}`);
   }
+  function early() { if (!T) return; T.days = T.picks.length; go(6); }
   function doAct(i) {
-    const cn = byCode(T.c), o = options(cn)[+i], tr = travelers(), c = C(), last = T.d >= T.days;
-    T.picks.push(o);
+    if (!T || !T.ops || !T.ops[i]) return;
+    const cn = byCode(T.c), o = T.ops[i], tr = travelers(), c = C(), last = T.d >= T.days;
+    T.ops = null; T.picks.push(o);
     open(`<div class="postcard"><div class="pcart">${ART.page(o[1], o[2], heroesOf(tr), 'idle')}<span class="pcstamp">${flagOf(T.c)}</span></div>
       <p><b>اليوم ${DAYN[T.d]}:</b> ${o[0]} ${o[2]}</p><small>${tr.map((p) => c.esc(p.n)).join(' و')} · ${cn.n}</small></div>
-      <button class="btn" onclick="${last ? 'Trips.go(6)' : 'Trips.nextDay()'}">${last ? 'نرجع الرياض 🛬🇸🇦' : 'اليوم ' + DAYN[T.d + 1] + ' ☀️'}</button>`);
+      <button class="btn" onclick="${last ? 'Trips.go(6)' : 'Trips.nextDay()'}">${last ? 'نرجع الرياض 🛬🇸🇦' : 'اليوم ' + DAYN[T.d + 1] + ' ☀️'}</button>
+      ${last ? '' : '<button class="btn alt" style="margin-top:10px" onclick="Trips.early()">🛬 نرجع الرياض الحين</button>'}`);
   }
   function nextDay() { T.d++; go(5); }
   function stepHome() {
@@ -231,5 +238,5 @@ const Trips = (() => {
       <div class="row"><button class="btn" onclick="Trips.game('${G.kind}')">مرة ثانية 🔁</button><button class="btn alt" onclick="Trips.game('${G.kind === 'flag' ? 'cap' : 'flag'}')">${G.kind === 'flag' ? '🏛️ العواصم' : '🚩 الأعلام'}</button></div>`);
   }
 
-  return { render, start, toggle, go, addPerson, setType, savePerson, delPerson, search, setRegion, pick, setDays, fly, doAct, nextDay, album, passport, game, ans, allTrips };
+  return { render, start, toggle, go, addPerson, setType, savePerson, delPerson, search, setRegion, pick, setDays, fly, doAct, nextDay, early, album, passport, game, ans, allTrips };
 })();
