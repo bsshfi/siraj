@@ -1034,7 +1034,7 @@ const App = (() => {
     $('libChips').innerHTML = LIB_FILTERS.map(([t, f]) => `<button class="chip ${f === libFilter ? 'on' : ''}" onclick="App.setLibFilter('${f}')">${t}</button>`).join('');
     const q = ($('storySearch').value || '').trim();
     const hero = S.fam.kids.length ? [S.fam.kids[0]] : [{ name: 'البطل', g: 'm', av: {} }];
-    const all = STORIES.filter((s) => (!q || s.title.includes(q) || s.value.includes(q) || catOf(s)[2].includes(q)) &&
+    const all = STORIES.filter((s) => !s.hidden && (!q || s.title.includes(q) || s.value.includes(q) || catOf(s)[2].includes(q)) &&
       (!libFilter || catOf(s)[0] === libFilter));
     const read = new Set(allLogs().map((e) => e.s));
     $('allStories').innerHTML = all.slice(0, libShown).map((s) => `<button class="sitem" onclick="App.preview('${s.id}')">
