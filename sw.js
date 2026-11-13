@@ -1,8 +1,8 @@
 /* سِراج | SIRAJ — يشغّل التطبيق بدون إنترنت، ويحدّثه تلقائيًا، ويعرض الإشعارات
    مع كل تحديث: غيّر CACHE هنا و VERSION في config.js و ?v= في index.html */
 importScripts('config.js');
-const CACHE = 'siraj-v4.2.2';
-const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'stories-4.js', 'stories-5.js', 'stories-6.js', 'extra.js', 'young.js', 'play.js', 'english-2.js', 'english.js', 'english-3.js', 'space.js', 'night.js', 'honors.js', 'trips-data.js', 'trips.js', 'manifest.webmanifest', 'wamd-stats.js', 'wamd-cfg.js',
+const CACHE = 'siraj-v4.3';
+const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'stories-4.js', 'stories-5.js', 'stories-6.js', 'extra.js', 'young.js', 'play.js', 'english-2.js', 'english.js', 'english-3.js', 'space.js', 'night.js', 'honors.js', 'trips-data.js', 'trips.js', 'about.js', 'privacy.html', 'wamdarc-light.png', 'wamdarc-dark.png', 'manifest.webmanifest', 'wamd-stats.js', 'wamd-cfg.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
