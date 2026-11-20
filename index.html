@@ -783,6 +783,36 @@ body.nt .bnav,body.nt[data-pal] .bnav{--nb:#262A5A;box-shadow:0 12px 28px rgba(0
 .vrow{display:flex;direction:rtl;flex-direction:row;align-items:center;gap:10px;background:#F6F3FF;border-radius:18px;padding:8px 10px;border:3px solid transparent}.vrow.on{border-color:var(--orange);background:#FFF1E6}
 .vrow b{flex:1;text-align:right;font-size:17px}.vrow .btn{width:auto;padding:9px 16px;font-size:15px;margin:0}
 .vplay{width:46px;height:46px;border-radius:50%;background:#fff;font-size:20px;box-shadow:0 3px 8px rgba(43,35,80,.12);flex:none}
+
+/* v4.6 رأس مرتب: الاسم يمين، القمر يسار، وتحتها حبتين (اليوم والتاريخ / الفصل) مثل سهم ونبض */
+.hx{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 2px 14px}
+.hxb{flex:1;min-width:0}
+.hxb h1{margin:0;font-size:42px;font-weight:800;line-height:1.05;color:var(--ink);display:flex;align-items:center;gap:10px}
+.hxb h1 img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.14)}
+.hxb small{display:block;margin-top:6px;color:#4B5470;font-size:15px;font-weight:600}
+.hxm{position:relative;flex:none;display:flex;align-items:flex-start;gap:6px}
+.moonx{width:92px;height:92px;border-radius:50%;padding:0;background:radial-gradient(circle,rgba(255,236,170,.55),rgba(255,236,170,0) 68%);position:relative;overflow:visible}
+.moonx .mn{position:absolute;inset:8px;animation:moonpulse 6s ease-in-out infinite}
+.moonx .mn svg{width:76px;height:76px;display:block;filter:drop-shadow(0 0 12px #FFE9A8aa)}
+.moonx .spk{position:absolute;width:12px;height:12px;animation:spk 2.6s ease-in-out infinite}.moonx .spk svg{width:100%;height:100%}
+.moonx .cld{display:none}
+.moonx .sat{position:absolute;left:-8px;bottom:0;width:38px;animation:satb 5s ease-in-out infinite}.moonx .sat svg{width:38px;height:auto}
+.hxgear{order:2;margin-top:4px;width:36px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.95);color:#4B5470;box-shadow:0 4px 12px rgba(58,90,138,.16);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hxgear svg{width:18px;height:18px}
+.hpills{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.hpill{display:flex;align-items:center;justify-content:center;gap:7px;height:48px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.95);box-shadow:0 6px 16px rgba(58,90,138,.12);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);white-space:nowrap;min-width:0}
+.hpill b{font-size:16px;font-weight:800;color:var(--ink)}.hpill small{font-size:14px;font-weight:700;color:#6B7290;direction:ltr}.hpi{font-size:18px}
+.hpill .season,.hpill #season.season{all:unset;display:inline-flex;align-items:center;gap:7px;font-size:16px;font-weight:800;color:var(--ink)!important;flex-direction:row-reverse}
+.hpill .season em,.hpill #season.season em{position:static!important;transform:none!important;font-style:normal;font-size:19px;filter:none}
+.modebar{background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.95);border-radius:18px;padding:4px;margin:0 0 4px;box-shadow:0 6px 16px rgba(58,90,138,.1)}
+.modebar button{color:#5A6180;font-size:15px;padding:10px 8px;border-radius:14px}
+.modebar button.on{background:linear-gradient(180deg,var(--or2),var(--orange));color:#fff;box-shadow:0 4px 10px #F2851E44}
+.modehint{color:#6B7290;font-size:12.5px;margin:4px 0 10px}
+body.nt .hxb h1,body.nt .hpill b,body.nt .hpill .season,body.nt .hpill #season.season{color:#F4F1FF!important}
+body.nt .hxb small,body.nt .hpill small,body.nt .modehint{color:#C9C4E8}
+body.nt .hpill,body.nt .hxgear,body.nt .modebar{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);color:#D9D5F2}
+body.nt .modebar button{color:#C9C4E8}
+@media (max-width:390px){.hxb h1{font-size:36px}.hxb h1 img{width:28px;height:28px}.moonx{width:80px;height:80px}.moonx .mn svg{width:64px;height:64px}.hpill b,.hpill .season{font-size:15px}}
 </style>
 </head>
 <body>
@@ -852,10 +882,12 @@ body.nt .bnav,body.nt[data-pal] .bnav{--nb:#262A5A;box-shadow:0 12px 28px rgba(0
 
 <!-- الرئيسية -->
 <section id="home" class="screen">
-  <header class="hd3">
-    <div class="brand3"><b>سِراج <img src="icons/icon-192.png" alt=""><button class="hgear" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></b><small id="hello">حكاية الليلة</small></div>
-    <div class="hd3l"><div class="clock"><b id="clk"></b><small id="dt"></small><span id="season" class="season"></span></div><button class="moonbtn" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button></div>
+  <header class="hx">
+    <div class="hxb"><h1>سِراج <img src="icons/icon-192.png" alt=""></h1><small id="hello">حكاية الليلة</small></div>
+    <div class="hxm"><button class="moonx" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button>
+      <button class="hxgear" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
   </header>
+  <div class="hpills"><div class="hpill"><span class="hpi">📅</span><b id="clk"></b><small id="dt"></small></div><div class="hpill"><span id="season" class="season"></span></div></div>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
     <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
   <div class="modebar" id="modeBar" style="display:none"></div>
@@ -1096,29 +1128,29 @@ body.nt .bnav,body.nt[data-pal] .bnav{--nb:#262A5A;box-shadow:0 12px 28px rgba(0
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=4.5"></script>
-<script src="sync.js?v=4.5"></script>
-<script src="art.js?v=4.5"></script>
-<script src="stories.js?v=4.5"></script>
-<script src="stories-2.js?v=4.5"></script>
-<script src="stories-3.js?v=4.5"></script>
-<script src="stories-4.js?v=4.5"></script>
-<script src="stories-5.js?v=4.5"></script>
-<script src="stories-6.js?v=4.5"></script>
-<script src="extra.js?v=4.5"></script>
-<script src="young.js?v=4.5"></script>
-<script src="play.js?v=4.5"></script>
-<script src="english-2.js?v=4.5"></script>
-<script src="english.js?v=4.5"></script>
-<script src="english-3.js?v=4.5"></script>
-<script src="space.js?v=4.5"></script>
-<script src="night.js?v=4.5"></script>
-<script src="honors.js?v=4.5"></script>
-<script src="trips-data.js?v=4.5"></script>
-<script src="trips.js?v=4.5"></script>
-<script src="about.js?v=4.5"></script>
-<script src="app.js?v=4.5"></script>
-<script src="wamd-stats.js?v=4.5" data-app="siraj"></script>
-<script src="wamd-cfg.js?v=4.5" data-app="siraj" defer></script>
+<script src="config.js?v=4.6"></script>
+<script src="sync.js?v=4.6"></script>
+<script src="art.js?v=4.6"></script>
+<script src="stories.js?v=4.6"></script>
+<script src="stories-2.js?v=4.6"></script>
+<script src="stories-3.js?v=4.6"></script>
+<script src="stories-4.js?v=4.6"></script>
+<script src="stories-5.js?v=4.6"></script>
+<script src="stories-6.js?v=4.6"></script>
+<script src="extra.js?v=4.6"></script>
+<script src="young.js?v=4.6"></script>
+<script src="play.js?v=4.6"></script>
+<script src="english-2.js?v=4.6"></script>
+<script src="english.js?v=4.6"></script>
+<script src="english-3.js?v=4.6"></script>
+<script src="space.js?v=4.6"></script>
+<script src="night.js?v=4.6"></script>
+<script src="honors.js?v=4.6"></script>
+<script src="trips-data.js?v=4.6"></script>
+<script src="trips.js?v=4.6"></script>
+<script src="about.js?v=4.6"></script>
+<script src="app.js?v=4.6"></script>
+<script src="wamd-stats.js?v=4.6" data-app="siraj"></script>
+<script src="wamd-cfg.js?v=4.6" data-app="siraj" defer></script>
 </body>
 </html>
