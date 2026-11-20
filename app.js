@@ -791,7 +791,8 @@ const App = (() => {
     R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec), hist: [], lvl: storyLevel(hs) };
     const rs = S.resume; if (rs && rs.id === id && Date.now() - rs.at < 12 * 36e5 && rs.i > 0) { R.i = rs.i; R.hist = rs.hist || []; }
     R.short = R.lvl === 1 && canShort(st); R.total = readerPages().length + 2;
-    show('reader'); renderPage();
+    show('reader');
+    if (S.voice && !kidVoice() && voiceOpts().length) { renderPage(true); voicePick(() => renderPage()); } else renderPage();
   }
   function recKey() { return R.st.id + ':' + R.i; }
   function recChanged() { if (R) renderRecBar(); }
@@ -814,7 +815,7 @@ const App = (() => {
     R.rec = !R.rec; if (!R.rec) Play.stopRec();
     toast(R.rec ? 'وضع التسجيل: اقرأ كل صفحة بصوتك 🎙️' : 'انتهى وضع التسجيل'); renderRecBar();
   }
-  function renderPage() {
+  function renderPage(quiet) {
     const { st, hs, i, total } = R, PG = readerPages();
     // «كمّل من وين وقفت»: نحفظ مكانه في القصة
     try { if (i > 0 && i < st.pages.length) S.resume = { id: st.id, i, hist: R.hist, at: Date.now() }; else if (i >= st.pages.length && S.resume && S.resume.id === st.id) S.resume = null; save(); } catch (e) {}
@@ -852,7 +853,7 @@ const App = (() => {
       }
     }
     $('stage').innerHTML = html; $('nav').innerHTML = nav;
-    speak(say, false, $('ptext'));
+    if (quiet !== true) speak(say, false, $('ptext'));
   }
   // في جوال وليّ الأمر: «معاينة» ما تنحسب، و«أقرأ مع العيال» تنحسب
   function counts() { return S.role !== 'parent' || S.parentMode === 'kids'; }
@@ -895,10 +896,43 @@ const App = (() => {
   }
 
   /* ---------- القراءة بالصوت (أصوات الجهاز نفسه) ---------- */
-  function arVoice() {
-    if (!('speechSynthesis' in window)) return null;
-    const v = speechSynthesis.getVoices();
-    return v.find((x) => /^ar[-_]SA/i.test(x.lang)) || v.find((x) => /^ar/i.test(x.lang));
+  function arVoices() {
+    if (!('speechSynthesis' in window)) return [];
+    const v = speechSynthesis.getVoices().filter((x) => /^ar/i.test(x.lang)), seen = new Set();
+    return v.sort((a, b) => (/^ar[-_]SA/i.test(b.lang) ? 1 : 0) - (/^ar[-_]SA/i.test(a.lang) ? 1 : 0)).filter((x) => !seen.has(x.name) && seen.add(x.name));
+  }
+  function arVoice() { return arVoices()[0] || null; }
+  /* الطفل يختار صوت القارئ من أصوات جهازه هو، ويتحفظ له */
+  const MAL = /majed|maged|tarik|naayf|hamed|fahed|shakir|\bmale/i;
+  const FEM = /laila|layla|hoda|salma|zariyah|amira|mariam|maryam|nora|noura|sara|female|woman|ليلى|سلمى|نورة/i;
+  function voiceOpts() {
+    const vs = arVoices().slice(0, 4); if (!vs.length) return [];
+    vs.sort((a, b) => (FEM.test(b.name) ? 1 : 0) - (FEM.test(a.name) ? 1 : 0));
+    const ic = ['🌸', '⭐', '🎈', '🦋'], nth = ['الأول', 'الثاني', 'الثالث', 'الرابع'];
+    const o = vs.map((v, i) => ({ n: v.name, p: 1, r: .85, t: FEM.test(v.name) ? 'صوت امرأة' : MAL.test(v.name) ? 'صوت رجل' : 'الصوت ' + nth[i], e: FEM.test(v.name) ? '👩' : MAL.test(v.name) ? '👨' : ic[i] }));
+    const seenT = {}; o.forEach((x) => { seenT[x.t] = (seenT[x.t] || 0) + 1; if (seenT[x.t] > 1) x.t += ' ' + ['', '', '٢', '٣', '٤'][seenT[x.t]]; });
+    o.push({ n: vs[0].name, p: 1.35, r: .85, t: 'صوت ناعم', e: '🧁' }, { n: vs[0].name, p: 1.12, r: .7, t: 'صوت هادي للنوم', e: '🌙' });
+    return o;
+  }
+  const kidVoice = () => { const k = (R && R.hs[0]) || heroes()[0]; return k && (S.kv || {})[k.id]; };
+  function voicePick(then) {
+    const o = voiceOpts(), k = (R && R.hs[0]) || heroes()[0], cur = kidVoice();
+    if (!o.length) { if (then) then(); return; }
+    voicePick.then = then;
+    $('gameBody').innerHTML = `<div class="vpick"><div class="vbig">🗣️</div><h2>بأي صوت تبي القصة${k ? ' يا ' + esc(k.name) : ''}؟</h2><p class="muted">اضغط ▶️ وتسمع الصوت، وبعدين اختار اللي يعجبك</p>
+      <div class="vlist">${o.map((x, i) => `<div class="vrow ${cur && cur.n === x.n && cur.p === x.p && cur.r === x.r ? 'on' : ''}"><button class="vplay" onclick="App.voiceTry(${i})" aria-label="جرّب">▶️</button><b>${x.e} ${x.t}</b><button class="btn" onclick="App.voiceSet(${i})">اختار</button></div>`).join('')}</div>
+      <p class="muted" style="font-size:12.5px">تقدر تغيّره بعدين من زر 🗣️ فوق القصة</p></div>`;
+    $('gameModal').classList.add('on');
+  }
+  function voiceTry(i) {
+    const x = voiceOpts()[i], k = (R && R.hs[0]) || heroes()[0]; if (!x) return;
+    speak((k ? 'هلا ' + k.name + '! ' : 'هلا! ') + 'أنا بقرأ لك قصة الليلة.', true, null, x);
+  }
+  function voiceSet(i) {
+    const x = voiceOpts()[i], k = (R && R.hs[0]) || heroes()[0]; if (!x) return;
+    if (k) { S.kv = { ...(S.kv || {}), [k.id]: { n: x.n, p: x.p, r: x.r } }; save(); }
+    stopSpeak(); Play.closeGame(); toast('تم ✓ ' + x.t);
+    const t = voicePick.then; voicePick.then = null; if (t) t(); else if (R) renderPage();
   }
   /* شريط «يشتغل الآن» مثل الواتساب: يطلع فوق في كل مكان، فيه الوقت وزر إيقاف */
   const Now = (() => {
@@ -926,12 +960,12 @@ const App = (() => {
 
   /* القراءة بصوت + تلوين الكلمة اللي تنقرأ (إذا الجهاز يدعم، وإلا تقدير بالوقت) */
   let kTimer = null;
-  function speak(text, force, wordsEl) {
+  function speak(text, force, wordsEl, pref) {
     stopSpeak();
     if ((!S.voice && !force) || !('speechSynthesis' in window)) return;
     const u = new SpeechSynthesisUtterance(text.replace(/[«»]/g, ' '));
-    const v = arVoice(); if (v) u.voice = v;
-    u.lang = v ? v.lang : 'ar-SA'; u.rate = .85; u.pitch = 1.05;
+    const kp = pref || kidVoice(), v = (kp && arVoices().find((x) => x.name === kp.n)) || arVoice(); if (v) u.voice = v;
+    u.lang = v ? v.lang : 'ar-SA'; u.rate = kp && v && v.name === kp.n ? kp.r : .85; u.pitch = kp && v && v.name === kp.n ? kp.p : 1.05;
     if (wordsEl) {
       const ws = [...wordsEl.querySelectorAll('.w')], base = text.indexOf(wordsEl.dataset.t || ''), starts = [];
       let pos = 0; ws.forEach((w) => { const i = text.indexOf(w.textContent, base + pos); starts.push(i); pos = i - base + w.textContent.length; });
@@ -1249,7 +1283,7 @@ const App = (() => {
   return {
     ctx, family, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, toggleFull, setShortKids, isNight, isLocked,
     init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
-    openStory, step, closeReader, wake, toggleFav, toggleVoice, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
+    openStory, step, closeReader, wake, toggleFav, toggleVoice, voicePick: () => voicePick(), voiceTry, voiceSet, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
     tour, goSet, now: Now, stopAllSound, choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
   };
 })();
