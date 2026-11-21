@@ -899,6 +899,23 @@ body.nt .bnav button{color:#C9C4E8!important}
 .pincancel{margin-top:10px;background:none;border:0;color:#7A4BE0;font-weight:800;font-size:16px;padding:10px}
 body.nt .pincard{background:linear-gradient(180deg,#2A2F66,#1F2454)!important}body.nt .pincard h2{color:#F4F1FF}
 body.nt .pad button{background:#353B7A!important;color:#fff!important;box-shadow:none}
+
+/* v5.1.1 تنعيم: الغيوم تذوب بدون خط، حبوب ومعاينة أصغر، رأس وشرائح الإعدادات */
+.skyfx{overflow:visible;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+.skycl{bottom:40px;opacity:.75}
+.hpills{gap:8px}
+.hpill{height:44px;padding:0 10px;gap:6px}.hpill b,.hpill .season,.hpill #season.season{font-size:15px!important}.hpill small{font-size:13.5px}
+.hpi,.hpill .season em{width:24px!important;height:24px!important}.hpi svg,.hpill .season em svg{width:24px!important;height:24px!important}
+.modebar{background:#fff!important;padding:3px!important;border-radius:16px!important;max-width:100%;box-shadow:0 6px 16px rgba(58,90,138,.12)!important}
+.modebar button{padding:7px 8px!important;font-size:14px!important;border-radius:13px!important;gap:6px!important}
+.mbi,.mbi svg{width:19px!important;height:19px!important}
+.modehint{font-size:12px!important;margin:3px 0 8px!important}
+body.nt .modebar{background:rgba(255,255,255,.1)!important}
+.pghead{display:flex;align-items:center;gap:10px;margin:0;font-size:30px;font-weight:800;color:#2E2A6B}.pghead i{display:inline-block;width:34px;height:34px}.pghead i svg{width:34px;height:34px}
+body.nt .pghead{color:#F4F1FF}
+.setnav{background:transparent!important;padding:6px 2px!important;margin:0 -2px 8px!important;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);padding-inline:14px!important}
+.setnav button{padding:7px 12px!important;font-size:13px!important;border:0!important;box-shadow:0 3px 10px rgba(58,90,138,.12)}
+.subnav button{padding:8px 8px!important;font-size:14px!important;border-radius:14px!important}.subnav i{width:20px!important;height:20px!important}
 </style>
 </head>
 <body>
@@ -1036,7 +1053,7 @@ body.nt .pad button{background:#353B7A!important;color:#fff!important;box-shadow
 <!-- الإعدادات -->
 <section id="settings" class="screen">
   <div class="top">
-    <div class="brand">⚙️ الإعدادات</div>
+    <h1 class="pghead"><i data-ic="gear"></i>الإعدادات</h1>
     <button class="iconbtn" onclick="App.show('home')" aria-label="رجوع">→</button>
   </div>
   <div class="setnav"><button onclick="App.goSet('sFam')">👨‍👩‍👧 العائلة</button><button onclick="App.goSet('sKids')">🧒 الأطفال</button><button onclick="App.goSet('sNight')">📚 القصص والنوم</button><button onclick="App.goSet('sMsg')">💌 الرسائل والمكافأة</button><button onclick="App.goSet('sLook')">🎨 المظهر</button><button onclick="App.goSet('sNotif')">🔔 الإشعارات</button><button onclick="App.goSet('sApp')">ℹ️ عن سِراج</button></div>
@@ -1215,32 +1232,32 @@ body.nt .pad button{background:#353B7A!important;color:#fff!important;box-shadow
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=5.1"></script>
-<script src="sync.js?v=5.1"></script>
-<script src="art.js?v=5.1"></script>
-<script src="stories.js?v=5.1"></script>
-<script src="stories-2.js?v=5.1"></script>
-<script src="stories-3.js?v=5.1"></script>
-<script src="stories-4.js?v=5.1"></script>
-<script src="stories-5.js?v=5.1"></script>
-<script src="stories-6.js?v=5.1"></script>
-<script src="stories-7.js?v=5.1"></script>
-<script src="extra.js?v=5.1"></script>
-<script src="young.js?v=5.1"></script>
-<script src="play.js?v=5.1"></script>
-<script src="english-2.js?v=5.1"></script>
-<script src="english.js?v=5.1"></script>
-<script src="english-3.js?v=5.1"></script>
-<script src="space.js?v=5.1"></script>
-<script src="night.js?v=5.1"></script>
-<script src="honors.js?v=5.1"></script>
-<script src="stickers.js?v=5.1"></script>
-<script src="room.js?v=5.1"></script>
-<script src="trips-data.js?v=5.1"></script>
-<script src="trips.js?v=5.1"></script>
-<script src="about.js?v=5.1"></script>
-<script src="app.js?v=5.1"></script>
-<script src="wamd-stats.js?v=5.1" data-app="siraj"></script>
-<script src="wamd-cfg.js?v=5.1" data-app="siraj" defer></script>
+<script src="config.js?v=5.1.1"></script>
+<script src="sync.js?v=5.1.1"></script>
+<script src="art.js?v=5.1.1"></script>
+<script src="stories.js?v=5.1.1"></script>
+<script src="stories-2.js?v=5.1.1"></script>
+<script src="stories-3.js?v=5.1.1"></script>
+<script src="stories-4.js?v=5.1.1"></script>
+<script src="stories-5.js?v=5.1.1"></script>
+<script src="stories-6.js?v=5.1.1"></script>
+<script src="stories-7.js?v=5.1.1"></script>
+<script src="extra.js?v=5.1.1"></script>
+<script src="young.js?v=5.1.1"></script>
+<script src="play.js?v=5.1.1"></script>
+<script src="english-2.js?v=5.1.1"></script>
+<script src="english.js?v=5.1.1"></script>
+<script src="english-3.js?v=5.1.1"></script>
+<script src="space.js?v=5.1.1"></script>
+<script src="night.js?v=5.1.1"></script>
+<script src="honors.js?v=5.1.1"></script>
+<script src="stickers.js?v=5.1.1"></script>
+<script src="room.js?v=5.1.1"></script>
+<script src="trips-data.js?v=5.1.1"></script>
+<script src="trips.js?v=5.1.1"></script>
+<script src="about.js?v=5.1.1"></script>
+<script src="app.js?v=5.1.1"></script>
+<script src="wamd-stats.js?v=5.1.1" data-app="siraj"></script>
+<script src="wamd-cfg.js?v=5.1.1" data-app="siraj" defer></script>
 </body>
 </html>
