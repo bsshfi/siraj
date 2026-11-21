@@ -45,9 +45,9 @@ const Trips = (() => {
       <p>${parent ? 'هنا كل الرحلات اللي سافرها العيال مع العائلة 🌍' : 'اختر مين يسافر معك، وين تروحون، وكم يوم… ويلا! 🌍'}</p>
       <small>🛫 كل الرحلات تطلع من مطار الملك خالد الدولي بالرياض</small>
       <button class="btn" onclick="Trips.start()">✈️ رحلة جديدة</button></div>
-      <div class="trstats"><button class="card" onclick="Trips.passport()"><span>📕</span><b>${AR(visited.length)}</b><small>جوازي · ختم</small></button>
-        <button class="card" onclick="Trips.game('flag')"><span>🚩</span><b>الأعلام</b><small>لعبة</small></button>
-        <button class="card" onclick="Trips.game('cap')"><span>🏛️</span><b>العواصم</b><small>لعبة</small></button></div>
+      <div class="trstats"><button class="card" onclick="Trips.passport()"><span>${Stk.icon('passport')}</span><b>${AR(visited.length)}</b><small>جوازي · ختم</small></button>
+        <button class="card" onclick="Trips.game('flag')"><span>${Stk.icon('flag')}</span><b>الأعلام</b><small>لعبة</small></button>
+        <button class="card" onclick="Trips.game('cap')"><span>${Stk.icon('landmark')}</span><b>العواصم</b><small>لعبة</small></button></div>
       <div class="card"><h3>🧳 ${parent ? 'سجل رحلات العيال' : 'رحلاتي'} <small>${AR(list.length)} رحلة</small></h3>
       ${list.length ? `<div class="trlog">${list.slice(0, 40).map((t) => tripRow(t)).join('')}</div>` : '<p class="muted" style="text-align:center">ما فيه رحلات للحين… أول رحلة وين بتكون؟ 🤔</p>'}</div>`;
   }

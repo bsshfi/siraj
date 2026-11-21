@@ -505,7 +505,8 @@ const App = (() => {
     const d = new Date(); if (!$('clk')) return;
     $('clk').textContent = d.toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long' });
     $('dt').textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-    const se = season(d); $('season').innerHTML = se[0] + '<em>' + se[2] + '</em>'; $('season').className = 'season ' + se[1];
+    const se = season(d); $('season').innerHTML = se[0] + '<em>' + (typeof Stk !== 'undefined' ? Stk.icon(se[1]) : se[2]) + '</em>';
+    if ($('hpCal') && typeof Stk !== 'undefined') $('hpCal').innerHTML = Stk.icon('cal', d.getDate()); $('season').className = 'season ' + se[1];
     const ap = appPrefs(); document.body.dataset.pal = ap.pal;
     const th = ap.theme;
     document.body.classList.toggle('nt', th === 'dark' || (th === 'auto' && isNight()));
@@ -521,6 +522,7 @@ const App = (() => {
     const spk = [[4, 4, 0, 16], [74, -2, -.8, 18], [82, 40, -1.6, 12], [62, 76, -2.2, 11], [-2, 52, -1.1, 11]]
       .map(([l, t, dl, w]) => `<i class="spk" style="left:${l}%;top:${t}%;width:${w}px;height:${w}px;animation-delay:${dl}s">${star}</i>`).join('');
     const cld = '<svg class="cld" viewBox="0 0 150 44" preserveAspectRatio="none"><g fill="#fff" opacity=".9"><ellipse cx="30" cy="32" rx="30" ry="12"/><ellipse cx="58" cy="26" rx="24" ry="14"/><ellipse cx="92" cy="32" rx="30" ry="11"/><ellipse cx="124" cy="34" rx="24" ry="9"/></g></svg>';
+    if (typeof Stk !== 'undefined') return Stk.moonReader();
     return `<i class="mn">${Space.moonSVG(Space.moonAge(), 108, true)}</i>${cld}${spk}<i class="sat">${Space.planetSVG(5, 58)}</i>`;
   }
   /* المظهر: جهاز الطفل ياخذ اللون اللي اختاره وليّ الأمر للطفل، وجهاز وليّ الأمر له اختياره */
@@ -554,7 +556,8 @@ const App = (() => {
   }
   function renderTop(ks) {
     tickClock();
-    if (typeof Space !== 'undefined') $('moonBtn').innerHTML = moonDeco();
+    if (typeof Space !== 'undefined' || typeof Stk !== 'undefined') $('moonBtn').innerHTML = moonDeco();
+    if (typeof Stk !== 'undefined' && !$('skyfx')) { $('home').insertAdjacentHTML('afterbegin', Stk.skyfx()); $('home').firstElementChild.id = 'skyfx'; }
     const k = ks[0], x = k ? kidNights(k) : { month: 0, streak: 0 };
     $('chStars').innerHTML = `⭐ <em>${AR(x.month)}</em> ${x.month === 1 ? 'نجمة' : 'نجوم'} هالشهر`;
     $('chStreak').innerHTML = `🔥 <em>${AR(x.streak)}</em> ${x.streak === 1 ? 'ليلة' : 'ليالٍ'} متتالية`;
@@ -724,7 +727,7 @@ const App = (() => {
         const t = new Date(e.t);
         return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
       }).join('');
-      el.innerHTML = `<div class="pgrid"><button class="card" onclick="App.askPin(App.openSettings)"><span>⚙️</span>الإعدادات</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sMsg')})"><span>💌</span>رسالة للعيال</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sRw')})"><span>🎁</span>المكافأة</button><button class="card" onclick="App.refreshAll()"><span>🔄</span>حدّث أجهزتهم</button></div>` + (typeof Trips !== 'undefined' ? `<button class="card rpbtn" onclick="App.tab('trips')"><span>✈️</span><div><b>رحلات العيال</b><small>${AR(Trips.allTrips().length)} رحلة حول العالم · شوف وين سافروا</small></div><em>←</em></button>` : '') + familyStrip('parent') + (typeof Honors !== 'undefined' ? Honors.reportBtn() + Honors.board() : '') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
+      el.innerHTML = `<div class="pgrid"><button class="card" onclick="App.askPin(App.openSettings)"><span>${typeof Stk !== 'undefined' ? Stk.icon('gear') : ''}</span>الإعدادات</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sMsg')})"><span>${typeof Stk !== 'undefined' ? Stk.icon('letter') : ''}</span>رسالة للعيال</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sRw')})"><span>${typeof Stk !== 'undefined' ? Stk.icon('gift') : ''}</span>المكافأة</button><button class="card" onclick="App.refreshAll()"><span>${typeof Stk !== 'undefined' ? Stk.icon('refresh') : ''}</span>حدّث أجهزتهم</button></div>` + (typeof Trips !== 'undefined' ? `<button class="card rpbtn" onclick="App.tab('trips')"><span>${typeof Stk !== 'undefined' ? Stk.icon('plane') : ''}</span><div><b>رحلات العيال</b><small>${AR(Trips.allTrips().length)} رحلة حول العالم · شوف وين سافروا</small></div><em>←</em></button>` : '') + familyStrip('parent') + (typeof Honors !== 'undefined' ? Honors.reportBtn() + Honors.board() : '') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
         `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>` +
         ((S.log.length || (S.act || []).length) ? `<div class="card"><h2>قراءات هذا الجوال</h2><p class="muted">قصص وألعاب انحسبت من جوالك (${S.log.length} قصة · ${(S.act || []).length} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.</p><button class="btn alt" onclick="App.clearMine()">مسح قراءات هذا الجوال</button></div>` : '');
     };

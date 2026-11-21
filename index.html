@@ -820,6 +820,50 @@ body.nt .modebar button{color:#C9C4E8}
 .trmode button:active{border-color:var(--orange)}.trmode button:last-child{background:linear-gradient(160deg,#E4F6EA,#F6FFF8)}
 .trmode span{font-size:46px;line-height:1.1}.trmode b{font-size:19px}.trmode small{color:var(--soft);font-size:14px}
 .welcome h2{color:#0E7A43}.stampnew.green{border-color:#0E7A43;color:#0E7A43}
+
+/* ===== v5.0 إعادة التصميم: سماء زرقاء، قمر يقرأ، شريط بنفسجي-وردي، ملصقات، وغرفتي ===== */
+body,body[data-pal="sky"]{background:linear-gradient(180deg,#4FA3EC 0%,#7CBDF3 20%,#A9D3F7 40%,#D6EAFB 62%,#EEF2FD 82%,#F4EEFB 100%);background-attachment:fixed}
+#home{position:relative;z-index:0}
+.skyfx{position:absolute;top:calc(-1 * env(safe-area-inset-top));left:-16px;right:-16px;height:330px;z-index:-1;pointer-events:none;overflow:hidden}
+.skyfx i{position:absolute;animation:spk 2.8s ease-in-out infinite}.skyfx i svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 4px #fff8)}
+.skycl{position:absolute;left:0;right:0;bottom:24px;width:100%;height:90px}
+body.nt .skycl{opacity:.18}body.nt .skyfx i svg{filter:drop-shadow(0 0 6px #FFE27A)}
+.hx{align-items:flex-start;margin-top:4px}
+.hxm{position:relative;width:158px;height:136px;display:block;flex:none;margin-inline-end:-6px}
+.moonx{position:absolute;inset:0;width:100%!important;height:100%!important;background:none;border-radius:0}
+.moonread{width:100%;height:100%;display:block;overflow:visible}
+.moonread .mrb{animation:mrbob 5s ease-in-out infinite;transform-origin:112px 80px}
+@keyframes mrbob{50%{transform:translateY(-3px) rotate(-1.5deg)}}
+.hxgear{position:absolute;top:-2px;left:-4px;z-index:2;order:0;margin:0;width:44px;height:44px;background:#fff;border:0;box-shadow:0 6px 16px rgba(40,70,140,.2);color:#3F4C6B}.hxgear svg{width:22px;height:22px}
+.hxb{padding-top:22px}.hxb h1{font-size:46px;color:#2E2A6B}.hxb h1 img{width:44px;height:44px;border-radius:13px}.hxb small{color:#2E3A5C;font-size:16px;font-weight:700}
+.hpills{position:relative;margin-top:-6px}
+.hpill{background:#FFF6EA;border:0;box-shadow:0 8px 20px rgba(60,80,150,.16);height:54px}
+.hpill b{font-size:17px}.hpill small{color:#2E2A6B;font-size:15px;font-weight:800}
+.hpi,.hpill .season em{display:inline-flex;width:30px;height:30px}.hpi svg,.hpill .season em svg{width:30px;height:30px;filter:drop-shadow(1.2px 0 0 #fff) drop-shadow(-1.2px 0 0 #fff) drop-shadow(0 1.2px 0 #fff) drop-shadow(0 -1.2px 0 #fff) drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+.kidsbar{background:linear-gradient(135deg,#FFFFFF,#F3ECFF)!important;border:0!important;box-shadow:0 10px 24px rgba(90,70,170,.14)!important}
+.klbl{color:#3B2E8C!important}
+/* الشريط السفلي: تدرّج شعار سراج */
+.bnav,body[data-pal] .bnav,body.nt .bnav,body.nt[data-pal] .bnav{--nb:#7A4BE0;background:linear-gradient(115deg,#5B3FD6 0%,#8A4BE0 40%,#C05AC8 72%,#EE73A8 100%);box-shadow:0 12px 28px rgba(110,60,190,.38)}
+.bnav button.on,body.nt .bnav button.on{background:rgba(255,255,255,.28)}
+/* أيقونات الملصقات */
+.stkv{width:100%;height:100%;display:block;overflow:visible}
+.stk{display:inline-block;line-height:1;filter:drop-shadow(1.2px 0 0 #fff) drop-shadow(-1.2px 0 0 #fff) drop-shadow(0 1.2px 0 #fff) drop-shadow(0 -1.2px 0 #fff) drop-shadow(0 1.6px 1.4px rgba(0,0,0,.2))}
+.pgrid span,.trstats span,.achg span,.rpbtn>span{display:inline-flex;width:40px;height:40px;font-size:30px;align-items:center;justify-content:center}
+.pgrid span svg,.trstats span svg,.achg span svg,.rpbtn>span svg,.subnav i svg{filter:drop-shadow(1.4px 0 0 #fff) drop-shadow(-1.4px 0 0 #fff) drop-shadow(0 1.4px 0 #fff) drop-shadow(0 -1.4px 0 #fff) drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.subnav button{display:inline-flex;align-items:center;gap:6px}.subnav i{display:inline-block;width:24px;height:24px;flex:none}
+/* غرفتي */
+.room{padding:14px;background:linear-gradient(160deg,#fff,#F6F0FF)}
+.roomh{display:flex;align-items:center;justify-content:space-between}.roomh h3{margin:0}
+.roomst{display:inline-flex;align-items:center;gap:6px;background:#FFF3C9;border-radius:999px;padding:4px 12px 4px 8px}.roomst svg{width:24px;height:24px}.roomst b{font-size:18px;color:#8A5A00}
+.roomart{margin:10px 0;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 2px #fff,0 8px 18px rgba(90,70,170,.15)}
+.roomsvg{width:100%;height:auto;display:block}
+.roomnext{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:700;color:#3B2E8C}.roomnext i{display:block;height:10px;border-radius:9px;background:#EDE6FF;overflow:hidden}.roomnext i b{display:block;height:100%;background:linear-gradient(90deg,#FFB547,#FF7AB6);border-radius:9px}
+.roomgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.roomgrid div{display:flex;flex-direction:column;align-items:center;background:#F6F3FF;border-radius:14px;padding:6px 4px;filter:grayscale(1);opacity:.5}
+.roomgrid div.on{filter:none;opacity:1;background:#FFF6EA}
+.roomgrid svg{width:52px;height:44px}.roomgrid small{font-size:11.5px;font-weight:700;text-align:center;line-height:1.3;margin-top:2px}
+.roomtip{font-size:12.5px;margin:10px 0 0}
+@media (max-width:390px){.hxm{width:136px;height:118px}.hxb h1{font-size:38px}.hxb h1 img{width:36px;height:36px}.hxb{padding-top:16px}}
 </style>
 </head>
 <body>
@@ -894,7 +938,7 @@ body.nt .modebar button{color:#C9C4E8}
     <div class="hxm"><button class="moonx" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button>
       <button class="hxgear" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
   </header>
-  <div class="hpills"><div class="hpill"><span class="hpi">📅</span><b id="clk"></b><small id="dt"></small></div><div class="hpill"><span id="season" class="season"></span></div></div>
+  <div class="hpills"><div class="hpill"><span class="hpi" id="hpCal">📅</span><b id="clk"></b><small id="dt"></small></div><div class="hpill"><span id="season" class="season"></span></div></div>
   <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
     <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
   <div class="modebar" id="modeBar" style="display:none"></div>
@@ -910,8 +954,8 @@ body.nt .modebar button{color:#C9C4E8}
     <div id="qtiles" hidden></div>
   </div>
   <div id="paneSky" style="display:none"><div id="rewardCard"></div><div id="sky"></div><div class="kidfoot" id="kidFoot"></div></div>
-  <div class="subnav" id="subExplore" style="display:none"><button data-t="trips" id="subTrips" style="display:none">✈️ رحلاتي</button><button data-t="space">🪐 الكواكب والقمر</button><button data-t="lib">📚 مكتبة القصص</button></div>
-  <div class="subnav" id="subLearn" style="display:none"><button data-t="eng">🔤 English</button><button data-t="play">🎨 ألعاب</button></div>
+  <div class="subnav" id="subExplore" style="display:none"><button data-t="trips" id="subTrips" style="display:none"><i data-ic="plane"></i>رحلاتي</button><button data-t="space"><i data-ic="planet"></i>الكواكب والقمر</button><button data-t="lib"><i data-ic="books"></i>مكتبة القصص</button></div>
+  <div class="subnav" id="subLearn" style="display:none"><button data-t="eng"><i data-ic="abc"></i>English</button><button data-t="play"><i data-ic="palette"></i>ألعاب</button></div>
   <div id="paneTrips" style="display:none"><div id="trips"></div></div>
   <div id="paneSpace" style="display:none"><div id="space"></div></div>
   <div id="panePlay" style="display:none"><div id="play"></div></div>
@@ -1135,30 +1179,32 @@ body.nt .modebar button{color:#C9C4E8}
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=4.7"></script>
-<script src="sync.js?v=4.7"></script>
-<script src="art.js?v=4.7"></script>
-<script src="stories.js?v=4.7"></script>
-<script src="stories-2.js?v=4.7"></script>
-<script src="stories-3.js?v=4.7"></script>
-<script src="stories-4.js?v=4.7"></script>
-<script src="stories-5.js?v=4.7"></script>
-<script src="stories-6.js?v=4.7"></script>
-<script src="stories-7.js?v=4.7"></script>
-<script src="extra.js?v=4.7"></script>
-<script src="young.js?v=4.7"></script>
-<script src="play.js?v=4.7"></script>
-<script src="english-2.js?v=4.7"></script>
-<script src="english.js?v=4.7"></script>
-<script src="english-3.js?v=4.7"></script>
-<script src="space.js?v=4.7"></script>
-<script src="night.js?v=4.7"></script>
-<script src="honors.js?v=4.7"></script>
-<script src="trips-data.js?v=4.7"></script>
-<script src="trips.js?v=4.7"></script>
-<script src="about.js?v=4.7"></script>
-<script src="app.js?v=4.7"></script>
-<script src="wamd-stats.js?v=4.7" data-app="siraj"></script>
-<script src="wamd-cfg.js?v=4.7" data-app="siraj" defer></script>
+<script src="config.js?v=5.0"></script>
+<script src="sync.js?v=5.0"></script>
+<script src="art.js?v=5.0"></script>
+<script src="stories.js?v=5.0"></script>
+<script src="stories-2.js?v=5.0"></script>
+<script src="stories-3.js?v=5.0"></script>
+<script src="stories-4.js?v=5.0"></script>
+<script src="stories-5.js?v=5.0"></script>
+<script src="stories-6.js?v=5.0"></script>
+<script src="stories-7.js?v=5.0"></script>
+<script src="extra.js?v=5.0"></script>
+<script src="young.js?v=5.0"></script>
+<script src="play.js?v=5.0"></script>
+<script src="english-2.js?v=5.0"></script>
+<script src="english.js?v=5.0"></script>
+<script src="english-3.js?v=5.0"></script>
+<script src="space.js?v=5.0"></script>
+<script src="night.js?v=5.0"></script>
+<script src="honors.js?v=5.0"></script>
+<script src="stickers.js?v=5.0"></script>
+<script src="room.js?v=5.0"></script>
+<script src="trips-data.js?v=5.0"></script>
+<script src="trips.js?v=5.0"></script>
+<script src="about.js?v=5.0"></script>
+<script src="app.js?v=5.0"></script>
+<script src="wamd-stats.js?v=5.0" data-app="siraj"></script>
+<script src="wamd-cfg.js?v=5.0" data-app="siraj" defer></script>
 </body>
 </html>
