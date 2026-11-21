@@ -843,8 +843,14 @@ body.nt .skycl{opacity:.18}body.nt .skyfx i svg{filter:drop-shadow(0 0 6px #FFE2
 .kidsbar{background:linear-gradient(135deg,#FFFFFF,#F3ECFF)!important;border:0!important;box-shadow:0 10px 24px rgba(90,70,170,.14)!important}
 .klbl{color:#3B2E8C!important}
 /* الشريط السفلي: تدرّج شعار سراج */
-.bnav,body[data-pal] .bnav{--nb:#3D7FE6;background:linear-gradient(115deg,#2D5FD0 0%,#3D7FE6 40%,#4FA0F2 75%,#6DBBF7 100%);box-shadow:0 12px 28px rgba(40,95,190,.38)}
-body.nt .bnav,body.nt[data-pal] .bnav{background:linear-gradient(115deg,#1F2A66 0%,#2B3D8C 50%,#3A5BB5 100%);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+.bnav,body[data-pal] .bnav{background:#A9D8F8;gap:6px;padding:7px;box-shadow:0 12px 28px rgba(40,95,190,.28)}
+body.nt .bnav,body.nt[data-pal] .bnav{background:#1C2A66;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+/* كل تبويب مربع بلون من شعار سراج */
+.bnav button{--tc:#8B5CF6;background:color-mix(in srgb,var(--tc) 22%,#fff)!important;color:#2B2A5E!important;opacity:1!important;border-radius:18px!important;box-shadow:none!important}
+#tabTonight{--tc:#8B5CF6}#tabMe{--tc:#EC6FA8}#tabExplore{--tc:#F5913A}#tabLearn{--tc:#E9B526}#tabParents{--tc:#6D7BF2}
+.bnav button.on{background:var(--tc)!important;color:#fff!important;box-shadow:0 6px 14px color-mix(in srgb,var(--tc) 45%,transparent),inset 0 0 0 2px rgba(255,255,255,.7)!important}
+body.nt .bnav button{background:color-mix(in srgb,var(--tc) 30%,#1C2A66)!important;color:#E9E6FF!important}
+body.nt .bnav button.on{background:var(--tc)!important;color:#fff!important}
 .bnav button.on,body.nt .bnav button.on{background:rgba(255,255,255,.28)}
 /* أيقونات الملصقات */
 .stkv{width:100%;height:100%;display:block;overflow:visible}
@@ -1180,32 +1186,32 @@ body.nt .bnav,body.nt[data-pal] .bnav{background:linear-gradient(115deg,#1F2A66 
 
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=5.0.1"></script>
-<script src="sync.js?v=5.0.1"></script>
-<script src="art.js?v=5.0.1"></script>
-<script src="stories.js?v=5.0.1"></script>
-<script src="stories-2.js?v=5.0.1"></script>
-<script src="stories-3.js?v=5.0.1"></script>
-<script src="stories-4.js?v=5.0.1"></script>
-<script src="stories-5.js?v=5.0.1"></script>
-<script src="stories-6.js?v=5.0.1"></script>
-<script src="stories-7.js?v=5.0.1"></script>
-<script src="extra.js?v=5.0.1"></script>
-<script src="young.js?v=5.0.1"></script>
-<script src="play.js?v=5.0.1"></script>
-<script src="english-2.js?v=5.0.1"></script>
-<script src="english.js?v=5.0.1"></script>
-<script src="english-3.js?v=5.0.1"></script>
-<script src="space.js?v=5.0.1"></script>
-<script src="night.js?v=5.0.1"></script>
-<script src="honors.js?v=5.0.1"></script>
-<script src="stickers.js?v=5.0.1"></script>
-<script src="room.js?v=5.0.1"></script>
-<script src="trips-data.js?v=5.0.1"></script>
-<script src="trips.js?v=5.0.1"></script>
-<script src="about.js?v=5.0.1"></script>
-<script src="app.js?v=5.0.1"></script>
-<script src="wamd-stats.js?v=5.0.1" data-app="siraj"></script>
-<script src="wamd-cfg.js?v=5.0.1" data-app="siraj" defer></script>
+<script src="config.js?v=5.0.2"></script>
+<script src="sync.js?v=5.0.2"></script>
+<script src="art.js?v=5.0.2"></script>
+<script src="stories.js?v=5.0.2"></script>
+<script src="stories-2.js?v=5.0.2"></script>
+<script src="stories-3.js?v=5.0.2"></script>
+<script src="stories-4.js?v=5.0.2"></script>
+<script src="stories-5.js?v=5.0.2"></script>
+<script src="stories-6.js?v=5.0.2"></script>
+<script src="stories-7.js?v=5.0.2"></script>
+<script src="extra.js?v=5.0.2"></script>
+<script src="young.js?v=5.0.2"></script>
+<script src="play.js?v=5.0.2"></script>
+<script src="english-2.js?v=5.0.2"></script>
+<script src="english.js?v=5.0.2"></script>
+<script src="english-3.js?v=5.0.2"></script>
+<script src="space.js?v=5.0.2"></script>
+<script src="night.js?v=5.0.2"></script>
+<script src="honors.js?v=5.0.2"></script>
+<script src="stickers.js?v=5.0.2"></script>
+<script src="room.js?v=5.0.2"></script>
+<script src="trips-data.js?v=5.0.2"></script>
+<script src="trips.js?v=5.0.2"></script>
+<script src="about.js?v=5.0.2"></script>
+<script src="app.js?v=5.0.2"></script>
+<script src="wamd-stats.js?v=5.0.2" data-app="siraj"></script>
+<script src="wamd-cfg.js?v=5.0.2" data-app="siraj" defer></script>
 </body>
 </html>
