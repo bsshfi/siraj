@@ -5,7 +5,8 @@ const Trips = (() => {
   const AR = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
   const DAYS = ['', 'يوم واحد', 'يومين', '٣ أيام', '٤ أيام', '٥ أيام', '٦ أيام', 'أسبوع كامل'];
   const DAYN = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع'];
-  const byCode = (c) => COUNTRIES.find((x) => x.c === c);
+  const SAUDI = { c: 'SA', n: 'السعودية', cap: 'الرياض', r: 'gcc', sc: 'desert' };
+  const byCode = (c) => (c === 'SA' ? SAUDI : COUNTRIES.find((x) => x.c === c));
   let T = null, region = 'all', q = '';
 
   /* ---------- البيانات ---------- */
@@ -51,10 +52,10 @@ const Trips = (() => {
       ${list.length ? `<div class="trlog">${list.slice(0, 40).map((t) => tripRow(t)).join('')}</div>` : '<p class="muted" style="text-align:center">ما فيه رحلات للحين… أول رحلة وين بتكون؟ 🤔</p>'}</div>`;
   }
   function tripRow(t) {
-    const cn = byCode(t.c) || { n: t.c, cap: '' }, c = C();
+    const cn = byCode(t.c) || { n: t.c, cap: '' }, c = C(), fr = t.ret && (byCode(t.from) || { n: t.from });
     const who = (t.k || []).map((id) => { const k = c.kidById(id); return k ? k.name : ''; }).filter(Boolean);
-    return `<button class="trrow" onclick="Trips.album('${t.id}')"><span class="trflag">${flagOf(t.c)}</span><div><b>${cn.n}</b>
-      <small>${DAYS[t.days] || AR(t.days) + ' أيام'} · ${new Date(t.at).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'long' })}${who.length && c.S().role === 'parent' ? ' · رحلة ' + c.esc(who.join(' و')) : ''}</small>
+    return `<button class="trrow" onclick="Trips.album('${t.id}')"><span class="trflag">${flagOf(t.c)}</span><div><b>${t.ret ? 'العودة للسعودية 💚' : cn.n}</b>
+      <small>${t.ret ? 'من ' + fr.n + ' ' + flagOf(t.from) : DAYS[t.days] || AR(t.days) + ' أيام'} · ${new Date(t.at).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'long' })}${who.length && c.S().role === 'parent' ? ' · رحلة ' + c.esc(who.join(' و')) : ''}</small>
       <i>${(t.people || []).slice(0, 5).map((p) => ART.avatarSVG(p.av, p.g, 30)).join('')}</i></div><em>←</em></button>`;
   }
 
@@ -62,16 +63,23 @@ const Trips = (() => {
   const open = (html) => { $('gameBody').innerHTML = `<div class="trw">${html}</div>`; $('gameModal').classList.add('on'); $('gameBody').parentElement.scrollTop = 0; };
   function start() {
     const c = C(), mine = c.S().role === 'child' ? c.myKids().map((k) => k.id) : [];
-    T = { step: 0, sel: new Set(mine), c: null, days: 3, d: 0, picks: [] };
+    T = { step: 'mode', sel: new Set(mine), c: null, days: 3, d: 0, picks: [], ret: false };
     region = 'all'; q = ''; step();
   }
   function step() {
     if (!T) return;
-    const fn = [stepPeople, stepPlace, stepDays, stepAirport, stepArrive, stepDay, stepHome][T.step];
+    if (T.step === 'mode') return stepMode();
+    const fn = [stepPeople, stepPlace, stepDays, stepAirport, stepArrive, stepDay, stepHome, stepWelcome][T.step];
     fn();
   }
   const dots = () => `<div class="trdots">${['👨‍👩‍👧‍👦', '🌍', '🗓️', '🛫'].map((e, i) => `<span class="${i <= Math.min(T.step, 3) ? 'on' : ''}">${e}</span>`).join('')}</div>`;
 
+  function stepMode() {
+    open(`<h2>وش نوع الرحلة؟ ✈️</h2><p class="muted">اختر وحدة</p>
+      <div class="trmode"><button onclick="Trips.setMode(0)"><span>🛫</span><b>رحلة من الرياض</b><small>نسافر لأي دولة في العالم 🌍</small></button>
+        <button onclick="Trips.setMode(1)"><span>🇸🇦</span><b>راجعين للسعودية</b><small>كنا مسافرين برّا… ونرجع لبلدنا 💚</small></button></div>`);
+  }
+  function setMode(r) { if (!T) return; T.ret = !!r; go(0); }
   function stepPeople() {
     const c = C(), ps = people();
     open(`${dots()}<h2>مين بيسافر؟ 🧳</h2><p class="muted">اختر المسافرين (تقدر تضيف شخصيات)</p>
@@ -97,7 +105,7 @@ const Trips = (() => {
   function delPerson(id) { const S = C().S(); S.tripPeople = (S.tripPeople || []).filter((p) => p.id !== id); T.sel.delete(id); C().save(); stepPeople(); }
 
   function stepPlace() {
-    open(`${dots()}<h2>وين نروح؟ 🌍</h2>
+    open(`${dots()}<h2>${T.ret ? 'من وين راجعين؟ 🌍' : 'وين نروح؟ 🌍'}</h2>
       <input class="inp" id="trQ" placeholder="🔍 دوّر على دولة…" value="${C().esc(q)}" oninput="Trips.search(this.value)" style="margin:8px 0">
       <div class="trreg">${REGIONS.map(([k, n]) => `<button class="chip ${region === k ? 'on' : ''}" onclick="Trips.setRegion('${k}')">${n}</button>`).join('')}</div>
       <div class="trgrid" id="trGrid">${grid()}</div>
@@ -117,6 +125,12 @@ const Trips = (() => {
   const heroesOf = (list) => list.map((p) => ({ av: p.av, g: p.g }));
   function stepDays() {
     const cn = byCode(T.c), inf = COUNTRY_INFO[T.c] || {}, tr = travelers(), c = C();
+    if (T.ret) return open(`${dots()}<h2>بطاقة العودة 🇸🇦</h2><p class="muted">راجعين لبلدنا 💚</p>
+      <div class="bpass"><div class="bph"><span>✈️ سِراج للطيران</span><span>بطاقة صعود</span></div>
+        <div class="bpr"><div><small>من</small><b>${flagOf(T.c)}</b><em>${cn.cap}، ${cn.n}</em></div><div class="bpline">✈️</div><div><small>إلى</small><b>RUH</b><em>الرياض 🇸🇦</em></div></div>
+        <div class="bpf">${inf.h ? `<span>⏱️ ${AR(inf.h).replace('.', '٫')} ساعة طيران تقريبًا</span>` : ''}<span>👥 ${AR(tr.length)} ${tr.length === 1 ? 'مسافر' : 'مسافرين'}</span></div>
+        <div class="bpp">${tr.map((p) => `<span>${ART.avatarSVG(p.av, p.g, 34)}<small>${c.esc(p.n)}</small></span>`).join('')}</div></div>
+      <div class="row"><button class="btn" onclick="Trips.go(3)">للمطار 🛫</button><button class="btn alt" onclick="Trips.go(1)">غيّر الدولة</button></div>`);
     open(`${dots()}<h2>كم يوم؟ 🗓️</h2>
       <div class="trdays">${[1, 2, 3, 4, 5, 6, 7].map((n) => `<button class="${T.days === n ? 'on' : ''}" onclick="Trips.setDays(${n})">${AR(n)}</button>`).join('')}</div>
       <div class="bpass"><div class="bph"><span>✈️ سِراج للطيران</span><span>بطاقة صعود</span></div>
@@ -129,6 +143,11 @@ const Trips = (() => {
 
   function stepAirport() {
     const cn = byCode(T.c), tr = travelers();
+    if (T.ret) return open(`<h2>🛫 مطار ${cn.cap}</h2><p class="muted">${cn.n} · رحلة رقم SJ${AR(100 + (T.c.charCodeAt(1) * 7 + T.c.charCodeAt(0)) % 900)} إلى الرياض</p>
+      <div class="trart">${ART.page('road', '🛫', heroesOf(tr))}</div>
+      <div class="flight" id="trFlight"><span class="f1">${flagOf(T.c)}<small>${cn.cap}</small></span><i></i><span class="pl">✈️</span><span class="f2">🇸🇦<small>الرياض</small></span></div>
+      <p class="trsay" id="trSay">اربطوا الأحزمة… راجعين لبلدنا 💚</p>
+      <button class="btn" id="trGo" onclick="Trips.fly()">انطلق ✈️</button>`);
     open(`<h2>🛫 مطار الملك خالد الدولي</h2><p class="muted">الرياض · رحلة رقم SJ${AR(100 + (T.c.charCodeAt(0) * 7 + T.c.charCodeAt(1)) % 900)} إلى ${cn.n}</p>
       <div class="trart">${ART.page('road', '🛫', heroesOf(tr))}</div>
       <div class="flight" id="trFlight"><span class="f1">🇸🇦<small>الرياض</small></span><i></i><span class="pl">✈️</span><span class="f2">${flagOf(T.c)}<small>${cn.cap}</small></span></div>
@@ -137,9 +156,9 @@ const Trips = (() => {
   }
   function fly() {
     $('trFlight').classList.add('go'); $('trGo').disabled = true; $('trGo').style.opacity = '.5';
-    const says = ['الطيارة طارت فوق الرياض 🌆', 'فوق الغيوم ☁️☁️', 'شوي ونوصل… 👀'];
+    const cn = byCode(T.c), says = T.ret ? ['الطيارة طارت فوق ' + cn.cap + ' 🌆', 'فوق الغيوم ☁️☁️', 'بانت أنوار الرياض! 👀'] : ['الطيارة طارت فوق الرياض 🌆', 'فوق الغيوم ☁️☁️', 'شوي ونوصل… 👀'];
     says.forEach((s, i) => setTimeout(() => { if ($('trSay')) $('trSay').textContent = s; }, 700 + i * 900));
-    setTimeout(() => { if (T && T.step === 3) go(4); }, 3400);
+    setTimeout(() => { if (T && T.step === 3) go(T.ret ? 7 : 4); }, 3400);
   }
   function stepArrive() {
     const cn = byCode(T.c), inf = COUNTRY_INFO[T.c];
@@ -185,12 +204,34 @@ const Trips = (() => {
       <div class="row"><button class="btn" onclick="Trips.album('${trip.id}')">📸 ألبوم الرحلة</button><button class="btn alt" onclick="Play.closeGame();Trips.render()">تمام</button></div>`);
     render();
   }
+  function stepWelcome() {
+    const c = C(), S = c.S(), from = byCode(T.c), tr = travelers();
+    const kidsIn = tr.filter((p) => !p.parent && !String(p.id).startsWith('x')).map((p) => p.id);
+    const k = S.role === 'child' ? c.myKids().map((x) => x.id) : kidsIn;
+    const trip = { id: 't' + Date.now().toString(36), c: 'SA', from: T.c, ret: 1, days: 0, at: Date.now(), k, people: tr.map((p) => ({ n: p.n, g: p.g, av: p.av })), picks: [] };
+    const first = !allTrips().some((t) => t.c === 'SA');
+    S.trips = [...(S.trips || []), trip].slice(-80); S.progDirty = true; c.save(); c.syncNow();
+    try { Play.logAct('trip', { id: 'trip-SA' }); } catch (e) {}
+    T = null;
+    open(`<div class="arrive welcome"><div class="bigflag">🇸🇦</div><h2>أهلًا بكم في بلدكم 💚</h2>
+      <p>الحمد لله على السلامة، رجعنا من ${from.n} ${flagOf(from.c)}</p>
+      <div class="trart">${ART.page('desert', '🇸🇦', heroesOf(tr))}</div>
+      <div class="stampnew green"><span>🇸🇦</span><b>السعودية</b><small>${new Date().toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'short', year: 'numeric' })}</small></div>
+      <p class="muted">${first ? 'ختم السعودية دخل جوازك! 📕' : 'ختم جديد للسعودية في جوازك 📕'} وانحفظت الرحلة في سجل الرحلات 🧳</p></div>
+      <div class="row"><button class="btn" onclick="Play.closeGame();Trips.render()">تمام 💚</button><button class="btn alt" onclick="Trips.passport()">📕 جوازي</button></div>`);
+    render();
+  }
   function go(n) { if (!T) return; T.step = n; step(); }
 
   /* ---------- الألبوم والجواز ---------- */
   function album(id) {
     const t = allTrips().find((x) => x.id === id); if (!t) return;
     const cn = byCode(t.c) || { n: t.c, cap: '' }, c = C(), h = heroesOf(t.people || []);
+    if (t.ret) { const fr = byCode(t.from) || { n: t.from };
+      return open(`<h2>🇸🇦 العودة للسعودية</h2><p class="muted">من ${fr.n} ${flagOf(t.from)} · ${new Date(t.at).toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+        <div class="bpp" style="justify-content:center">${(t.people || []).map((p) => `<span>${ART.avatarSVG(p.av, p.g, 38)}<small>${c.esc(p.n)}</small></span>`).join('')}</div>
+        <div class="albm"><div class="postcard"><div class="pcart">${ART.page('desert', '🇸🇦', h)}<span class="pcstamp">🇸🇦</span></div><p><b>أهلًا بكم في بلدكم 💚</b></p></div></div>
+        <button class="btn alt" onclick="Play.closeGame()">إغلاق</button>`); }
     open(`<h2>${flagOf(t.c)} رحلة ${cn.n}</h2><p class="muted">${DAYS[t.days] || ''} · ${new Date(t.at).toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
       <div class="bpp" style="justify-content:center">${(t.people || []).map((p) => `<span>${ART.avatarSVG(p.av, p.g, 38)}<small>${c.esc(p.n)}</small></span>`).join('')}</div>
       <div class="albm">${(t.picks || []).map((p, i) => `<div class="postcard"><div class="pcart">${ART.page(p[1], p[2], h)}</div><p><b>اليوم ${DAYN[i + 1] || AR(i + 1)}:</b> ${p[0]} ${p[2]}</p></div>`).join('')}</div>
@@ -200,8 +241,8 @@ const Trips = (() => {
     const list = allTrips(), map = {};
     list.forEach((t) => { map[t.c] = map[t.c] || { n: 0, at: t.at }; map[t.c].n++; map[t.c].at = Math.min(map[t.c].at, t.at); });
     const codes = Object.keys(map).sort((a, b) => map[a].at - map[b].at);
-    open(`<div class="passport"><div class="pph">🇸🇦<b>جواز سفر سِراج</b><small>زرت ${AR(codes.length)} من ${AR(COUNTRIES.length)} دولة</small></div>
-      <i class="ppbar"><b style="width:${Math.max(2, Math.round(codes.length / COUNTRIES.length * 100))}%"></b></i>
+    open(`<div class="passport"><div class="pph">🇸🇦<b>جواز سفر سِراج</b><small>زرت ${AR(codes.length)} من ${AR(COUNTRIES.length + 1)} دولة</small></div>
+      <i class="ppbar"><b style="width:${Math.max(2, Math.round(codes.length / (COUNTRIES.length + 1) * 100))}%"></b></i>
       <div class="stamps">${codes.length ? codes.map((cd, i) => `<div class="stamp" style="--r:${(i * 37) % 24 - 12}deg"><span>${flagOf(cd)}</span><b>${(byCode(cd) || { n: cd }).n}</b><small>${map[cd].n > 1 ? '×' + AR(map[cd].n) : new Date(map[cd].at).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'short' })}</small></div>`).join('') : '<p class="muted">الجواز فاضي… سافر وخذ أول ختم ✈️</p>'}</div></div>
       <button class="btn alt" onclick="Play.closeGame()">إغلاق</button>`);
   }
@@ -238,5 +279,5 @@ const Trips = (() => {
       <div class="row"><button class="btn" onclick="Trips.game('${G.kind}')">مرة ثانية 🔁</button><button class="btn alt" onclick="Trips.game('${G.kind === 'flag' ? 'cap' : 'flag'}')">${G.kind === 'flag' ? '🏛️ العواصم' : '🚩 الأعلام'}</button></div>`);
   }
 
-  return { render, start, toggle, go, addPerson, setType, savePerson, delPerson, search, setRegion, pick, setDays, fly, doAct, nextDay, early, album, passport, game, ans, allTrips };
+  return { render, start, setMode, toggle, go, addPerson, setType, savePerson, delPerson, search, setRegion, pick, setDays, fly, doAct, nextDay, early, album, passport, game, ans, allTrips };
 })();

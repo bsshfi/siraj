@@ -68,7 +68,8 @@ const App = (() => {
   /* قصص الأنبياء: كل اثنين وجمعة بالترتيب من آدم إلى محمد ﷺ */
   const isPro = (s) => s && s.cat === 'pro';
   const isSah = (s) => s && s.cat === 'sahaba';
-  const isNarr = (s) => isPro(s) || isSah(s);
+  const isQan = (s) => s && s.cat === 'qanimal';
+  const isNarr = (s) => isPro(s) || isSah(s) || isQan(s);
   const laterPart = (s) => s && s.ser && s.part > 1;
   const isProDay = (d) => d.getDay() === 1 || d.getDay() === 5;
   function proOfDay(d) {
@@ -82,7 +83,8 @@ const App = (() => {
   function storyQueue() {
     const r = rng(hash((S.code || 'x') + '#queue'));
     const reg = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s)).map((s) => [r(), s]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
-    const pro = STORIES.filter(isPro), sah = STORIES.filter(isSah), out = [];
+    const pro = [], sah = STORIES.filter(isSah), out = [], qan = STORIES.filter(isQan);
+    STORIES.filter(isPro).forEach((x, j) => { pro.push(x); if (j % 4 === 3 && qan.length) pro.push(qan.shift()); }); pro.push(...qan);
     let i = 0, p = 0, c = 0, turn = 0;
     while (i < reg.length || p < pro.length || c < sah.length) {
       for (let k = 0; k < 2 && i < reg.length; k++) out.push(reg[i++]);
@@ -116,6 +118,8 @@ const App = (() => {
   const CATS = [
     ['pro', '🕌', 'قصص الأنبياء', null],
     ['sahaba', '🌟', 'قصص الصحابة', null],
+    ['saudi', '🇸🇦', 'سعوديتي', null],
+    ['qanimal', '🐪', 'حيوانات في القرآن', null],
     ['choose', '🧭', 'اختر الطريق', null],
     ['series', '📚', 'سلاسل', null],
     ['occ', '🎉', 'المناسبات', null],
@@ -133,9 +137,10 @@ const App = (() => {
   function catOf(s) {
     if (isPro(s)) return CATS[0];
     if (isSah(s)) return CATS[1];
-    if (s.cat2 === 'choose') return CATS[2];
-    if (s.ser) return CATS[3];
-    if (s.occ) return CATS[1];
+    if (s.cat === 'saudi' || s.cat === 'qanimal') return CATS.find((c) => c[0] === s.cat);
+    if (s.cat2 === 'choose') return CATS.find((c) => c[0] === 'choose');
+    if (s.ser) return CATS.find((c) => c[0] === 'series');
+    if (s.occ) return CATS.find((c) => c[0] === 'occ');
     return CATS.find((c) => c[3] && c[3].test(s.value)) || CATS[CATS.length - 1];
   }
   function catChip(s, withVal) {
