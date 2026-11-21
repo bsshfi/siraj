@@ -1,5 +1,6 @@
 /* سِراج | SIRAJ — رحلات حول العالم ✈️ (كل الرحلات من مطار الملك خالد الدولي بالرياض وترجع له) */
 const Trips = (() => {
+  const SI = (n, a) => (typeof Stk !== 'undefined' ? Stk.icon(n, a) : '⭐');
   const $ = (id) => document.getElementById(id);
   const C = () => App.ctx();
   const AR = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
@@ -45,9 +46,9 @@ const Trips = (() => {
       <p>${parent ? 'هنا كل الرحلات اللي سافرها العيال مع العائلة 🌍' : 'اختر مين يسافر معك، وين تروحون، وكم يوم… ويلا! 🌍'}</p>
       <small>🛫 كل الرحلات تطلع من مطار الملك خالد الدولي بالرياض</small>
       <button class="btn" onclick="Trips.start()">✈️ رحلة جديدة</button></div>
-      <div class="trstats"><button class="card" onclick="Trips.passport()"><span>${Stk.icon('passport')}</span><b>${AR(visited.length)}</b><small>جوازي · ختم</small></button>
-        <button class="card" onclick="Trips.game('flag')"><span>${Stk.icon('flag')}</span><b>الأعلام</b><small>لعبة</small></button>
-        <button class="card" onclick="Trips.game('cap')"><span>${Stk.icon('landmark')}</span><b>العواصم</b><small>لعبة</small></button></div>
+      <div class="trstats"><button class="card" onclick="Trips.passport()"><span>${SI('passport')}</span><b>${AR(visited.length)}</b><small>جوازي · ختم</small></button>
+        <button class="card" onclick="Trips.game('flag')"><span>${SI('flag')}</span><b>الأعلام</b><small>لعبة</small></button>
+        <button class="card" onclick="Trips.game('cap')"><span>${SI('landmark')}</span><b>العواصم</b><small>لعبة</small></button></div>
       <div class="card"><h3>🧳 ${parent ? 'سجل رحلات العيال' : 'رحلاتي'} <small>${AR(list.length)} رحلة</small></h3>
       ${list.length ? `<div class="trlog">${list.slice(0, 40).map((t) => tripRow(t)).join('')}</div>` : '<p class="muted" style="text-align:center">ما فيه رحلات للحين… أول رحلة وين بتكون؟ 🤔</p>'}</div>`;
   }

@@ -1,5 +1,6 @@
 /* سِراج | SIRAJ — الدفعة ٤: لوحة شرف العائلة والشارات، وتقرير الأسبوع */
 const Honors = (() => {
+  const SI = (n, a) => (typeof Stk !== 'undefined' ? Stk.icon(n, a) : '⭐');
   const $ = (id) => document.getElementById(id);
   const C = () => App.ctx();
   const AR = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
@@ -82,7 +83,7 @@ const Honors = (() => {
       ${S.fam.reward && S.fam.reward.text ? `<p class="muted">🎁 مكافأة الأسبوع: ${c.esc(S.fam.reward.text)} (${AR(S.fam.reward.stars || 5)} نجوم)</p>` : ''}</div>`;
     $('gameModal').classList.add('on');
   }
-  function reportBtn() { return '<button class="card rpbtn" onclick="Honors.report()"><span>' + Stk.icon('chart') + '</span><div><b>تقرير الأسبوع</b><small>وش سوّوا العيال آخر ٧ أيام · يوصلك إشعار كل جمعة</small></div><em>←</em></button>'; }
+  function reportBtn() { return '<button class="card rpbtn" onclick="Honors.report()"><span>' + SI('chart') + '</span><div><b>تقرير الأسبوع</b><small>وش سوّوا العيال آخر ٧ أيام · يوصلك إشعار كل جمعة</small></div><em>←</em></button>'; }
 
   /* إنجازاتي: كرت محفّز للطفل */
   function achCard(k, compact) {
@@ -91,8 +92,8 @@ const Honors = (() => {
     const { out } = titlesFor(c.S().fam.kids, weekStart()), titles = out[k.id] || [];
     const left = 7 - sk.cur;
     return `<div class="card ach"><span class="achtrophy">🏆</span><h3>🌟 إنجازات ${c.esc(k.name)}</h3><p>${titles.length ? 'هذا الأسبوع أنت ' + titles.map((t) => t[1]).join(' و') + '! 🎉' : 'كل قصة تقراها تقرّبك من هدية جديدة ✨'}</p>
-      <div class="achg"><div><span>${Stk.icon('star')}</span><b>${AR(all.nights)}</b><small>نجمة</small></div><div><span>${Stk.icon('gift')}</span><b>${AR(ev.length)}</b><small>ملصق${rare ? ' · ' + AR(rare) + ' نادر' : ''}</small></div>
-        <div><span>${Stk.icon('shield')}</span><b>${AR(sk.unlocked.length)}</b><small>هدية</small></div><div><span>${Stk.icon('medal')}</span><b>${AR(bdg)}</b><small>شارة</small></div></div>
+      <div class="achg"><div><span>${SI('star')}</span><b>${AR(all.nights)}</b><small>نجمة</small></div><div><span>${SI('gift')}</span><b>${AR(ev.length)}</b><small>ملصق${rare ? ' · ' + AR(rare) + ' نادر' : ''}</small></div>
+        <div><span>${SI('shield')}</span><b>${AR(sk.unlocked.length)}</b><small>هدية</small></div><div><span>${SI('medal')}</span><b>${AR(bdg)}</b><small>شارة</small></div></div>
       <div class="achnext">🎯 باقي ${AR(left)} ${left === 1 ? 'قصة' : 'قصص'} وتكتمل كوكبة جديدة وتفتح هدية 🎁<i><b style="width:${Math.round(sk.cur / 7 * 100)}%"></b></i></div>
       ${!compact && titles.length ? `<div class="achbar">${titles.map(([i, t]) => `<span>${i} ${t}</span>`).join('')}</div>` : ''}
       ${compact ? `<button class="btn alt" style="margin-top:10px;width:100%" onclick="App.tab('sky')">شوف سمائي وهداياي ✨</button>` : `<button class="btn alt" style="margin-top:10px;width:100%" onclick="Honors.badges()">🎖️ كل الشارات</button>`}</div>`;

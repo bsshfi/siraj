@@ -53,6 +53,10 @@ const Info = (() => {
   }
   function fill() {
     document.querySelectorAll('.verV').forEach((x) => (x.textContent = CONFIG.VERSION));
+    try {
+      const er = JSON.parse(localStorage.getItem('siraj-err') || 'null'), n = document.getElementById('verNote');
+      if (n && er && er.v === CONFIG.VERSION && Date.now() - er.t < 2 * 864e5) { n.style.display = ''; n.style.fontSize = '11px'; n.style.direction = 'ltr'; n.style.textAlign = 'center'; n.textContent = '⚠︎ ' + er.f + ':' + er.l + ' ' + er.m; }
+    } catch (e) {}
     const k = $('kidFoot');
     if (k) k.innerHTML = `<b>سِراج — الإصدار ${CONFIG.VERSION}</b>${logo(false)}`;
   }

@@ -1065,7 +1065,7 @@ const App = (() => {
     $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
     $('verNote').textContent = 'الإصدار الحالي: ' + CONFIG.VERSION;
     libShown = 8; filterStories();
-    $('ver2').textContent = CONFIG.VERSION;
+    $('ver2').textContent = CONFIG.VERSION; if (typeof Info !== 'undefined') Info.fill();
   }
   /* مكتبة القصص في الإعدادات: فلاتر + بحث + بطاقات بصور، ٨ في كل دفعة */
   const LIB_FILTERS = [['الكل', ''], ...CATS.map((c) => [c[1] + ' ' + c[2], c[0]])];
@@ -1207,16 +1207,16 @@ const App = (() => {
       // الضغط اليدوي: نتأكد أول هل فيه نسخة أحدث، وإذا ما فيه نقول له إنه على آخر نسخة بدل ما نرجعه للرئيسية
       toast('جاري التحقق من التحديثات… 🔄');
       let latest = null;
-      try { const t = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store' })).text(); const m = t.match(/VERSION:\s*'([^']+)'/); latest = m && m[1]; } catch (e) {}
+      try { const ac = typeof AbortController !== 'undefined' ? new AbortController() : null; const to = setTimeout(() => ac && ac.abort(), 8000); const t = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store', signal: ac ? ac.signal : undefined })).text(); clearTimeout(to); const m = t.match(/VERSION:\s*'([^']+)'/); latest = m && m[1]; } catch (e) {}
       if (!latest) return toast('ما قدرت أتحقق، جرّب بعد شوي');
       if (latest === CONFIG.VERSION) {
-        try { await syncNow(); } catch (e) {}
+        try { syncNow(); } catch (e) {}
         const n = $('verNote'); if (n) n.textContent = 'الإصدار الحالي: ' + CONFIG.VERSION + ' ✓ آخر نسخة';
         return toast('عندك آخر نسخة ✓ الإصدار ' + CONFIG.VERSION);
       }
       toast('فيه نسخة جديدة ' + latest + '، جاري التحديث… ✨');
     }
-    try { await syncNow(); } catch (e) {}
+    try { await Promise.race([syncNow(), new Promise((r) => setTimeout(r, 3000))]); } catch (e) {}
     try { const ks = await caches.keys(); await Promise.all(ks.filter((k) => k.startsWith('siraj-v')).map((k) => caches.delete(k))); } catch (e) {}
     try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
     try { await freshFiles(); } catch (e) {}

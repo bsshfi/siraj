@@ -65,11 +65,16 @@ const Stk = (() => {
   }
 
   /* لفّ الإيموجي في عناصر الواجهة بإطار ملصق أبيض (بدون ما نلمس نص القصص) */
-  const RX = /((?:\p{Regional_Indicator}{2})|(?:\p{Extended_Pictographic}(?:️|⃣|[\u{1F3FB}-\u{1F3FF}]|‍\p{Extended_Pictographic}️?)*))/gu;
+  let RX;
+  try { RX = new RegExp('((?:\\p{Regional_Indicator}{2})|(?:\\p{Extended_Pictographic}(?:\\uFE0F|\\u20E3|[\\u{1F3FB}-\\u{1F3FF}]|\\u200D\\p{Extended_Pictographic}\\uFE0F?)*))', 'gu'); }
+  catch (e) { try { RX = new RegExp('([\\u{1F1E6}-\\u{1F1FF}]{2}|[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}\\u{2B00}-\\u{2BFF}](?:\\uFE0F|\\u200D[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}]\\uFE0F?)*)', 'gu'); } catch (e2) { RX = null; } }
   const SEL = 'button,h1,h2,h3,label,.chip,.hpill,.klbl,.card>span,.trstats span,.trops span,.ilist li>b,.achg span,.rpbtn>span,.pgrid span,.facts span,.bigflag,.stamp span,.stampnew span,.trflag,.vbig,.tops button';
   const SKIP = '#ptext,#stage,.ptext,input,textarea,svg,.stk,#nowBar,.toast,script,style';
   function wrap(root) {
-    if (!root || root.nodeType !== 1 || root.closest(SKIP)) return;
+    try { wrap0(root); } catch (e) {}
+  }
+  function wrap0(root) {
+    if (!RX || !root || root.nodeType !== 1 || root.closest(SKIP)) return;
     const els = root.matches(SEL) ? [root, ...root.querySelectorAll(SEL)] : root.querySelectorAll(SEL);
     els.forEach((el) => {
       if (el.closest(SKIP)) return;
@@ -84,7 +89,7 @@ const Stk = (() => {
   }
   let busy = false;
   const mo = new MutationObserver((ms) => { if (busy) return; busy = true; try { ms.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1) wrap(n); else if (n.parentElement) wrap(n.parentElement); })); } finally { busy = false; } });
-  function start() { document.querySelectorAll('i[data-ic]').forEach((x) => (x.innerHTML = icon(x.dataset.ic))); wrap(document.body); mo.observe(document.body, { childList: true, subtree: true }); }
+  function start() { try { document.querySelectorAll('i[data-ic]').forEach((x) => (x.innerHTML = icon(x.dataset.ic))); wrap(document.body); if (RX) mo.observe(document.body, { childList: true, subtree: true }); } catch (e) {} }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
   return { icon, moonReader, skyfx, wrap };
 })();

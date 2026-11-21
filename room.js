@@ -1,5 +1,6 @@
 /* سِراج | SIRAJ — v5.0 غرفتي: غرفة الطفل تتزيّن بالأثاث كل ما جمع نجوم (ليالي قراءة)، والملصقات تتعلّق على لوحته */
 const Room = (() => {
+  const SI = (n, a) => (typeof Stk !== 'undefined' ? Stk.icon(n, a) : '⭐');
   const C = () => App.ctx();
   const AR = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
   /* [المعرّف، الاسم، النجوم المطلوبة، رسمته في الغرفة] — viewBox 360×240 */
@@ -37,7 +38,7 @@ const Room = (() => {
     const next = ITEMS.find((it) => stars < it[2]), got = ITEMS.filter((it) => stars >= it[2]).length;
     const prev = [...ITEMS].reverse().find((it) => stars >= it[2]), from = prev ? prev[2] : 0;
     const pct = next ? Math.round((stars - from) / (next[2] - from) * 100) : 100;
-    return `<div class="card room"><div class="roomh"><h3>غرفة ${c.esc(k.name)} 🏠</h3><span class="roomst">${Stk.icon('star')}<b>${AR(stars)}</b></span></div>
+    return `<div class="card room"><div class="roomh"><h3>غرفة ${c.esc(k.name)} 🏠</h3><span class="roomst">${SI('star')}<b>${AR(stars)}</b></span></div>
       <div class="roomart">${svg(k, stars, stickers)}</div>
       ${next ? `<div class="roomnext"><span>${AR(next[2] - stars)} ${next[2] - stars === 1 ? 'نجمة' : 'نجوم'} وينفتح لك <b>${next[1]}</b> 🎁</span><i><b style="width:${Math.max(6, pct)}%"></b></i></div>` : '<div class="roomnext"><span>🏆 غرفتك كاملة! أنت بطل القراءة</span></div>'}
       <div class="roomgrid">${ITEMS.map((it) => `<div class="${stars >= it[2] ? 'on' : ''}"><svg viewBox="${box(it[0])}">${it[3]}</svg><small>${stars >= it[2] ? it[1] : '🔒 ' + AR(it[2]) + ' ⭐'}</small></div>`).join('')}</div>
