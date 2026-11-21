@@ -24,6 +24,9 @@ const Stk = (() => {
     shield: () => W(`<path d="M24 5l16 6v11c0 10-7 17-16 21C15 39 8 32 8 22V11z" fill="#5B8DEF"/><path d="M24 5l16 6v11c0 10-7 17-16 21z" fill="#4373D6"/><path d="M17 23l5 5 9-10" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
     medal: () => W(`<path d="M14 4h8l4 12h-8zM34 4h-8l-4 12h8z" fill="#5B8DEF"/><circle cx="24" cy="30" r="13" fill="#FFB547"/><circle cx="24" cy="30" r="9" fill="#FFD23F"/><path d="M24 24l2 4 4.5.5-3.3 3 1 4.4-4.2-2.4-4.2 2.4 1-4.4-3.3-3 4.5-.5z" fill="#fff"/>`),
     trophy: () => W(`<path d="M14 8h20v10a10 10 0 0 1-20 0z" fill="#FFD23F"/><path d="M14 11H7c0 7 4 10 8 10M34 11h7c0 7-4 10-8 10" stroke="#FFB300" stroke-width="3" fill="none"/><rect x="21" y="27" width="6" height="7" fill="#FFB300"/><rect x="14" y="34" width="20" height="7" rx="2" fill="#8A5A3B"/>`),
+    search: () => W(`<circle cx="20" cy="20" r="12" fill="#CDEBFF" stroke="#5B8DEF" stroke-width="5"/><path d="M29 29l11 11" stroke="#7A4BE0" stroke-width="7" stroke-linecap="round"/><path d="M14 16a7 7 0 0 1 6-5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`),
+    book: () => W(`<path d="M4 12c7-3 14-2 20 3v26c-6-5-13-6-20-3z" fill="#8E5BEA"/><path d="M44 12c-7-3-14-2-20 3v26c6-5 13-6 20-3z" fill="#6D45D9"/><path d="M7 14c6-2 11-1 16 3v21c-5-4-10-5-16-3z" fill="#fff"/><path d="M41 14c-6-2-11-1-16 3v21c5-4 10-5 16-3z" fill="#FBF7FF"/><path d="M11 20l8 2M11 25l8 2M29 22l8-2M29 27l8-2" stroke="#D5CBEF" stroke-width="2" stroke-linecap="round"/>`),
+    lock: () => W(`<path d="M15 21v-6a9 9 0 0 1 18 0v6" stroke="#8E9AAF" stroke-width="5" fill="none"/><rect x="9" y="20" width="30" height="23" rx="7" fill="#FFB547"/><circle cx="24" cy="30" r="3.5" fill="#8A5A00"/><rect x="22.5" y="31" width="3" height="6" rx="1.5" fill="#8A5A00"/>`),
     chart: () => W(`<rect x="6" y="6" width="36" height="36" rx="7" fill="#fff"/><rect x="12" y="24" width="6" height="12" rx="2" fill="#5B8DEF"/><rect x="21" y="16" width="6" height="20" rx="2" fill="#FF8FC4"/><rect x="30" y="11" width="6" height="25" rx="2" fill="#4CD97B"/>`)
   };
   const icon = (name, arg) => (I[name] ? I[name](arg) : '');
@@ -89,7 +92,7 @@ const Stk = (() => {
   }
   let busy = false;
   const mo = new MutationObserver((ms) => { if (busy) return; busy = true; try { ms.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1) wrap(n); else if (n.parentElement) wrap(n.parentElement); })); } finally { busy = false; } });
-  function start() { try { document.querySelectorAll('i[data-ic]').forEach((x) => (x.innerHTML = icon(x.dataset.ic))); wrap(document.body); if (RX) mo.observe(document.body, { childList: true, subtree: true }); } catch (e) {} }
+  function start() { try { document.querySelectorAll('i[data-ic]').forEach((x) => (x.innerHTML = icon(x.dataset.ic))); } catch (e) {} }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
   return { icon, moonReader, skyfx, wrap };
 })();

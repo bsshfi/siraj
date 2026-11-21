@@ -407,7 +407,7 @@ const App = (() => {
     e.app = e.app || {};
     $('kidPal').innerHTML = PALS.map(([v, t, g]) => `<button type="button" class="${(e.app.pal || 'sky') === v ? 'on' : ''}" data-p="${v}"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
     $('kidPal').querySelectorAll('button').forEach((b) => (b.onclick = () => { e.app.pal = b.dataset.p; buildKidForm(); }));
-    seg('kidTheme', e.app.theme || 'light', (v) => (e.app.theme = v));
+    seg('kidTheme', e.app.theme === 'dark' ? 'dark' : 'light', (v) => (e.app.theme = v));
     opts('kidHead', ART.HEADS[G]); seg('kidHead', ART.headOf(a, G === 'f'), (v) => { a.head = v; a.hijab = v === 'hijab' ? 1 : 0; });
     opts('kidStyle', ART.STYLES[G].map((t, i) => [i, t])); seg('kidStyle', a.style || 0, (v) => (a.style = +v));
     opts('kidOutfit', ART.OUTFITS[G]); seg('kidOutfit', a.outfit || 'tee', (v) => (a.outfit = v));
@@ -496,7 +496,8 @@ const App = (() => {
     $('tabParents').style.display = S.role === 'parent' ? '' : 'none';
     const mb = $('modeBar'), kidsMode = S.parentMode === 'kids';
     mb.style.display = S.role === 'parent' ? '' : 'none';
-    mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">🔍 معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">📖 أقرأ مع العيال</button>`;
+    const ic = (n) => (typeof Stk !== 'undefined' ? '<i class="mbi">' + Stk.icon(n) + '</i>' : '');
+    mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">${ic('search')}معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">${ic('book')}أقرأ مع العيال</button>`;
     $('modeHint').textContent = S.role !== 'parent' ? '' : kidsMode ? 'القصص والألعاب تنحسب للأبطال المختارين ⭐' : 'تتصفح بس، وما ينحسب شي على العيال';
     renderLib();
   }
@@ -527,7 +528,7 @@ const App = (() => {
   }
   /* المظهر: جهاز الطفل ياخذ اللون اللي اختاره وليّ الأمر للطفل، وجهاز وليّ الأمر له اختياره */
   function devKid() { return S.role === 'child' && (S.devKids || []).length ? kidById(S.devKids[0]) : null; }
-  function appPrefs() { const k = devKid(), a = (k && k.app) || {}; return k ? { pal: a.pal || 'sky', theme: a.theme || 'light' } : { pal: S.pal || 'sky', theme: S.theme || 'light' }; }
+  function appPrefs() { const k = devKid(), a = (k && k.app) || {}; const th = k ? a.theme : S.theme; return { pal: 'sky', theme: th === 'dark' ? 'dark' : 'light' }; }
   function setPref(key, v) { const k = devKid(); if (k) { k.app = { ...(k.app || {}), [key]: v }; famChanged(); } else { S[key] = v; save(); } tickClock(); renderSettings(); }
   let msgTo = null, msgFrom = null, rwStars = null;
   function msgSegs() {
@@ -996,18 +997,19 @@ const App = (() => {
   /* ---------- رمز وليّ الأمر ---------- */
   function askPin(cb) {
     pinBuf = ''; pinCb = cb; drawPin();
-    $('pinPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '⌫', 0, ''].map((x) => `<button data-k="${x}" ${x === '' ? 'style="visibility:hidden"' : ''}>${x}</button>`).join('');
+    if ($('pinIc') && typeof Stk !== 'undefined') $('pinIc').innerHTML = Stk.icon('lock');
+    $('pinPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map((x) => `<button data-k="${x}" class="${x === '⌫' ? 'del' : ''}" ${x === '' ? 'style="visibility:hidden"' : ''}>${x === '⌫' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-5 6M12 9l5 6"/></svg>' : x}</button>`).join('');
     $('pinPad').querySelectorAll('button').forEach((b) => (b.onclick = () => {
       const k = b.dataset.k;
       if (k === '⌫') pinBuf = pinBuf.slice(0, -1); else if (k !== '' && pinBuf.length < 4) pinBuf += k;
       drawPin();
       if (pinBuf.length === 4) setTimeout(() => {
-        if (pinBuf === S.fam.pin) { closeModal('pinModal'); pinCb && pinCb(); } else { toast('الرمز غير صحيح'); pinBuf = ''; drawPin(); }
+        if (pinBuf === S.fam.pin) { closeModal('pinModal'); pinCb && pinCb(); } else { toast('الرمز غير صحيح'); $('pinDots').classList.remove('shake'); void $('pinDots').offsetWidth; $('pinDots').classList.add('shake'); pinBuf = ''; drawPin(); }
       }, 150);
     }));
     $('pinModal').classList.add('on');
   }
-  function drawPin() { $('pinDots').innerHTML = [0, 1, 2, 3].map((i) => `<span>${i < pinBuf.length ? '●' : ''}</span>`).join(''); }
+  function drawPin() { $('pinDots').innerHTML = [0, 1, 2, 3].map((i) => `<span class="${i < pinBuf.length ? 'on' : ''}"></span>`).join(''); }
   function changePin() {
     const p = $('newPin').value.replace(/\D/g, '');
     if (p.length !== 4) return toast('الرمز لازم يكون ٤ أرقام');
@@ -1060,7 +1062,7 @@ const App = (() => {
     $('msgText').value = m.t || ''; $('rwText').value = r.text || '';
     msgTo = m.to || 'all'; msgFrom = m.from || fam.dad || 'بابا'; rwStars = r.stars || 5;
     msgSegs();
-    $('themeSeg').innerHTML = [['auto', '🌗 تلقائي'], ['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${appPrefs().theme === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
+    $('themeSeg').innerHTML = [['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${appPrefs().theme === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
     $('palSeg').innerHTML = PALS.map(([v, t, g]) => `<button class="${appPrefs().pal === v ? 'on' : ''}" onclick="App.setPal('${v}')"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
     $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
     $('verNote').textContent = 'الإصدار الحالي: ' + CONFIG.VERSION;
