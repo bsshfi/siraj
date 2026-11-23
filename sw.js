@@ -1,7 +1,7 @@
-/* سِراج | SIRAJ — يشغّل التطبيق بدون إنترنت، ويحدّثه تلقائيًا، ويعرض الإشعارات
+/* سراج | SIRAJ — يشغّل التطبيق بدون إنترنت، ويحدّثه تلقائيًا، ويعرض الإشعارات
    مع كل تحديث: غيّر CACHE هنا و VERSION في config.js و ?v= في index.html */
 importScripts('config.js');
-const CACHE = 'siraj-v5.1.1';
+const CACHE = 'siraj-v5.1.2';
 const FILES = ['./', 'index.html', 'config.js', 'sync.js', 'app.js', 'art.js', 'stories.js', 'stories-2.js', 'stories-3.js', 'stories-4.js', 'stories-5.js', 'stories-6.js', 'stories-7.js', 'extra.js', 'young.js', 'play.js', 'english-2.js', 'english.js', 'english-3.js', 'space.js', 'night.js', 'honors.js', 'stickers.js', 'room.js', 'trips-data.js', 'trips.js', 'about.js', 'privacy.html', 'wamdarc-light.png', 'wamdarc-dark.png', 'manifest.webmanifest', 'wamd-stats.js', 'wamd-cfg.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
@@ -50,14 +50,14 @@ async function onPush() {
   } catch (e) {}
   const data = await localData();
   const kids = data.kids || {};
-  if (!items.length) items = [{ t: 'msg', title: 'سِراج 🌙', body: 'عندك جديد في سِراج' }];
+  if (!items.length) items = [{ t: 'msg', title: 'سراج 🌙', body: 'عندك جديد في سراج' }];
   const shown = items.slice(-3).map((it) => {
-    let title = 'سِراج 🌙', body = '';
+    let title = 'سراج 🌙', body = '';
     if (it.t === 'bed') {
       const sel = (data.sel || []).map((id) => kids[id]).filter(Boolean);
       const list = sel.length ? sel : Object.values(kids);
       title = '🌙 حان وقت حكاية الليلة';
-      body = list.length ? `يا ${joinNames(list)}، سِراج ينتظركم بقصة جديدة ✨` : 'سِراج ينتظركم بقصة جديدة ✨';
+      body = list.length ? `يا ${joinNames(list)}، سراج ينتظركم بقصة جديدة ✨` : 'سراج ينتظركم بقصة جديدة ✨';
     } else if (it.t === 'done') {
       const list = (it.kids || []).map((id) => kids[id]).filter(Boolean);
       const verb = list.length > 1 ? 'خلّصوا' : list[0] && list[0].g === 'f' ? 'خلّصت' : 'خلّص';

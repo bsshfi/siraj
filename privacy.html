@@ -3,87 +3,158 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>سياسة الخصوصية | سِراج SIRAJ</title>
-<meta name="description" content="سياسة الخصوصية لتطبيق سِراج SIRAJ من ومض آرك WAMD ARC.">
+<title>سياسة الخصوصية — سراج | SIRAJ</title>
+<meta name="description" content="سياسة الخصوصية لتطبيق سراج | SIRAJ من ومض آرك — Privacy Policy for the SIRAJ app by WAMD ARC.">
 <link rel="icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#F4F1FF">
+<meta name="theme-color" content="#4FA3EC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<script>try{var t=JSON.parse(localStorage.getItem('siraj')||'{}').theme;if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <style>
-:root{--bg:#F4F1FF;--card:#fff;--ink:#2B2350;--soft:#7A7398;--accent:#F28C28;--line:#ECE8F8}
+:root{--bg:#EEF2FD;--card:rgba(255,255,255,.8);--text:#2B2350;--muted:#6E6A8C;--line:rgba(80,90,140,.14);--accent:#6A42D8;--good:#2f9a68;--sky1:#4FA3EC;--sky2:#7CBDF3;--haze:#A9D3F7;color-scheme:light}
+:root[data-theme="dark"]{--bg:#1A1D42;--card:rgba(255,255,255,.07);--text:#F1EEFF;--muted:#B3ADD6;--line:rgba(255,255,255,.1);--accent:#B9A5FF;--good:#4fd39a;--sky1:#1E2348;--sky2:#2C2F5C;--haze:#3A3566;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="dark"]){--bg:#1A1D42;--card:rgba(255,255,255,.07);--text:#F1EEFF;--muted:#B3ADD6;--line:rgba(255,255,255,.1);--accent:#B9A5FF;--good:#4fd39a;--sky1:#1E2348;--sky2:#2C2F5C;--haze:#3A3566;color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.85 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;padding:24px 16px 40px}
-header,main,footer{max-width:680px;margin:0 auto}
-header{text-align:center;margin-bottom:14px}
-header img{width:76px;height:76px;border-radius:18px;box-shadow:0 10px 24px rgba(43,35,80,.15)}
-h1{font-size:24px;margin:10px 0 0}
-header p{color:var(--soft);margin:0;font-size:14px}
-.card{background:var(--card);border-radius:20px;padding:16px 18px;margin:12px 0;box-shadow:0 6px 18px rgba(43,35,80,.06)}
-.tldr{border:2px solid #FFE1C2}
-h2{font-size:18px;margin:16px 0 2px}
-.card h2:first-child{margin-top:0}
-h2 span{margin-inline-end:6px}
-p{margin:4px 0}
-ul{margin:4px 0;padding-inline-start:20px}
-a{color:#6A45C9}
-code{font-family:ui-monospace,Menlo,monospace;font-size:14px;direction:ltr;unicode-bidi:embed}
-footer{text-align:center;color:var(--soft);font-size:13px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--sky1) 0,var(--sky2) 200px,var(--haze) 420px,var(--bg) 640px) no-repeat,var(--bg);color:var(--text);font:16px/1.85 'IBM Plex Sans Arabic','SF Arabic','Geeza Pro',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 28px) 16px 48px}
+header{text-align:center;margin-bottom:22px;position:relative;color:#fff}
+.back{position:absolute;top:0;inset-inline-start:0;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.55);color:#fff;text-decoration:none;font-weight:700;font-size:14px;border-radius:999px;padding:6px 14px}
+.back svg{width:16px;height:16px}
+[dir="rtl"] .back svg{transform:scaleX(-1)}
+header img{width:76px;height:76px;border-radius:18px;box-shadow:0 10px 26px -8px rgba(40,60,90,.45)}
+h1{font-size:28px;line-height:1.3;margin:14px 0 2px}
+.sub{color:rgba(255,255,255,.9);font-size:14px;margin:0}
+.lang{display:inline-flex;margin-top:16px;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.55);border-radius:14px;padding:4px}
+.lang button{font:inherit;font-size:14px;border:0;background:none;color:#fff;padding:6px 16px;border-radius:10px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:#7A4FE0;font-weight:700}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.6);border-radius:22px;padding:6px 20px 18px;box-shadow:0 10px 28px rgba(80,70,60,.1);margin-bottom:14px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+:root[data-theme="dark"] .card{border-color:rgba(255,255,255,.1)}
+h2{font-size:18px;margin:16px 0 4px;display:flex;align-items:center;gap:8px}
+h2 span{font-size:20px}
+p,li{margin:6px 0}
+ul{padding-inline-start:20px;margin:6px 0}
+.tldr{border:2px solid color-mix(in srgb,var(--good) 50%,transparent)}
+.tldr h2{color:var(--good)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:13.5px;background:color-mix(in srgb,var(--accent) 10%,transparent);padding:1px 6px;border-radius:6px;direction:ltr;unicode-bidi:isolate;white-space:nowrap;display:inline-block}
+a{color:var(--accent);font-weight:700}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:24px}
+footer b{display:block;color:var(--text);font-size:15px;letter-spacing:.2em;direction:ltr}
+[hidden]{display:none!important}
+.limited{font-size:13.5px;opacity:.85;border-inline-start:3px solid currentColor;padding-inline-start:10px;margin-top:10px}
 </style>
 </head>
 <body>
-<header>
-  <img src="icons/icon-192.png" alt="">
-  <h1>سياسة الخصوصية</h1>
-  <p>سِراج | SIRAJ · آخر تحديث: نوفمبر ٢٠٢٦</p>
-</header>
+<div class="wrap">
+  <header>
+    <a class="back" href="./" id="backTop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span id="backTxt">سراج</span></a>
+    <img src="icons/icon-192.png" alt="" width="76" height="76">
+    <h1 id="ttl">سياسة الخصوصية</h1>
+    <p class="sub" id="sub">سراج | SIRAJ · آخر تحديث: ٢٣ نوفمبر ٢٠٢٦</p>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-l="ar" aria-pressed="true">العربية</button>
+      <button type="button" data-l="en" aria-pressed="false">English</button>
+    </div>
+  </header>
 
-<main id="ar" lang="ar" dir="rtl">
-  <section class="card tldr">
-    <h2><span>🔒</span>باختصار</h2>
-    <ul>
-      <li>أسماء أطفالك وكل بيانات العائلة <b>تنشفّر على جهازك</b> قبل ما تطلع منه، وخادمنا ما يقدر يقرأها.</li>
-      <li>ما نعرض إعلانات، وما فيه مشتريات داخل التطبيق، وما نبيع أي بيانات.</li>
-      <li>الأطفال ما يشوفون روابط ولا مشاركة ولا تواصل؛ هذي كلها عند وليّ الأمر خلف رمز سري.</li>
-      <li>الإحصائيات مجهولة الهوية: بدون أسماء وبدون موقع وبدون كوكيز.</li>
-    </ul>
-  </section>
+  <!-- ===================== العربية ===================== -->
+  <main id="ar" lang="ar" dir="rtl">
+    <section class="card tldr">
+      <h2><span>🔒</span>باختصار</h2>
+      <ul>
+        <li>أسماء أطفالك وكل بيانات العائلة تتشفّر على جهازك قبل ما تطلع منه، وما نقدر نقرأها.</li>
+        <li>ما نعرض إعلانات، وما فيه مشتريات داخل التطبيق، وما نبيع أي بيانات.</li>
+        <li>الأطفال ما يشوفون روابط ولا مشاركة ولا تواصل؛ هذي كلها عند وليّ الأمر خلف رمز سري.</li>
+        <li>الإحصائيات مجهولة الهوية: بدون أسماء وبدون موقع وبدون كوكيز.</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2><span>👋</span>من نحن</h2>
+      <p>سراج | SIRAJ تطبيق قصص قبل النوم بأسماء الأطفال، من تطوير <b>ومض آرك WAMD ARC</b>. التطبيق موجّه للوالدين، والطفل يستخدمه على جهاز يربطه وليّ أمره.</p>
+      <h2><span>📱</span>على جهازك</h2>
+      <p>أسماء الأطفال وأعمارهم وشخصياتهم، والقصص المقروءة والمفضلة، والأنشطة والرحلات، والإعدادات. كلها محفوظة على الجهاز نفسه.</p>
+      <h2><span>🔐</span>المزامنة بين أجهزة العائلة</h2>
+      <p>عشان تشوف تقدّم أطفالك من جوالك، تنرسل بيانات العائلة والتقدّم إلينا <b>مشفّرة بالكامل</b> بمفتاح مأخوذ من رمز العائلة. الرمز نفسه ما ينرسل أبدًا، فاللي يوصلنا نص مشفّر ما نقدر نفتحه.</p>
+      <h2><span>🔔</span>الإشعارات (اختيارية)</h2>
+      <p>إذا فعّلتها نستقبل ما يلزم لإرسالها فقط: اشتراك الإشعارات، ونوع الجهاز (وليّ أمر أو طفل)، ووقت النوم والمنطقة الزمنية لتذكير القصة، ومعرّف العائلة المشفّر لتوصيل تقرير الأسبوع لوليّ الأمر. ما فيه أسماء، وينحذف الاشتراك عند إيقاف الإشعارات.</p>
+      <h2><span>🎙️</span>الميكروفون (اختياري)</h2>
+      <p>في تمارين نطق الإنجليزي، يُستخدم الميكروفون فقط لما يضغط الطفل زر التسجيل. التعرّف على الكلام يتم عن طريق خدمة المتصفح أو نظام الجهاز، وما يوصلنا أي صوت ولا نحفظه.</p>
+      <h2><span>🔗</span>المشاركة والتواصل</h2>
+      <p>مشاركة التطبيق ورمز العائلة تتم من جهازك مباشرة عبر التطبيق اللي تختاره. والتواصل معنا عبر بريدك الإلكتروني، وما نستخدم الرسائل إلا للرد عليك.</p>
+      <h2><span>📊</span>إحصائيات مجهولة</h2>
+      <p>لنعرف عدد مستخدمي تطبيقاتنا، يرسل التطبيق عند فتحه إحصائية مجهولة الهوية، مثل نوع الجهاز ورقم الإصدار واللغة، مع معرّف عشوائي يولّده الجهاز. بدون أسماء وبدون موقع وبدون كوكيز. وقد يعرض التطبيق أحيانًا رسالة قصيرة منّا (مثل خبر تحديث) بدون إرسال أي بيانات عنك.</p>
+      <h2><span>🛡️</span>حماية بياناتك</h2>
+      <p>نحفظ ما يوصلنا على خوادم آمنة، وبيانات العائلة توصلنا مشفّرة أصلاً. ونستعين بمزوّدي خدمات موثوقين لتشغيل التطبيق وتحميل الخطوط، وقد يسجّلون عنوان IP ضمن السجلات المعتادة لأي موقع. ما نستخدم أي أدوات تتبّع أو إعلانات.</p>
+      <h2><span>🧒</span>خصوصية الأطفال</h2>
+      <p>ما نطلب من الطفل أي بيانات، وما فيه حسابات ولا محادثات مع غرباء. الإعدادات والمشاركة والتواصل والروابط الخارجية كلها عند وليّ الأمر فقط.</p>
+      <h2><span>🗑️</span>حذف بياناتك</h2>
+      <p>«فك ربط هذا الجهاز» من الإعدادات يمسح البيانات من الجهاز، وإزالة التطبيق أو مسح بيانات المتصفح تحذف كل شيء محلي. ولحذف نسخة العائلة المشفّرة من عندنا، راسلنا من البريد أدناه.</p>
+      <h2><span>📝</span>التعديلات</h2>
+      <p>قد نحدّث هذه السياسة عند إضافة ميزات جديدة، وسيتغير تاريخ «آخر تحديث» أعلى الصفحة.</p>
+      <h2><span>✉️</span>تواصل معنا</h2>
+      <p>لأي سؤال عن خصوصيتك أو خصوصية أطفالك: <a href="mailto:siraj@wamdarc.com">siraj@wamdarc.com</a></p>
+    </section>
+  </main>
 
-  <section class="card">
-    <h2><span>👋</span>من نحن</h2>
-    <p>سِراج SIRAJ تطبيق قصص قبل النوم بأسماء الأطفال، من تطوير <b>ومض آرك WAMD ARC</b>، ويعمل من <code>siraj.wamdarc.com</code>. التطبيق موجّه للوالدين، والطفل يستخدمه على جهاز يربطه وليّ أمره.</p>
+  <!-- ===================== English ===================== -->
+  <main id="en" lang="en" dir="ltr" hidden>
+    <section class="card tldr">
+      <h2><span>🔒</span>In short</h2>
+      <ul>
+        <li>Your children’s names and all family data are encrypted on your device before they leave it, and we cannot read them.</li>
+        <li>No ads, no in-app purchases, and we never sell data.</li>
+        <li>Children see no links, sharing or contact options; those are all with the parent behind a PIN.</li>
+        <li>Statistics are anonymous: no names, no location and no cookies.</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2><span>👋</span>Who we are</h2>
+      <p>SIRAJ (سراج) is a bedtime-stories app that uses children’s names, made by <b>WAMD ARC</b>. The app is meant for parents, and a child uses it on a device the parent links.</p>
+      <h2><span>📱</span>On your device</h2>
+      <p>Children’s names, ages and characters, stories read and favourites, activities and trips, and settings. All of it stays on the device itself.</p>
+      <h2><span>🔐</span>Syncing family devices</h2>
+      <p>So you can follow your children’s progress from your phone, family data and progress are sent to us <b>fully encrypted</b> with a key derived from the family code. The code itself is never sent, so what reaches us is encrypted text we cannot open.</p>
+      <h2><span>🔔</span>Notifications (optional)</h2>
+      <p>If you turn them on, we receive only what is needed to send them: the notification subscription, the device type (parent or child), bedtime and time zone for the story reminder, and the encrypted family ID to deliver the weekly report to the parent. No names, and the subscription is deleted when you turn notifications off.</p>
+      <h2><span>🎙️</span>Microphone (optional)</h2>
+      <p>In the English pronunciation practice, the microphone is used only when the child presses the record button. Speech recognition is done by the browser or the device’s system, and no audio reaches us or is stored.</p>
+      <h2><span>🔗</span>Sharing and contact</h2>
+      <p>Sharing the app or the family code happens straight from your device through the app you choose. You contact us by email, and we only use your messages to reply to you.</p>
+      <h2><span>📊</span>Anonymous statistics</h2>
+      <p>To know how many people use our apps, the app sends an anonymous count when it opens, such as the device type, app version and language, with a random ID created on your device. We use no cookies and never link these numbers to a person. The app may also show a short message from us (such as update news) without sending any data about you.</p>
+      <h2><span>🛡️</span>Keeping your data safe</h2>
+      <p>What reaches us is kept on secure servers, and family data is already encrypted when it arrives. We rely on trusted service providers to run the app and load its fonts, and they may log IP addresses like any website does. We use no trackers and no ads.</p>
+      <h2><span>🧒</span>Children’s privacy</h2>
+      <p>We ask children for no data, and there are no accounts and no chats with strangers. Settings, sharing, contact and external links are for the parent only.</p>
+      <h2><span>🗑️</span>Deleting your data</h2>
+      <p>“Unlink this device” in Settings wipes the data on that device, and removing the app or clearing browser data deletes everything stored locally. To delete the family’s encrypted copy from our side, email us at the address below.</p>
+      <h2><span>📝</span>Changes</h2>
+      <p>We may update this policy when we add features, and the “Last updated” date at the top will change.</p>
+      <h2><span>✉️</span>Contact us</h2>
+      <p>For any question about your privacy or your children’s privacy: <a href="mailto:siraj@wamdarc.com">siraj@wamdarc.com</a></p>
+    </section>
+  </main>
 
-    <h2><span>📱</span>على جهازك</h2>
-    <p>أسماء الأطفال وأعمارهم وشخصياتهم، والقصص المقروءة والمفضلة، والأنشطة والرحلات، والإعدادات. كلها محفوظة على الجهاز نفسه.</p>
-
-    <h2><span>🔐</span>المزامنة بين أجهزة العائلة</h2>
-    <p>عشان تشوف تقدّم أطفالك من جوالك، تُرسل بيانات العائلة والتقدّم إلى خادمنا (على Cloudflare) <b>مشفّرة بالكامل (AES-256)</b> بمفتاح مأخوذ من رمز العائلة. الرمز نفسه ما يُرسل أبدًا، فالخادم يخزّن نصًّا مشفّرًا ما يقدر يفتحه، ومعه وقت آخر تحديث فقط.</p>
-
-    <h2><span>🔔</span>الإشعارات (اختيارية)</h2>
-    <p>إذا فعّلتها يستقبل خادمنا: عنوان الاشتراك في الإشعارات، ونوع الجهاز (وليّ أمر أو طفل)، ووقت النوم والمنطقة الزمنية لتذكير القصة، ومعرّف العائلة المشفّر لتوصيل تقرير الأسبوع لوليّ الأمر. ما فيه أسماء، ويُحذف الاشتراك عند إيقاف الإشعارات.</p>
-
-    <h2><span>🎙️</span>الميكروفون (اختياري)</h2>
-    <p>في تمارين نطق الإنجليزي، يُستخدم الميكروفون فقط لما يضغط الطفل زر التسجيل. التعرّف على الكلام يتم عن طريق خدمة المتصفح أو نظام الجهاز (مثل Apple أو Google)، وما يوصل أي صوت لخادمنا ولا نحفظه.</p>
-
-    <h2><span>🔗</span>المشاركة والتواصل</h2>
-    <p>مشاركة التطبيق ورمز العائلة تتم من جهازك مباشرة عبر التطبيق اللي تختاره. والتواصل معنا عبر بريدك الإلكتروني، وما نستخدم الرسائل إلا للرد عليك.</p>
-
-    <h2><span>📊</span>إحصائيات مجهولة</h2>
-    <p>عند الفتح: اسم التطبيق، ومعرّف عشوائي يولّده الجهاز، وهل التطبيق مثبّت، ونوع الجهاز، والإصدار، واللغة. بدون أسماء وبدون موقع وبدون كوكيز. وقد يعرض التطبيق أحيانًا رسالة قصيرة منّا (مثل خبر تحديث) تُقرأ من خادمنا بدون إرسال أي بيانات عنك.</p>
-
-    <h2><span>🌐</span>الاستضافة والخطوط</h2>
-    <p>التطبيق مستضاف على <b>GitHub Pages</b>، والخط من <b>Google Fonts</b>، وقد تسجّل الجهتان عنوان IP ضمن سجلاتهما المعتادة. ما نستخدم أي أدوات تتبّع أو إعلانات.</p>
-
-    <h2><span>🧒</span>خصوصية الأطفال</h2>
-    <p>ما نطلب من الطفل أي بيانات، وما فيه حسابات ولا محادثات مع غرباء. الإعدادات والمشاركة والتواصل والروابط الخارجية كلها عند وليّ الأمر فقط.</p>
-
-    <h2><span>🗑️</span>حذف بياناتك</h2>
-    <p>«فك ربط هذا الجهاز» من الإعدادات يمسح البيانات من الجهاز، وإزالة التطبيق أو مسح بيانات المتصفح تحذف كل شيء محلي. ولحذف نسخة العائلة المشفّرة من خادمنا، راسلنا من البريد أدناه.</p>
-
-    <h2><span>✉️</span>تواصل معنا</h2>
-    <p>لأي سؤال عن خصوصيتك أو خصوصية أطفالك: <a href="mailto:siraj@wamdarc.com">siraj@wamdarc.com</a></p>
-  </section>
-</main>
-
-<footer>
-  <p>© ومض آرك WAMD ARC · <a href="https://wamdarc.com">wamdarc.com</a></p>
-</footer>
+  <footer>
+    <b>WAMD ARC</b>
+    <a href="https://wamdarc.com" style="font-weight:400">wamdarc.com</a> · <a href="./" style="font-weight:400" id="back">سراج</a>
+  </footer>
+</div>
+<script>
+(function () {
+  var T = { ar: ['سياسة الخصوصية', 'سراج | SIRAJ · آخر تحديث: ٢٣ نوفمبر ٢٠٢٦', 'سراج'], en: ['Privacy Policy', 'سراج | SIRAJ · Last updated: November 23, 2026', 'SIRAJ'] };
+  function set(l) {
+    document.documentElement.lang = l; document.documentElement.dir = l === 'en' ? 'ltr' : 'rtl';
+    document.getElementById('ar').hidden = l !== 'ar'; document.getElementById('en').hidden = l !== 'en';
+    document.getElementById('ttl').textContent = T[l][0]; document.getElementById('sub').textContent = T[l][1]; document.getElementById('back').textContent = T[l][2]; document.getElementById('backTxt').textContent = T[l][2];
+    document.title = T[l][0] + ' — سراج | SIRAJ';
+    [].forEach.call(document.querySelectorAll('.lang button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.l === l)); });
+  }
+  [].forEach.call(document.querySelectorAll('.lang button'), function (b) { b.onclick = function () { set(b.dataset.l); history.replaceState(null, '', '?lang=' + b.dataset.l); }; });
+  var q = /[?&]lang=(en|ar)/.exec(location.search);
+  set(q ? q[1] : (!/^ar/i.test(navigator.language || '') ? 'en' : 'ar'));
+})();
+</script>
 </body>
 </html>

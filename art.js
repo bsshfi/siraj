@@ -1,4 +1,4 @@
-/* سِراج | SIRAJ — الرسومات: الشخصيات والمشاهد (SVG) */
+/* سراج | SIRAJ — الرسومات: الشخصيات والمشاهد (SVG) */
 const ART = (() => {
   const SKIN = ['#FDDCC0', '#F1C08F', '#D9A06B', '#A96F45'];
   const HAIR = ['#2B1B12', '#5A3420', '#9C5B2E', '#E0B062', '#C0392B'];
@@ -141,7 +141,7 @@ const ART = (() => {
     return `<svg viewBox="0 0 100 150" width="${size}" height="${Math.round(size * 1.5)}" aria-hidden="true">${avatar(av, g)}</svg>`;
   }
 
-  /* إكسسوارات تنفتح من «سماء سِراج» (كل كوكبة = إكسسوار) */
+  /* إكسسوارات تنفتح من «سماء سراج» (كل كوكبة = إكسسوار) */
   const ACC = [
     { id: 'crown', name: 'تاج', icon: '👑' },
     { id: 'star', name: 'مشبك نجمة', icon: '⭐' },

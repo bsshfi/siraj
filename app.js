@@ -1,4 +1,4 @@
-/* سِراج | SIRAJ — منطق التطبيق */
+/* سراج | SIRAJ — منطق التطبيق */
 const KEY = 'siraj';
 const DAD = ['بابا', 'يبه', 'أبوي', 'بابي'];
 const MOM = ['ماما', 'يمه', 'أمي', 'مامي'];
@@ -197,8 +197,8 @@ const App = (() => {
   /* ---------- الترحيب والتثبيت ---------- */
   function renderWelcome() {
     $('installSteps').innerHTML = isIOS()
-      ? '<b>أضفه للشاشة الرئيسية ليعمل كتطبيق:</b><br>١. اضغط زر المشاركة <b>⬆️</b><br>٢. اختر <b>«إضافة إلى الشاشة الرئيسية»</b><br>٣. افتح سِراج من أيقونته 🌙'
-      : '<b>أضفه للشاشة الرئيسية ليعمل كتطبيق:</b><br>١. اضغط قائمة المتصفح <b>⋮</b><br>٢. اختر <b>«تثبيت التطبيق»</b> أو «إضافة إلى الشاشة الرئيسية»<br>٣. افتح سِراج من أيقونته 🌙';
+      ? '<b>أضفه للشاشة الرئيسية ليعمل كتطبيق:</b><br>١. اضغط زر المشاركة <b>⬆️</b><br>٢. اختر <b>«إضافة إلى الشاشة الرئيسية»</b><br>٣. افتح سراج من أيقونته 🌙'
+      : '<b>أضفه للشاشة الرئيسية ليعمل كتطبيق:</b><br>١. اضغط قائمة المتصفح <b>⋮</b><br>٢. اختر <b>«تثبيت التطبيق»</b> أو «إضافة إلى الشاشة الرئيسية»<br>٣. افتح سراج من أيقونته 🌙';
   }
   function skipWelcome() { try { sessionStorage.setItem('siraj-skip', '1'); } catch (e) {} start(); }
 
@@ -708,7 +708,7 @@ const App = (() => {
           })()}
           ${(() => {
             const d = devices().filter((x) => x.role === 'child' && (x.kids || []).includes(k.id));
-            return d.length ? `<div class="devbadge on">📱 سِراج مثبّت على ${esc(d[0].plat || 'جهاز')}${d.length > 1 ? ' و' + (d.length - 1) + ' غيره' : ''} · آخر فتح ${ago(d[0].last)}</div>`
+            return d.length ? `<div class="devbadge on">📱 سراج مثبّت على ${esc(d[0].plat || 'جهاز')}${d.length > 1 ? ' و' + (d.length - 1) + ' غيره' : ''} · آخر فتح ${ago(d[0].last)}</div>`
               : `<button class="devbadge" onclick="App.showFamilyCode(false)">⚪ ما فيه جهاز مربوط ل${k.g === 'f' ? 'ها' : 'ه'}، اربط جهاز${k.g === 'f' ? 'ها' : 'ه'} ←</button>`;
           })()}
         </div>`;
@@ -1108,13 +1108,13 @@ const App = (() => {
     $('codeModal').classList.add('on');
   }
   async function shareJoin() {
-    const text = 'اربط جهاز الأطفال بعائلتنا في سِراج 🌙\nرمز العائلة: ' + S.code + '\n' + joinLink();
-    try { if (navigator.share) await navigator.share({ title: 'ربط سِراج', text }); else { await navigator.clipboard.writeText(text); toast('تم النسخ ✓'); } } catch (e) {}
+    const text = 'اربط جهاز الأطفال بعائلتنا في سراج 🌙\nرمز العائلة: ' + S.code + '\n' + joinLink();
+    try { if (navigator.share) await navigator.share({ title: 'ربط سراج', text }); else { await navigator.clipboard.writeText(text); toast('تم النسخ ✓'); } } catch (e) {}
   }
   async function copyCode() { try { await navigator.clipboard.writeText(S.code); toast('تم نسخ الرمز ✓'); } catch (e) { toast(S.code); } }
   async function shareApp() {
-    const text = 'سِراج 🌙 قصص ما قبل النوم، أبطالها أطفالك. قصص هادفة بأسمائهم وبالصور، وتشتغل بدون إنترنت.';
-    try { if (navigator.share) await navigator.share({ title: 'سِراج | SIRAJ', text, url: CONFIG.SITE }); else { await navigator.clipboard.writeText(text + '\n' + CONFIG.SITE); toast('تم نسخ الرابط ✓'); } } catch (e) {}
+    const text = 'سراج 🌙 قصص ما قبل النوم، أبطالها أطفالك. قصص هادفة بأسمائهم وبالصور، وتشتغل بدون إنترنت.';
+    try { if (navigator.share) await navigator.share({ title: 'سراج | SIRAJ', text, url: CONFIG.SITE }); else { await navigator.clipboard.writeText(text + '\n' + CONFIG.SITE); toast('تم نسخ الرابط ✓'); } } catch (e) {}
   }
   function unlink() {
     if (!confirm('فك ربط هذا الجهاز ومسح بياناته منه؟ (بيانات العائلة تبقى محفوظة في الرمز)')) return;
@@ -1133,7 +1133,7 @@ const App = (() => {
     closeModal('notifModal');
     if (!CONFIG.VAPID) return toast('الإشعارات تحتاج إعداد السيرفر أولًا');
     if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window))
-      return toast(isIOS() && !standalone() ? 'أضف سِراج للشاشة الرئيسية أولًا، ثم فعّل الإشعارات' : 'هذا الجهاز لا يدعم الإشعارات');
+      return toast(isIOS() && !standalone() ? 'أضف سراج للشاشة الرئيسية أولًا، ثم فعّل الإشعارات' : 'هذا الجهاز لا يدعم الإشعارات');
     try {
       const p = await Notification.requestPermission();
       if (p !== 'granted') return toast('لم يتم السماح بالإشعارات');

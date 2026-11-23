@@ -1,4 +1,4 @@
-/* سِراج | SIRAJ — رحلات حول العالم ✈️ (كل الرحلات من مطار الملك خالد الدولي بالرياض وترجع له) */
+/* سراج | SIRAJ — رحلات حول العالم ✈️ (كل الرحلات من مطار الملك خالد الدولي بالرياض وترجع له) */
 const Trips = (() => {
   const SI = (n, a) => (typeof Stk !== 'undefined' ? Stk.icon(n, a) : '⭐');
   const $ = (id) => document.getElementById(id);
@@ -127,14 +127,14 @@ const Trips = (() => {
   function stepDays() {
     const cn = byCode(T.c), inf = COUNTRY_INFO[T.c] || {}, tr = travelers(), c = C();
     if (T.ret) return open(`${dots()}<h2>بطاقة العودة 🇸🇦</h2><p class="muted">راجعين لبلدنا 💚</p>
-      <div class="bpass"><div class="bph"><span>✈️ سِراج للطيران</span><span>بطاقة صعود</span></div>
+      <div class="bpass"><div class="bph"><span>✈️ سراج للطيران</span><span>بطاقة صعود</span></div>
         <div class="bpr"><div><small>من</small><b>${flagOf(T.c)}</b><em>${cn.cap}، ${cn.n}</em></div><div class="bpline">✈️</div><div><small>إلى</small><b>RUH</b><em>الرياض 🇸🇦</em></div></div>
         <div class="bpf">${inf.h ? `<span>⏱️ ${AR(inf.h).replace('.', '٫')} ساعة طيران تقريبًا</span>` : ''}<span>👥 ${AR(tr.length)} ${tr.length === 1 ? 'مسافر' : 'مسافرين'}</span></div>
         <div class="bpp">${tr.map((p) => `<span>${ART.avatarSVG(p.av, p.g, 34)}<small>${c.esc(p.n)}</small></span>`).join('')}</div></div>
       <div class="row"><button class="btn" onclick="Trips.go(3)">للمطار 🛫</button><button class="btn alt" onclick="Trips.go(1)">غيّر الدولة</button></div>`);
     open(`${dots()}<h2>كم يوم؟ 🗓️</h2>
       <div class="trdays">${[1, 2, 3, 4, 5, 6, 7].map((n) => `<button class="${T.days === n ? 'on' : ''}" onclick="Trips.setDays(${n})">${AR(n)}</button>`).join('')}</div>
-      <div class="bpass"><div class="bph"><span>✈️ سِراج للطيران</span><span>بطاقة صعود</span></div>
+      <div class="bpass"><div class="bph"><span>✈️ سراج للطيران</span><span>بطاقة صعود</span></div>
         <div class="bpr"><div><small>من</small><b>RUH</b><em>الرياض 🇸🇦</em></div><div class="bpline">✈️</div><div><small>إلى</small><b>${flagOf(T.c)}</b><em>${cn.cap}، ${cn.n}</em></div></div>
         <div class="bpf"><span>🗓️ ${DAYS[T.days]}</span>${inf.h ? `<span>⏱️ ${AR(inf.h).replace('.', '٫')} ساعة طيران تقريبًا</span>` : ''}<span>👥 ${AR(tr.length)} ${tr.length === 1 ? 'مسافر' : 'مسافرين'}</span></div>
         <div class="bpp">${tr.map((p) => `<span>${ART.avatarSVG(p.av, p.g, 34)}<small>${c.esc(p.n)}</small></span>`).join('')}</div></div>
@@ -242,7 +242,7 @@ const Trips = (() => {
     const list = allTrips(), map = {};
     list.forEach((t) => { map[t.c] = map[t.c] || { n: 0, at: t.at }; map[t.c].n++; map[t.c].at = Math.min(map[t.c].at, t.at); });
     const codes = Object.keys(map).sort((a, b) => map[a].at - map[b].at);
-    open(`<div class="passport"><div class="pph">🇸🇦<b>جواز سفر سِراج</b><small>زرت ${AR(codes.length)} من ${AR(COUNTRIES.length + 1)} دولة</small></div>
+    open(`<div class="passport"><div class="pph">🇸🇦<b>جواز سفر سراج</b><small>زرت ${AR(codes.length)} من ${AR(COUNTRIES.length + 1)} دولة</small></div>
       <i class="ppbar"><b style="width:${Math.max(2, Math.round(codes.length / (COUNTRIES.length + 1) * 100))}%"></b></i>
       <div class="stamps">${codes.length ? codes.map((cd, i) => `<div class="stamp" style="--r:${(i * 37) % 24 - 12}deg"><span>${flagOf(cd)}</span><b>${(byCode(cd) || { n: cd }).n}</b><small>${map[cd].n > 1 ? '×' + AR(map[cd].n) : new Date(map[cd].at).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'short' })}</small></div>`).join('') : '<p class="muted">الجواز فاضي… سافر وخذ أول ختم ✈️</p>'}</div></div>
       <button class="btn alt" onclick="Play.closeGame()">إغلاق</button>`);

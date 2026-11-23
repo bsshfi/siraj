@@ -1,4 +1,4 @@
-/* سِراج | SIRAJ — حول التطبيق، الخصوصية، التواصل، الإضافة للشاشة الرئيسية (عند وليّ الأمر فقط)
+/* سراج | SIRAJ — حول التطبيق، الخصوصية، التواصل، الإضافة للشاشة الرئيسية (عند وليّ الأمر فقط)
    وتذييل صغير للعيال في «أنا» (الإصدار والشعار، بدون روابط) */
 const Info = (() => {
   const $ = (id) => document.getElementById(id);
@@ -23,13 +23,13 @@ const Info = (() => {
       ['👨‍👩‍👧', 'متابعة الوالدين', 'لوحة شرف، ورسائل للعيال، ومكافأة الأسبوع، وتقرير كل جمعة.'],
       ['🔒', 'خصوصية العائلة', 'أسماء الأطفال وكل بياناتهم تنشفّر على جهازك قبل أي مزامنة.']
     ];
-    sheet(hero('سِراج | SIRAJ', 'v' + CONFIG.VERSION) + `<p class="itag">قصص قبل النوم بأسماء أطفالك 🌙</p>
-      <p class="itext">سِراج يحوّل وقت النوم لحكاية يكون أطفالك أبطالها: قصة كل ليلة بأسمائهم، ورسومات فيها شخصياتهم، وأنشطة خفيفة تعلّمهم وتسعدهم. بدون إعلانات، وبدون مشتريات داخل التطبيق.</p>
+    sheet(hero('سراج | SIRAJ', 'v' + CONFIG.VERSION) + `<p class="itag">قصص قبل النوم بأسماء أطفالك 🌙</p>
+      <p class="itext">سراج يحوّل وقت النوم لحكاية يكون أطفالك أبطالها: قصة كل ليلة بأسمائهم، ورسومات فيها شخصياتهم، وأنشطة خفيفة تعلّمهم وتسعدهم. بدون إعلانات، وبدون مشتريات داخل التطبيق.</p>
       <ul class="ilist">${F.map(([e, t, d]) => `<li><b>${e}</b><span><b>${t}</b><i>${d}</i></span></li>`).join('')}</ul>
       <p class="iby">من تطوير</p>${logo(true)}
       <button class="btn" onclick="App.shareApp()">مشاركة التطبيق 📤</button><button class="btn alt" style="margin-top:8px" onclick="Play.closeGame()">إغلاق</button>`);
   }
-  function contact() { location.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('سِراج — ملاحظة v' + CONFIG.VERSION); }
+  function contact() { location.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('سراج — ملاحظة v' + CONFIG.VERSION); }
   async function privacy() {
     let body = '';
     try {
@@ -37,19 +37,19 @@ const Info = (() => {
       if (m) { m.querySelectorAll('script,style').forEach((x) => x.remove()); body = m.innerHTML; }
     } catch (e) {}
     if (!body) return App.ctx().toast('تعذّر فتح السياسة، تأكد من الإنترنت');
-    sheet(hero('سياسة الخصوصية', 'سِراج | SIRAJ') + `<div class="pv">${body}</div><button class="btn" onclick="Play.closeGame()">تم</button>`);
+    sheet(hero('سياسة الخصوصية', 'سراج | SIRAJ') + `<div class="pv">${body}</div><button class="btn" onclick="Play.closeGame()">تم</button>`);
     document.querySelectorAll('.pv a[href^="http"]').forEach((x) => { x.target = '_blank'; x.rel = 'noopener'; });
   }
   const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   async function addHome() {
-    if (standalone()) return App.ctx().toast('سِراج مضاف للشاشة الرئيسية ✓');
+    if (standalone()) return App.ctx().toast('سراج مضاف للشاشة الرئيسية ✓');
     if (installEvt) { installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; return; }
     const ios = isIOS();
     sheet(hero('إضافة إلى الشاشة الرئيسية', 'يفتح مثل التطبيق، بملء الشاشة') + `<ol class="isteps">${ios
-      ? '<li>افتح سِراج من متصفح <b>Safari</b></li><li>اضغط زر المشاركة <b>⬆️</b> تحت (أو فوق في الآيباد)</li><li>اختر <b>«إضافة إلى الشاشة الرئيسية»</b></li><li>اضغط <b>«إضافة»</b> ✓</li>'
-      : '<li>افتح سِراج من متصفح <b>Chrome</b></li><li>اضغط القائمة <b>⋮</b> فوق</li><li>اختر <b>«إضافة إلى الشاشة الرئيسية»</b> أو <b>«تثبيت التطبيق»</b></li><li>اضغط <b>«تثبيت»</b> ✓</li>'}</ol>
-      <p class="muted">سوّها على كل جهاز في البيت، وتطلع أيقونة سِراج مع باقي التطبيقات.</p><button class="btn" onclick="Play.closeGame()">تمام</button>`);
+      ? '<li>افتح سراج من متصفح <b>Safari</b></li><li>اضغط زر المشاركة <b>⬆️</b> تحت (أو فوق في الآيباد)</li><li>اختر <b>«إضافة إلى الشاشة الرئيسية»</b></li><li>اضغط <b>«إضافة»</b> ✓</li>'
+      : '<li>افتح سراج من متصفح <b>Chrome</b></li><li>اضغط القائمة <b>⋮</b> فوق</li><li>اختر <b>«إضافة إلى الشاشة الرئيسية»</b> أو <b>«تثبيت التطبيق»</b></li><li>اضغط <b>«تثبيت»</b> ✓</li>'}</ol>
+      <p class="muted">سوّها على كل جهاز في البيت، وتطلع أيقونة سراج مع باقي التطبيقات.</p><button class="btn" onclick="Play.closeGame()">تمام</button>`);
   }
   function fill() {
     document.querySelectorAll('.verV').forEach((x) => (x.textContent = CONFIG.VERSION));
@@ -58,7 +58,7 @@ const Info = (() => {
       if (n && er && er.v === CONFIG.VERSION && Date.now() - er.t < 2 * 864e5) { n.style.display = ''; n.style.fontSize = '11px'; n.style.direction = 'ltr'; n.style.textAlign = 'center'; n.textContent = '⚠︎ ' + er.f + ':' + er.l + ' ' + er.m; }
     } catch (e) {}
     const k = $('kidFoot');
-    if (k) k.innerHTML = `<b>سِراج — الإصدار ${CONFIG.VERSION}</b>${logo(false)}`;
+    if (k) k.innerHTML = `<b>سراج | SIRAJ — الإصدار ${CONFIG.VERSION}</b>${logo(false)}`;
   }
   document.addEventListener('DOMContentLoaded', fill); if (document.readyState !== 'loading') setTimeout(fill);
   return { about, contact, privacy, addHome, fill };

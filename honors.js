@@ -1,4 +1,4 @@
-/* سِراج | SIRAJ — الدفعة ٤: لوحة شرف العائلة والشارات، وتقرير الأسبوع */
+/* سراج | SIRAJ — الدفعة ٤: لوحة شرف العائلة والشارات، وتقرير الأسبوع */
 const Honors = (() => {
   const SI = (n, a) => (typeof Stk !== 'undefined' ? Stk.icon(n, a) : '⭐');
   const $ = (id) => document.getElementById(id);
