@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 106,
+    "latestBuild": 107,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
-    "title": "تحديث سراج ✨",
-    "message": "جديد: ربط العائلة برمزها، شخصيات أطفالك الحقيقية، واختيار أبطال الليلة.",
+    "title": "سراج اكتمل ✨",
+    "message": "جديد: تبويب «أنا» بالنجوم والشارات وأذكار النوم، «اكتشف» برحلات حول العالم والفضاء، «العب وتعلّم» بالإنجليزي والألعاب، ولوحة «للوالدين».",
     "live": {
       "version": "5.1.2-6",
       "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-6/siraj-live-5.1.2-6.zip",
