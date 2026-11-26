@@ -51,6 +51,14 @@ html = html.replace(/\s*<link[^>]+fonts\.(googleapis|gstatic)\.com[^>]*>/g, '');
 if (/fonts\.googleapis\.com/.test(html)) fail('بقي رابط Google Fonts في index.html');
 html = html.replace(/\s*<link[^>]+rel="manifest"[^>]*>/g, '');
 html = html.replace(/\s*<script[^>]+wamd-stats\.js[^>]*><\/script>/g, '');
+// أداء أفضل على جوالات الأندرويد المتوسطة: تأثير التمويه (blur) ثقيل جدًا على WebView،
+// ويسبب بطء بالتنقّل وشاشة بيضاء لحظية. نشيله ونعوّضه بخلفية أوضح شوي — الشكل يبقى نفسه تقريبًا.
+html = replaceOnce(html, '</head>', `<style id="native-perf">
+*{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+:root{--glass:rgba(255,255,255,.92)}
+.bnav,body[data-pal] .bnav{background:rgba(255,255,255,.97)!important}
+</style>
+</head>`, 'index.html');
 html = replaceOnce(html, '<script src="config.js',
   '<link rel="stylesheet" href="vendor/fonts/fonts.css">\n<script src="native-shim.js"></script>\n<script src="vendor/qrcode.js"></script>\n<script src="config.js', 'index.html');
 fs.writeFileSync(path.join(OUT, 'index.html'), html);
