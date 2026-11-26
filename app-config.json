@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 110,
+    "latestBuild": 112,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
-    "title": "تحديث سراج 🔔",
-    "message": "خطوط أرتب، دعم التابلت، وإشعار تذكير وقت القصة صار يشتغل.",
+    "title": "سمائي وألعاب القصة ✨",
+    "message": "جديد: غرفتي، الكوكبات، ألبوم الملصقات، الهدايا، لوحة الشرف، تقرير الأسبوع، وألعاب القصة (تلوين، أحجية، أسئلة).",
     "live": {
       "version": "5.1.2-6",
       "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-6/siraj-live-5.1.2-6.zip",
