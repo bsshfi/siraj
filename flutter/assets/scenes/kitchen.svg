@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><g><rect width="400" height="260" fill="#FFF6E5"/>
+      <g fill="#FFE0B2"><rect x="2" y="120" width="36" height="36"/><rect x="42" y="120" width="36" height="36"/><rect x="82" y="120" width="36" height="36"/><rect x="122" y="120" width="36" height="36"/><rect x="162" y="120" width="36" height="36"/><rect x="202" y="120" width="36" height="36"/><rect x="242" y="120" width="36" height="36"/><rect x="282" y="120" width="36" height="36"/><rect x="322" y="120" width="36" height="36"/><rect x="362" y="120" width="36" height="36"/></g>
+      <rect x="20" y="20" width="160" height="70" rx="6" fill="#FF9F1C"/><line x1="100" y1="20" x2="100" y2="90" stroke="#E07E00" stroke-width="3"/>
+      <rect x="230" y="20" width="110" height="80" rx="6" fill="#BDEBFF" stroke="#fff" stroke-width="6"/>
+      <rect y="160" width="400" height="20" fill="#C47A3A"/><rect y="180" width="400" height="80" fill="#4DB8F0"/>
+      <circle cx="40" cy="220" r="4" fill="#fff"/><circle cx="140" cy="220" r="4" fill="#fff"/><circle cx="240" cy="220" r="4" fill="#fff"/><circle cx="340" cy="220" r="4" fill="#fff"/>
+      <path d="M260 160 h50 v-22 a25 8 0 0 0 -50 0z" fill="#6E668F"/><path d="M275 120 q5 -10 0 -18 M295 120 q5 -10 0 -18" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/></g></svg>

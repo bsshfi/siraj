@@ -1,0 +1,68 @@
+# سراج | Siraj — التطبيق الأصلي (Flutter)
+# يشتغل فقط على فرع flutter. يبني APK ويرفعه على الرابط الثابت للنسخة التجريبية.
+name: Flutter app
+
+on:
+  push:
+    branches: [flutter]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flutter-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flutter
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: تصدير القصص والرسومات من نسخة الويب
+        run: node tool/export.cjs
+
+      - name: تجهيز مشروع الأندرويد
+        run: |
+          flutter create --org com.wamdarc --project-name siraj --platforms android .
+          rm -rf test
+          python3 tool/patch_android.py
+          flutter pub get
+          dart run flutter_launcher_icons
+
+      - name: فحص الكود
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: بناء APK
+        run: |
+          BN=$((100 + GITHUB_RUN_NUMBER))
+          flutter build apk --release --build-number=$BN --build-name=2.0.0 || (sleep 45; flutter build apk --release --build-number=$BN --build-name=2.0.0)
+          cp build/app/outputs/flutter-apk/app-release.apk siraj-test.apk
+          echo "BN=$BN" >> "$GITHUB_ENV"
+
+      - name: نشر النسخة التجريبية على الرابط الثابت
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view android-test >/dev/null 2>&1 || \
+            gh release create android-test --target "${GITHUB_SHA}" --prerelease --title "سراج | Siraj — نسخة تجريبية للأندرويد" --notes "آخر نسخة تجريبية."
+          gh release upload android-test siraj-test.apk --clobber
+          gh release edit android-test --notes "آخر نسخة تجريبية (Flutter) — رقم البناء ${BN}"

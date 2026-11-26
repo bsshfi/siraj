@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><g><defs><linearGradient id="sfg17" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BE1FF"/><stop offset="1" stop-color="#FFF8E1"/></linearGradient></defs>
+      <rect width="400" height="260" fill="url(#sfg17)"/><circle cx="60" cy="50" r="24" fill="#FFD93D"/>
+      <path d="M0 180 Q200 160 400 180 V260 H0Z" fill="#9BD86A"/>
+      <rect x="250" y="95" width="110" height="90" fill="#E84A4A"/><path d="M240 100 L305 55 L370 100Z" fill="#B83232"/>
+      <rect x="285" y="135" width="40" height="50" fill="#fff"/><path d="M285 135 L325 185 M325 135 L285 185" stroke="#E84A4A" stroke-width="4"/>
+      <g stroke="#C47A3A" stroke-width="5"><line x1="20" y1="185" x2="20" y2="215"/><line x1="60" y1="185" x2="60" y2="215"/><line x1="100" y1="185" x2="100" y2="215"/><line x1="140" y1="185" x2="140" y2="215"/><line x1="180" y1="185" x2="180" y2="215"/><line x1="10" y1="195" x2="190" y2="195"/><line x1="10" y1="208" x2="190" y2="208"/></g>
+      <ellipse cx="220" cy="215" rx="22" ry="14" fill="#F2C94C"/></g></svg>

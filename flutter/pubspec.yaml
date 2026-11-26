@@ -1,0 +1,45 @@
+name: siraj
+description: "سراج | Siraj — قصص قبل النوم بأسماء أطفالك"
+publish_to: 'none'
+version: 2.0.0+100
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_svg: ^2.0.10
+  flutter_tts: ^4.0.2
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
+    - assets/scenes/
+    - assets/avatars/
+    - assets/brand/
+  fonts:
+    - family: Baloo
+      fonts:
+        - asset: assets/fonts/BalooBhaijaan2-400.ttf
+          weight: 400
+        - asset: assets/fonts/BalooBhaijaan2-600.ttf
+          weight: 600
+        - asset: assets/fonts/BalooBhaijaan2-700.ttf
+          weight: 700
+        - asset: assets/fonts/BalooBhaijaan2-800.ttf
+          weight: 800
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/brand/icon.png"
+  adaptive_icon_background: "assets/brand/icon-bg.png"
+  adaptive_icon_foreground: "assets/brand/icon-fg.png"
