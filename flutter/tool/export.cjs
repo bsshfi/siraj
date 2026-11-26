@@ -32,4 +32,6 @@ for (const g of ['m', 'f']) {
   const svg = ART.avatarSVG(D[g], g, 120);
   fs.writeFileSync(path.join(OUT, 'avatars', (g === 'm' ? 'boy' : 'girl') + '.svg'), clean(svg).replace(/^<svg (?!xmlns)/, '<svg xmlns="http://www.w3.org/2000/svg" '));
 }
+fs.mkdirSync(path.join(OUT, 'js'), { recursive: true });
+fs.copyFileSync(path.join(ROOT, 'art.js'), path.join(OUT, 'js', 'art.js'));
 console.log(`✓ ${stories.length} قصة، ${n} مشهد`);

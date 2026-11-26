@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'avatars.dart';
 import 'data.dart';
+import 'family.dart';
+import 'remote.dart';
 import 'screens/setup.dart';
 import 'screens/tonight.dart';
 import 'theme.dart';
@@ -15,7 +18,7 @@ Future<void> main() async {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  await Future.wait([Library.load(), Profile.load()]);
+  await Future.wait([Library.load(), Profile.load(), Family.I.load()]);
   runApp(const SirajApp());
 }
 
@@ -35,7 +38,12 @@ class SirajApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: Profile.hero == null ? const SetupScreen() : const Shell(),
+      // محرّك رسم الشخصيات (مخفي) — نفس رسّام نسخة الويب
+      builder: (context, child) => Stack(children: [
+        Positioned(left: 0, top: 0, child: Avatars.host()),
+        if (child != null) Positioned.fill(child: child),
+      ]),
+      home: Profile.hero == null && !Family.I.linked ? const WelcomeScreen() : const Shell(),
     );
   }
 }
@@ -47,8 +55,32 @@ class Shell extends StatefulWidget {
   State<Shell> createState() => _ShellState();
 }
 
-class _ShellState extends State<Shell> {
+class _ShellState extends State<Shell> with WidgetsBindingObserver {
   int _tab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Remote.check(context);
+      Family.I.syncNow();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Family.I.syncNow();
+      if (mounted) Remote.check(context);
+    }
+  }
 
   static const _tabs = [
     ('الليلة', Icons.nightlight_round, Color(0xFF8B5CF6)),

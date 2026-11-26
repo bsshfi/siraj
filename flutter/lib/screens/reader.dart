@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data.dart';
+import '../family.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/scene.dart';
@@ -9,7 +10,8 @@ import '../widgets/scene.dart';
 /// قارئ القصة: تقليب بالسحب، قراءة بالصوت، وصفحات "اختر الطريق"
 class ReaderScreen extends StatefulWidget {
   final Story story;
-  const ReaderScreen({super.key, required this.story});
+  final List<Kid> heroes;
+  const ReaderScreen({super.key, required this.story, required this.heroes});
   @override
   State<ReaderScreen> createState() => _ReaderScreenState();
 }
@@ -19,10 +21,12 @@ class _ReaderScreenState extends State<ReaderScreen> {
   int _i = 0;
   bool _auto = false; // القراءة بالصوت شغالة (تقلب الصفحات لحالها)
   bool _finished = false;
-  late final Kid _hero = Profile.hero ?? const Kid('بطلنا', 'm');
+  late final List<Kid> _heroes = widget.heroes.isEmpty ? const [Kid('بطلنا', 'm')] : widget.heroes;
+  Kid get _hero => _heroes.first;
+  String _fill(String x) => fillTemplate(x, _hero, friends: _heroes.sublist(1), dad: Family.I.dad, mom: Family.I.mom);
 
   Story get s => widget.story;
-  String _text(int i) => fillTemplate(s.pages[i].text, _hero);
+  String _text(int i) => _fill(s.pages[i].text);
 
   /// الصفحة الجاية: الخيارات تحدد الطريق، وصفحة النهاية توقف
   int? _next(int i) {
@@ -70,6 +74,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     if (_finished) return;
     _finished = true;
     Profile.markDone(s.id);
+    Family.I.logStory(s.id, _heroes);
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
@@ -79,13 +84,13 @@ class _ReaderScreenState extends State<ReaderScreen> {
         padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('🌙✨', style: TextStyle(fontSize: 46)),
-          Text('تصبح${_hero.isGirl ? 'ين' : ''} على خير يا ${_hero.name}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+          Text(_heroes.length > 1 ? 'تصبحون على خير يا ${_heroes.map((k) => k.name).join(' و')}' : 'تصبح${_hero.isGirl ? 'ين' : ''} على خير يا ${_hero.name}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
           if (s.question.isNotEmpty) ...[
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(color: const Color(0xFFF3EEFF), borderRadius: BorderRadius.circular(18)),
-              child: Text('💬 ${fillTemplate(s.question, _hero)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, height: 1.6, fontWeight: FontWeight.w600)),
+              child: Text('💬 ${_fill(s.question)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, height: 1.6, fontWeight: FontWeight.w600)),
             ),
           ],
           const SizedBox(height: 16),
@@ -128,7 +133,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(fillTemplate(s.title, _hero),
+                child: Text(_fill(s.title),
                     maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
               ),
               Text('${_i + 1}/${s.pages.length}', style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700)),
@@ -154,7 +159,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
               itemBuilder: (_, i) => _PageView(
                 page: s.pages[i],
                 text: _text(i),
-                hero: _hero,
+                heroes: _heroes,
                 heroTag: i == 0 ? 'art-${s.id}' : null,
                 onChoice: (target) {
                   setState(() => _auto = false);
@@ -191,15 +196,15 @@ class _ReaderScreenState extends State<ReaderScreen> {
 class _PageView extends StatelessWidget {
   final StoryPage page;
   final String text;
-  final Kid hero;
+  final List<Kid> heroes;
   final String? heroTag;
   final void Function(int) onChoice;
   final VoidCallback? onFinish;
-  const _PageView({required this.page, required this.text, required this.hero, required this.onChoice, this.heroTag, this.onFinish});
+  const _PageView({required this.page, required this.text, required this.heroes, required this.onChoice, this.heroTag, this.onFinish});
 
   @override
   Widget build(BuildContext context) {
-    final art = SceneArt(scene: page.scene, prop: page.prop, hero: hero, radius: 26);
+    final art = SceneArt(scene: page.scene, prop: page.prop, heroes: heroes, radius: 26);
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
       physics: const BouncingScrollPhysics(),

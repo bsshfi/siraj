@@ -56,12 +56,23 @@ class Story {
   }
 }
 
-/// بطل القصة: الاسم + ولد/بنت ('m' أو 'f')
+/// طفل (بطل القصة): الاسم + ولد/بنت ('m' أو 'f') + شكله من العائلة (av)
 class Kid {
   final String name;
   final String gender;
-  const Kid(this.name, this.gender);
+  final String id;
+  final int age;
+  final Map<String, dynamic>? av;
+  const Kid(this.name, this.gender, {this.id = '', this.age = 0, this.av});
   bool get isGirl => gender == 'f';
+
+  factory Kid.fromJson(Map<String, dynamic> j) => Kid(
+        (j['name'] ?? '').toString(),
+        j['g'] == 'f' ? 'f' : 'm',
+        id: (j['id'] ?? '').toString(),
+        age: (j['age'] is num) ? (j['age'] as num).toInt() : int.tryParse('${j['age']}') ?? 0,
+        av: j['av'] is Map ? Map<String, dynamic>.from(j['av'] as Map) : null,
+      );
 }
 
 class Library {

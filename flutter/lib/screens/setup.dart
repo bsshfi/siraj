@@ -5,8 +5,53 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../data.dart';
 import '../main.dart';
 import '../theme.dart';
+import 'link.dart';
 
-/// أول تشغيل: اسم البطل وولد/بنت (المرحلة ٢: ربط العائلة برمزها)
+/// أول تشغيل: ربط برمز العائلة، أو بطل سريع بدون رمز
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  void _home(BuildContext context) => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const Shell()));
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SkyBackground(
+        child: SafeArea(
+          child: ListView(padding: const EdgeInsets.all(22), children: [
+            const SizedBox(height: 30),
+            Center(child: ClipRRect(borderRadius: BorderRadius.circular(32), child: Image.asset('assets/brand/icon.png', width: 116, height: 116))),
+            const SizedBox(height: 14),
+            const Text('سراج', textAlign: TextAlign.center, style: TextStyle(fontSize: 44, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1)),
+            const Text('قصص قبل النوم… وطفلك هو البطل 🌙', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 36),
+            BigButton(
+              label: 'عندي رمز عائلة',
+              icon: Icons.key_rounded,
+              onTap: () async {
+                final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => const JoinScreen()));
+                if (ok == true && context.mounted) _home(context);
+              },
+            ),
+            const SizedBox(height: 12),
+            SoftCard(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              onTap: () async {
+                final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => const SetupScreen(editing: true)));
+                if (ok == true && context.mounted) _home(context);
+              },
+              child: const Text('ابدأ بدون رمز', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: C.ink)),
+            ),
+            const SizedBox(height: 14),
+            const Text('رمز العائلة يطلع من جهاز الوالدين في سراج،\nويربط كل أجهزة العائلة مع بعض.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14.5, color: C.soft, height: 1.6)),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// بطل سريع بدون عائلة: الاسم + ولد/بنت
 class SetupScreen extends StatefulWidget {
   final bool editing;
   const SetupScreen({super.key, this.editing = false});
@@ -27,11 +72,7 @@ class _SetupScreenState extends State<SetupScreen> {
     }
     await Profile.saveHero(Kid(n, _g));
     if (!mounted) return;
-    if (widget.editing) {
-      Navigator.of(context).pop(true);
-    } else {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const Shell()));
-    }
+    Navigator.of(context).pop(true);
   }
 
   Widget _pick(String g, String label) {
@@ -63,20 +104,11 @@ class _SetupScreenState extends State<SetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .4, .8]),
-        ),
+      body: SkyBackground(
         child: SafeArea(
           child: ListView(padding: const EdgeInsets.all(20), children: [
-            const SizedBox(height: 12),
-            if (widget.editing)
-              Align(alignment: AlignmentDirectional.centerStart, child: IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded))),
-            Center(child: ClipRRect(borderRadius: BorderRadius.circular(28), child: Image.asset('assets/brand/icon.png', width: 96, height: 96))),
-            const SizedBox(height: 10),
-            const Text('سراج', textAlign: TextAlign.center, style: TextStyle(fontSize: 38, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1)),
-            const Text('قصص قبل النوم… وطفلك هو البطل 🌙', textAlign: TextAlign.center, style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 24),
+            Align(alignment: AlignmentDirectional.centerStart, child: IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded))),
+            const SizedBox(height: 8),
             SoftCard(
               padding: const EdgeInsets.all(20),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -97,7 +129,7 @@ class _SetupScreenState extends State<SetupScreen> {
                 const SizedBox(height: 14),
                 Row(children: [_pick('m', 'ولد'), const SizedBox(width: 12), _pick('f', 'بنت')]),
                 const SizedBox(height: 18),
-                BigButton(label: widget.editing ? 'حفظ' : 'يلّا نبدأ ✨', onTap: _save),
+                BigButton(label: 'حفظ', onTap: _save),
               ]),
             ),
           ]),

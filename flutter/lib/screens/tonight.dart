@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../avatars.dart';
 import '../data.dart';
+import '../family.dart';
 import '../theme.dart';
 import '../widgets/scene.dart';
 import 'reader.dart';
+import 'link.dart';
 import 'setup.dart';
 
 /// شاشة "الليلة": الترحيب + قصة الليلة + قصص ثانية
@@ -27,22 +30,133 @@ class _TonightScreenState extends State<TonightScreen> {
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 380),
       reverseTransitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (_, a, __) => ReaderScreen(story: s),
+      pageBuilder: (_, a, __) => ReaderScreen(story: s, heroes: currentHeroes()),
       transitionsBuilder: (_, a, __, child) {
         final c = CurvedAnimation(parent: a, curve: Curves.easeOutCubic);
         return FadeTransition(opacity: c, child: ScaleTransition(scale: Tween(begin: .94, end: 1.0).animate(c), child: child));
       },
-    )).then((_) => setState(() {}));
+    )).then((_) => _refresh());
   }
 
-  Future<void> _editHero() async {
-    final changed = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => const SetupScreen(editing: true)));
-    if (changed == true) setState(() {});
+  @override
+  void initState() {
+    super.initState();
+    Family.I.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    Family.I.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _push(Widget w) async {
+    Navigator.pop(context);
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
+    _refresh();
+  }
+
+  void _settings() {
+    final f = Family.I;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text(f.linked ? 'العائلة مربوطة ✅' : 'الإعدادات', style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+            if (f.linked) ...[
+              if (f.kids.length > 1)
+                ListTile(leading: const Icon(Icons.groups_rounded, color: C.orange), title: const Text('مين يستخدم هالجهاز؟', style: TextStyle(fontWeight: FontWeight.w700)), onTap: () => _push(const WhoScreen())),
+              ListTile(
+                leading: const Icon(Icons.sync_rounded, color: C.sky),
+                title: const Text('تحديث من العائلة', style: TextStyle(fontWeight: FontWeight.w700)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  f.syncNow();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.link_off_rounded, color: Colors.redAccent),
+                title: const Text('فك ربط هالجهاز', style: TextStyle(fontWeight: FontWeight.w700)),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await f.unlink();
+                },
+              ),
+            ] else ...[
+              ListTile(leading: const Icon(Icons.key_rounded, color: C.orange), title: const Text('ربط برمز العائلة', style: TextStyle(fontWeight: FontWeight.w700)), onTap: () => _push(const JoinScreen())),
+              ListTile(leading: const Icon(Icons.edit_rounded, color: C.sky), title: const Text('تعديل البطل', style: TextStyle(fontWeight: FontWeight.w700)), onTap: () => _push(const SetupScreen(editing: true))),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+
+  /// اختيار أبطال الليلة (لو فيه أكثر من طفل على الجهاز)
+  Widget _picker() {
+    final f = Family.I;
+    final mine = f.myKids;
+    final sel = f.heroes.map((k) => k.id).toList();
+    return SizedBox(
+      height: 96,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          for (final k in mine)
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                final s = [...sel];
+                if (s.contains(k.id)) {
+                  if (s.length > 1) s.remove(k.id);
+                } else {
+                  s.add(k.id);
+                }
+                f.setHeroes(s);
+              },
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(end: 10),
+                child: Column(children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: sel.contains(k.id) ? C.orange : Colors.white54,
+                    ),
+                    child: Stack(children: [
+                      KidFace(kid: k, size: 60),
+                      if (sel.isNotEmpty && sel.first == k.id)
+                        const Positioned(right: 0, top: 0, child: Text('⭐', style: TextStyle(fontSize: 16))),
+                    ]),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(k.name, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: sel.contains(k.id) ? C.ink : const Color(0xFF34406E))),
+                ]),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final hero = Profile.hero ?? const Kid('بطلنا', 'm');
+    final heroes = currentHeroes();
+    final hero = heroes.first;
+    final friends = heroes.sublist(1);
+    String fill(String x) => fillTemplate(x, hero, friends: friends, dad: Family.I.dad, mom: Family.I.mom);
+    final showPicker = Family.I.linked && Family.I.myKids.length > 1;
     final tonight = Library.tonight();
     final more = Library.stories.where((s) => s.id != tonight.id && s.category.isEmpty).take(14).toList();
     final top = MediaQuery.of(context).padding.top;
@@ -68,12 +182,25 @@ class _TonightScreenState extends State<TonightScreen> {
                 ),
                 IconButton.filledTonal(
                   style: IconButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: .85)),
-                  onPressed: _editHero,
+                  onPressed: _settings,
                   icon: const Icon(Icons.tune_rounded, color: C.ink),
                 ),
               ]),
             ),
           ),
+          if (showPicker)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(22, 0, 22, 6),
+                    child: Text('مين أبطال الليلة؟', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+                  ),
+                  _picker(),
+                ]),
+              ),
+            ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             sliver: SliverToBoxAdapter(
@@ -81,7 +208,7 @@ class _TonightScreenState extends State<TonightScreen> {
                 padding: const EdgeInsets.all(10),
                 onTap: () => _open(tonight),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Hero(tag: 'art-${tonight.id}', child: SceneArt(scene: tonight.scene, hero: hero, prop: tonight.pages.first.prop, radius: 20)),
+                  Hero(tag: 'art-${tonight.id}', child: SceneArt(scene: tonight.scene, heroes: heroes, prop: tonight.pages.first.prop, radius: 20)),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 12, 8, 4),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -91,7 +218,7 @@ class _TonightScreenState extends State<TonightScreen> {
                         child: const Text('قصة الليلة', style: TextStyle(color: C.purple, fontWeight: FontWeight.w800, fontSize: 13)),
                       ),
                       const SizedBox(height: 6),
-                      Text(fillTemplate(tonight.title, hero), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, height: 1.3)),
+                      Text(fill(tonight.title), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, height: 1.3)),
                       if (tonight.value.isNotEmpty)
                         Text('قيمة الليلة: ${tonight.value}', style: const TextStyle(fontSize: 15, color: C.soft, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
@@ -121,7 +248,7 @@ class _TonightScreenState extends State<TonightScreen> {
                       Hero(tag: 'art-${s.id}', child: SceneArt(scene: s.scene, prop: s.pages.first.prop, radius: 16)),
                       const SizedBox(height: 8),
                       Expanded(
-                        child: Text(fillTemplate(s.title, hero),
+                        child: Text(fill(s.title),
                             maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, height: 1.3)),
                       ),
                       if (read) const Text('✓ قرأناها', style: TextStyle(fontSize: 12.5, color: Color(0xFF2FA36B), fontWeight: FontWeight.w700)),
