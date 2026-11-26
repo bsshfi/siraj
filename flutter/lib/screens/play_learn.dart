@@ -10,6 +10,7 @@ import '../nav.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/common.dart';
+import 'story_games.dart';
 
 /// تبويب "العب وتعلّم": الإنجليزي (حروف، كلمات، جمل) + ألعاب
 class PlayLearnScreen extends StatefulWidget {
@@ -221,7 +222,10 @@ class _PlayLearnScreenState extends State<PlayLearnScreen> {
             colors: const [C.night1, Color(0xFF3A3F78), Color(0xFF8C86C9)]);
       }),
     ];
+    if (Family.I.isNight) return [const StoryGamesCard()];
     return [
+      const StoryGamesCard(),
+      const SectionTitle('ألعاب تفكير وذكاء 🎮'),
       GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,

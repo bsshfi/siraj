@@ -9,6 +9,7 @@ import '../theme.dart';
 import '../tonight_logic.dart';
 import '../widgets/common.dart';
 import '../widgets/pin.dart';
+import '../sky.dart';
 import 'link.dart';
 import 'settings.dart';
 import 'setup.dart';
@@ -76,6 +77,69 @@ class _ParentsScreenState extends State<ParentsScreen> {
             style: FilledButton.styleFrom(backgroundColor: C.orange),
             child: const Text('نسخ الرمز', style: TextStyle(fontWeight: FontWeight.w800)),
           ),
+        ]),
+      ),
+    );
+  }
+
+  /// تقرير الأسبوع (آخر ٧ أيام مقارنة بالأسبوع اللي قبله)
+  void _report() {
+    final now = DateTime.now().millisecondsSinceEpoch, from = now - 7 * 86400000, prev = from - 7 * 86400000;
+    final kids = f.kids;
+    final out = Sky.titlesFor(kids, from).$1;
+    final r = f.fam['reward'];
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: .85,
+        builder: (_, sc) => ListView(controller: sc, padding: const EdgeInsets.all(18), children: [
+          const Text('📊 تقرير الأسبوع', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+          const Text('آخر ٧ أيام', textAlign: TextAlign.center, style: TextStyle(color: C.soft)),
+          for (final k in kids)
+            () {
+              final s = Sky.stats(k, from), p = Sky.stats(k, prev, from), diff = (s['nights'] as int) - (p['nights'] as int);
+              final last = (s['logs'] as List).take(3).map((e) => Tonight.byId(e['s'].toString())).whereType<Story>().map((st) => '«${fillTemplate(st.title, k)}»').toList();
+              Widget cell(Object n, String l) => Expanded(
+                    child: Column(children: [Text(Learn.ar(n), style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)), FittedBox(child: Text(l, style: const TextStyle(fontSize: 11.5, color: C.soft)))]),
+                  );
+              return Container(
+                margin: const EdgeInsets.only(top: 14),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: const Color(0xFFF7F9FD), borderRadius: BorderRadius.circular(20)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  Row(children: [
+                    KidFace(kid: k, size: 46),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(k.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+                        Wrap(spacing: 6, children: [for (final t in out[k.id] ?? []) Text('${t.$1} ${t.$2}', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: C.purple))]),
+                      ]),
+                    ),
+                  ]),
+                  const SizedBox(height: 10),
+                  Row(children: [
+                    cell(s['nights'], 'ليالي قراءة'),
+                    cell(s['stories'], 'قصة'),
+                    cell(s['adhkar'], 'أذكار'),
+                    cell(s['en'], 'إنجليزي'),
+                    cell((s['space'] as int) + (s['play'] as int), 'فضاء وألعاب'),
+                  ]),
+                  const SizedBox(height: 8),
+                  Text(
+                      '${diff > 0 ? '📈 أحسن من الأسبوع اللي قبله بـ${Learn.ar(diff)} ${diff == 1 ? 'ليلة' : 'ليالٍ'}' : diff < 0 ? '📉 أقل من الأسبوع اللي قبله، شجّعهم 💪' : '➖ نفس الأسبوع اللي قبله'} · 🔥 ${Learn.ar(f.streakOf(k))} متتالية',
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  if (last.isNotEmpty) Text('آخر القصص: ${last.join('، ')}', style: const TextStyle(color: C.soft, fontSize: 12.5)),
+                ]),
+              );
+            }(),
+          if (r is Map && r['text'] != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text('🎁 مكافأة الأسبوع: ${r['text']} (${Learn.ar(r['stars'] ?? 5)} نجوم)', style: const TextStyle(color: C.soft))),
+          const SizedBox(height: 14),
+          BigButton(label: 'تمام', onTap: () => Navigator.pop(ctx)),
         ]),
       ),
     );
@@ -156,6 +220,22 @@ class _ParentsScreenState extends State<ParentsScreen> {
           quick('🎁', 'المكافأة', () => _settings(jump: 'reward')),
           if (f.linked) ...[const SizedBox(width: 8), quick('🔑', 'الرمز', _code)],
         ]),
+        const SizedBox(height: 12),
+        SoftCard(
+          padding: const EdgeInsets.all(14),
+          onTap: _report,
+          child: const Row(children: [
+            Text('📊', style: TextStyle(fontSize: 34)),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('تقرير الأسبوع', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+                Text('وش سوّوا العيال آخر ٧ أيام', style: TextStyle(color: C.soft, fontWeight: FontWeight.w600)),
+              ]),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 16, color: C.soft),
+          ]),
+        ),
         const SectionTitle('الأطفال 👧👦'),
         for (final k in f.kids) () {
           final mine = logs.where((e) => ((e['k'] as List?) ?? []).contains(k.id)).toList();

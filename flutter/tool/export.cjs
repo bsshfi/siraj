@@ -64,7 +64,7 @@ console.log(`✓ ${stories.length} قصة، ${n} مشهد`);
 
 /* ---- خيارات محرّر الشخصيات + سياسة الخصوصية (عشان ما يطلع أي رابط ويب داخل التطبيق) ---- */
 (() => {
-  const pick = ['HEADS', 'STYLES', 'OUTFITS', 'SKIN', 'HAIR', 'SHIRT', 'HEADC', 'PANTS', 'LEAGUES', 'SHOES', 'SHOEC', 'DEFAULTS', 'CLUBS'];
+  const pick = ['HEADS', 'STYLES', 'OUTFITS', 'SKIN', 'HAIR', 'SHIRT', 'HEADC', 'PANTS', 'LEAGUES', 'SHOES', 'SHOEC', 'DEFAULTS', 'CLUBS', 'ACC'];
   const art = {}; pick.forEach((k) => (art[k] = ART[k]));
   fs.writeFileSync(path.join(OUT, 'data', 'art.json'), JSON.stringify(art));
   const html = fs.readFileSync(path.join(ROOT, 'privacy.html'), 'utf8');
@@ -87,3 +87,14 @@ console.log(`✓ ${stories.length} قصة، ${n} مشهد`);
 
 // شعار WAMD ARC لشاشة حول التطبيق
 for (const n of ['wamdarc-light.png', 'wamdarc-dark.png']) { try { fs.copyFileSync(path.join(ROOT, n), path.join(OUT, 'brand', n)); } catch (e) { console.error('تحذير: ما لقيت', n); } }
+
+/* ---- غرفتي: قطع الغرفة ورسوماتها من room.js ---- */
+(() => {
+  let s = fs.readFileSync(path.join(ROOT, 'room.js'), 'utf8');
+  const i = s.lastIndexOf('\n  return {');
+  s = s.slice(0, i) + '\n  globalThis.__ROOM = { ITEMS, BOX };' + s.slice(i);
+  const c3 = { console, Math, Date, JSON, App: { ctx: () => ({}) } }; vm.createContext(c3);
+  vm.runInContext(s, c3);
+  fs.writeFileSync(path.join(OUT, 'data', 'room.json'), JSON.stringify(c3.__ROOM));
+  console.log(`✓ غرفتي: ${c3.__ROOM.ITEMS.length} قطعة`);
+})();

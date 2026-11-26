@@ -11,11 +11,12 @@ import 'learn.dart';
 import 'nav.dart';
 import 'notify.dart';
 import 'remote.dart';
+import 'sky.dart';
 import 'screens/kid_editor.dart';
 import 'screens/sounds.dart';
 import 'widgets/pin.dart';
 import 'screens/explore.dart';
-import 'screens/me.dart';
+import 'screens/sky_screen.dart';
 import 'screens/parents.dart';
 import 'screens/play_learn.dart';
 import 'screens/setup.dart';
@@ -30,7 +31,7 @@ Future<void> main() async {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  await Future.wait([Library.load(), Profile.load(), Family.I.load(), Learn.load(), ArtOpts.load()]);
+  await Future.wait([Library.load(), Profile.load(), Family.I.load(), Learn.load(), ArtOpts.load(), Sky.load()]);
   runApp(const SirajApp());
 }
 
