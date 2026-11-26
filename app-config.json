@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 7,
+    "latestBuild": 102,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
-    "title": "تحديث جديد",
-    "message": "نسخة جديدة من سراج | Siraj تخفي أزرار الجوال وتعطيك الشاشة كاملة ✨",
+    "title": "سراج الجديد ✨",
+    "message": "جرّب النسخة الأصلية الجديدة من سراج | Siraj — أسرع وأنعم.",
     "live": {
       "version": "5.1.2-6",
       "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-6/siraj-live-5.1.2-6.zip",
