@@ -4,7 +4,12 @@
     "latestBuild": 5,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
     "title": "نسخة تجريبية جديدة",
-    "message": "فيه نسخة أحدث من سراج | Siraj فيها إصلاحات جديدة."
+    "message": "فيه نسخة أحدث من سراج | Siraj فيها إصلاحات جديدة.",
+    "live": {
+      "version": "5.1.2-4",
+      "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-4/siraj-live-5.1.2-4.zip",
+      "minBuild": 5
+    }
   },
   "flags": {
     "ads": false,
