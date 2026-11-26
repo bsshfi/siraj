@@ -134,6 +134,22 @@
     if (document.head) startBar(); else document.addEventListener('DOMContentLoaded', startBar);
   }
 
+  /* ٥٫٧) بعض نسخ WebView القديمة (أندرويد 12) ما ترسم الصفحة بعد تبديل التبويب إلا بعد سحب الشاشة.
+     نسوي "هزّة" تمرير خفيفة غير ملحوظة بعد كل تبديل عشان تنرسم مباشرة. */
+  var nudge = function () {
+    var y = window.scrollY || 0;
+    window.scrollTo(0, y + 1);
+    requestAnimationFrame(function () {
+      window.scrollTo(0, y);
+      void document.body.offsetHeight;
+      try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+    });
+  };
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest && e.target.closest('.bnav button, .subnav button, .tabs button');
+    if (t) { setTimeout(nudge, 50); setTimeout(nudge, 300); }
+  }, true);
+
   /* ٦) التحكم عن بُعد + إجبار التحديث
      يقرأ ملف إعدادات صغير من الموقع. ما يرسل أي معرّف للجهاز (مناسب لسياسة تطبيقات الأطفال).
      لو الملف مو موجود أو ما فيه نت: يستخدم آخر نسخة محفوظة، وإلا الإعدادات الافتراضية. */
