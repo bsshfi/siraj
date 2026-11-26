@@ -13,6 +13,22 @@ if 'TTS_SERVICE' not in s:
     s = s.replace('<queries>', '<queries>\n        ' + q, 1) if '<queries>' in s else s.replace('</manifest>', '    <queries>' + q + '</queries>\n</manifest>')
 if 'android.permission.INTERNET' not in s:
     s = s.replace('<application', '<uses-permission android:name="android.permission.INTERNET"/>\n    <application', 1)
+# الإشعارات المجدولة (تذكير وقت القصة): الصلاحيات + مستقبلات flutter_local_notifications (تبقى بعد إعادة التشغيل)
+for perm in ['android.permission.POST_NOTIFICATIONS', 'android.permission.RECEIVE_BOOT_COMPLETED', 'android.permission.VIBRATE']:
+    if perm not in s:
+        s = s.replace('<application', f'<uses-permission android:name="{perm}"/>\n    <application', 1)
+if 'ScheduledNotificationReceiver' not in s:
+    rc = '''        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+'''
+    s = s.replace('</application>', rc + '    </application>', 1)
 open(man, 'w', encoding='utf-8').write(s)
 
 shutil.copy(os.path.join(os.path.dirname(__file__), 'siraj-test.keystore'), os.path.join(A, 'app', 'siraj-test.keystore'))
@@ -31,5 +47,13 @@ if 'siraj-test.keystore' not in t:
     buildTypes {'''
     t = t.replace('    buildTypes {', block, 1)
     t = t.replace('signingConfig = signingConfigs.getByName("debug")', 'signingConfig = signingConfigs.getByName("siraj")')
+# مكتبة الإشعارات تحتاج core library desugaring
+if 'isCoreLibraryDesugaringEnabled' not in t:
+    t = re.sub(r'compileOptions\s*\{', 'compileOptions {\n        isCoreLibraryDesugaringEnabled = true', t, count=1)
+if 'desugar_jdk_libs' not in t:
+    if re.search(r'^dependencies\s*\{', t, re.M):
+        t = re.sub(r'^dependencies\s*\{', 'dependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")', t, count=1, flags=re.M)
+    else:
+        t += '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")\n}\n'
 open(g, 'w', encoding='utf-8').write(t)
 print('✓ android patched')

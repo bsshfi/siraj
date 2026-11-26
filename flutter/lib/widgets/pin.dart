@@ -70,7 +70,7 @@ class _PinPadState extends State<_PinPad> with SingleTickerProviderStateMixin {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 64, height: 64, decoration: BoxDecoration(color: const Color(0xFFFFF1E2), borderRadius: BorderRadius.circular(22)), child: const Icon(Icons.lock_rounded, color: C.orange, size: 34)),
         const SizedBox(height: 8),
-        const Text('رمز وليّ الأمر', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+        const Text('رمز وليّ الأمر', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
         Text(widget.hint, style: const TextStyle(color: C.soft, fontWeight: FontWeight.w600)),
         const SizedBox(height: 16),
         AnimatedBuilder(
@@ -110,7 +110,7 @@ class _PinPadState extends State<_PinPad> with SingleTickerProviderStateMixin {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(20),
                           onTap: () => _key(k),
-                          child: Center(child: k == '⌫' ? const Icon(Icons.backspace_rounded, color: C.soft) : Text(k, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800))),
+                          child: Center(child: k == '⌫' ? const Icon(Icons.backspace_rounded, color: C.soft) : Text(k, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800))),
                         ),
                       ),
             ],
@@ -158,7 +158,7 @@ class _MathGateState extends State<_MathGate> {
         const Text('👨‍👩‍👧', style: TextStyle(fontSize: 48)),
         const Text('للكبار فقط — جاوب عشان تدخل', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
         const SizedBox(height: 8),
-        Directionality(textDirection: TextDirection.ltr, child: Text('${Learn.ar(_a)} × ${Learn.ar(_b)} = ؟', style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: C.purple))),
+        Directionality(textDirection: TextDirection.ltr, child: Text('${Learn.ar(_a)} × ${Learn.ar(_b)} = ؟', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.purple))),
         const SizedBox(height: 14),
         GridView.count(
           crossAxisCount: 2,
@@ -182,7 +182,7 @@ class _MathGateState extends State<_MathGate> {
                       setState(_new);
                     }
                   },
-                  child: Center(child: Text(Learn.ar(o), style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800))),
+                  child: Center(child: Text(Learn.ar(o), style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800))),
                 ),
               ),
           ],

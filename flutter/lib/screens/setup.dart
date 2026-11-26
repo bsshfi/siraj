@@ -45,7 +45,7 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(height: 18),
             Center(child: ClipRRect(borderRadius: BorderRadius.circular(32), child: Image.asset('assets/brand/icon.png', width: 110, height: 110))),
             const SizedBox(height: 12),
-            const Text('سراج', textAlign: TextAlign.center, style: TextStyle(fontSize: 44, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1)),
+            const Text('سراج', textAlign: TextAlign.center, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1)),
             const Text('قصص ما قبل النوم، أبطالها أطفالك ✨', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w700)),
             const SizedBox(height: 26),
             const Text('أهلًا بك 👋 من يستخدم هذا الجهاز؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 19, color: Color(0xFF26305A), fontWeight: FontWeight.w800)),
@@ -114,14 +114,14 @@ class _ParentSetupScreenState extends State<ParentSetupScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('🎉', style: TextStyle(fontSize: 50)),
-          const Text('تم إنشاء عائلتك!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+          const Text('تم إنشاء عائلتك!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
           const Text('هذا رمز عائلتك. احفظه، وبه تربط تابلت الأطفال.', textAlign: TextAlign.center, style: TextStyle(color: C.soft, height: 1.5)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
             decoration: BoxDecoration(color: const Color(0xFFF3EEFF), borderRadius: BorderRadius.circular(16)),
-            child: Text(f.code, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: 2, fontFamily: 'monospace', color: C.purple)),
+            child: Text(f.code, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, letterSpacing: 2, fontFamily: 'monospace', color: C.purple)),
           ),
           const SizedBox(height: 10),
           const Text('في التابلت: افتح سراج ← «جهاز طفل» ← أدخل الرمز.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13.5, color: C.soft)),
@@ -167,7 +167,7 @@ class _ParentSetupScreenState extends State<ParentSetupScreen> {
             Row(children: [
               IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded)),
               const SizedBox(width: 10),
-              const Text('عائلتي', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+              const Text('عائلتي', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
             ]),
             const SizedBox(height: 12),
             _card('الأطفال 🧒', 'أضف أطفالك ليصيروا أبطال القصص.', [
@@ -201,7 +201,7 @@ class _ParentSetupScreenState extends State<ParentSetupScreen> {
                   maxLength: 4,
                   textAlign: TextAlign.center,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(fontSize: 26, letterSpacing: 10, fontWeight: FontWeight.w800),
+                  style: const TextStyle(fontSize: 21, letterSpacing: 10, fontWeight: FontWeight.w800),
                   decoration: InputDecoration(
                     counterText: '',
                     hintText: '2580',
@@ -250,7 +250,7 @@ class _SetupScreenState extends State<SetupScreen> {
             SoftCard(
               padding: const EdgeInsets.all(20),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                const Text('مين بطل الحكاية؟', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+                const Text('مين بطل الحكاية؟', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 12),
                 TextField(controller: _name, decoration: const InputDecoration(hintText: 'اسم الطفل')),
                 const SizedBox(height: 14),

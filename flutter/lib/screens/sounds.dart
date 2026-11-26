@@ -108,7 +108,7 @@ class _SoundsScreenState extends State<SoundsScreen> {
           ),
           const SizedBox(height: 10),
           const Text('🌙', textAlign: TextAlign.center, style: TextStyle(fontSize: 70)),
-          const Text('أصوات النوم', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+          const Text('أصوات النوم', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800)),
           const Text('اختر صوت، وغمّض عيونك… ويطفي لحاله 😴', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 20),
           GridView.count(

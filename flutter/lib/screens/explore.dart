@@ -147,7 +147,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           const SizedBox(height: 6),
           SizedBox(width: 150, height: 150, child: CustomPaint(painter: MoonPainter(age))),
           const SizedBox(height: 8),
-          Text(pn, style: white.copyWith(fontSize: 28, fontWeight: FontWeight.w800)),
+          Text(pn, style: white.copyWith(fontSize: 21, fontWeight: FontWeight.w800)),
           Text('مضيء ${Learn.ar(Learn.illum(age))}٪ · عمره ${Learn.ar(age.floor() + 1)} ${age < 10 ? 'أيام' : 'يومًا'}', style: white.copyWith(color: Colors.white70, fontWeight: FontWeight.w700)),
           const SizedBox(height: 10),
           Text(pd, textAlign: TextAlign.center, style: white.copyWith(fontSize: 16.5, height: 1.6, fontWeight: FontWeight.w600)),
@@ -249,7 +249,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         builder: (_, sc) => ListView(controller: sc, padding: const EdgeInsets.fromLTRB(22, 18, 22, 30), children: [
           Center(child: PlanetBall(colors: cs, size: 90, ring: p['e'] == 'Saturn')),
           const SizedBox(height: 10),
-          Text('${p['n']}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800)),
+          Text('${p['n']}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800)),
           Text('${p['e']}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: C.soft, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           for (final row in [
@@ -292,7 +292,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       builder: (_) => Padding(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+          Text(title, style: const TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
           Text(body, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, height: 1.6, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
@@ -366,7 +366,7 @@ class _TripScreenState extends State<TripScreen> {
         padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Text(Learn.flag(c['c'].toString()), style: const TextStyle(fontSize: 64)),
-          Text('ختم ${c['n']} في جوازك! 🛂', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800)),
+          Text('ختم ${c['n']} في جوازك! 🛂', style: const TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800)),
           Text('زرت ${Learn.ar(Family.I.passport.length)} ${Family.I.passport.length == 1 ? 'دولة' : 'دول'} لين الحين', style: const TextStyle(fontSize: 16, color: C.soft, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
           BigButton(label: 'تمام', onTap: () {
@@ -449,7 +449,7 @@ class PassportScreen extends StatelessWidget {
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),
             const SizedBox(width: 10),
-            const Text('🛂 جواز سفري', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+            const Text('🛂 جواز سفري', style: TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800, color: Colors.white)),
           ]),
           const SizedBox(height: 16),
           if (been.isEmpty)

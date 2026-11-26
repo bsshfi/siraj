@@ -77,7 +77,7 @@ class _PlayLearnScreenState extends State<PlayLearnScreen> {
         return _Tile(
           onTap: () => _say('${r[0]}. ${r[1]}'),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('${r[0]}${r[0].toLowerCase()}', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: C.orange, fontFamily: 'sans-serif', height: 1.1)),
+            Text('${r[0]}${r[0].toLowerCase()}', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: C.orange, fontFamily: 'sans-serif', height: 1.1)),
             Text(r[3], style: const TextStyle(fontSize: 32)),
             Text(r[1], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, fontFamily: 'sans-serif')),
             Text(r[2], style: const TextStyle(fontSize: 12.5, color: C.soft, fontWeight: FontWeight.w700)),

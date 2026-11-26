@@ -263,7 +263,7 @@ class _KidEditorState extends State<KidEditor> {
             Row(children: [
               IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),
               const SizedBox(width: 8),
-              Expanded(child: Text(title, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF26305A)))),
+              Expanded(child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF26305A)))),
               FilledButton.icon(
                 onPressed: _save,
                 icon: const Icon(Icons.check_rounded),

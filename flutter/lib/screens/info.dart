@@ -58,7 +58,7 @@ class _InfoPage extends StatelessWidget {
           ),
           Center(child: ClipRRect(borderRadius: BorderRadius.circular(26), child: Image.asset('assets/brand/icon.png', width: 92, height: 92))),
           const SizedBox(height: 8),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
           Text(sub, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF34406E))),
           const SizedBox(height: 16),
           ...children,

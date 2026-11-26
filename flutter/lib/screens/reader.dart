@@ -73,7 +73,7 @@ Future<void> pickVoice(BuildContext context, Kid? k) async {
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('🗣️', style: TextStyle(fontSize: 44)),
-          Text('بأي صوت تبي القصة${k != null ? ' يا ${k.name}' : ''}؟', style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
+          Text('بأي صوت تبي القصة${k != null ? ' يا ${k.name}' : ''}؟', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
           const Text('اضغط ▶️ وتسمع الصوت، وبعدين اختار اللي يعجبك', style: TextStyle(color: C.soft, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
           for (final x in opts)
@@ -408,7 +408,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final art = SceneArt(scene: p.scene, prop: p.prop, heroes: Tonight.artHeroes(s, _hs, p), radius: 26);
     return ListView(padding: const EdgeInsets.fromLTRB(18, 14, 18, 12), physics: const BouncingScrollPhysics(), children: [
       if (i == 0) ...[
-        Text(_fill(s.title), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFD86B), fontSize: 23, fontWeight: FontWeight.w800, height: 1.3)),
+        Text(_fill(s.title), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFD86B), fontSize: 19.5, fontWeight: FontWeight.w800, height: 1.3)),
         const SizedBox(height: 6),
         Center(
           child: Container(
@@ -431,7 +431,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
       Container(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(26)),
-        child: Text(text, style: const TextStyle(fontSize: 21, height: 1.85, fontWeight: FontWeight.w600, color: C.ink)),
+        child: Text(text, style: const TextStyle(fontSize: 18, height: 1.85, fontWeight: FontWeight.w600, color: C.ink)),
       ),
       if (p.choices.isNotEmpty) ...[
         const SizedBox(height: 14),
@@ -463,7 +463,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
       child: ListView(shrinkWrap: true, padding: const EdgeInsets.all(26), children: [
         Text(more ? '⭐' : '🌙', textAlign: TextAlign.center, style: const TextStyle(fontSize: 80)),
         Text(more ? 'أحسنتم!' : one ? (_hero.isGirl ? 'تصبحين على خير' : 'تصبح على خير') : 'تصبحون على خير',
-            textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
+            textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
         Text(more ? '$n، الليلة لكم قصة ثانية ✨\n«${_fill(nxt.title)}»' : 'نومًا هنيئًا يا $n ✨\nوموعدنا مع حكايةٍ جديدة غدًا',
             textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 19, height: 1.7, fontWeight: FontWeight.w600)),

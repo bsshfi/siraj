@@ -32,7 +32,7 @@ class TabPage extends StatelessWidget {
             child: Row(children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(title, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF26305A), height: 1.1)),
+                  Text(title, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Color(0xFF26305A), height: 1.1)),
                   if (subtitle != null) Text(subtitle!, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF34406E))),
                 ]),
               ),
@@ -195,7 +195,7 @@ class _QuizScreenState extends State<QuizScreen> {
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),
             const SizedBox(width: 10),
-            Expanded(child: Text(widget.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF26305A)))),
+            Expanded(child: Text(widget.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF26305A)))),
             if (!_done) Text('${Learn.ar(_i + 1)}/${Learn.ar(n)}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF34406E))),
           ]),
           const SizedBox(height: 14),
@@ -204,7 +204,7 @@ class _QuizScreenState extends State<QuizScreen> {
               padding: const EdgeInsets.all(26),
               child: Column(children: [
                 Text(_score == n ? '🏆' : _score >= n / 2 ? '🌟' : '💪', style: const TextStyle(fontSize: 64)),
-                Text(_score == n ? 'ممتاز! كلها صح' : _score >= n / 2 ? 'أحسنت!' : 'محاولة حلوة!', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                Text(_score == n ? 'ممتاز! كلها صح' : _score >= n / 2 ? 'أحسنت!' : 'محاولة حلوة!', style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 4),
                 Text('جاوبت ${Learn.ar(_score)} من ${Learn.ar(n)}', style: const TextStyle(fontSize: 18, color: C.soft, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 18),
@@ -219,7 +219,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Column(children: [
                     if (q.big != null) Text(q.big!, style: const TextStyle(fontSize: 74, height: 1.2)),
-                    Text(q.prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, height: 1.5)),
+                    Text(q.prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, height: 1.5)),
                     if (q.say != null) ...[const SizedBox(height: 6), SpeakButton(q.say!, en: q.sayEn, size: 30)],
                   ]),
                 ),

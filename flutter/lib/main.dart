@@ -9,6 +9,7 @@ import 'data.dart';
 import 'family.dart';
 import 'learn.dart';
 import 'nav.dart';
+import 'notify.dart';
 import 'remote.dart';
 import 'screens/kid_editor.dart';
 import 'screens/sounds.dart';
@@ -50,10 +51,30 @@ class SirajApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       // محرّك رسم الشخصيات (مخفي) — نفس رسّام نسخة الويب
-      builder: (context, child) => Stack(children: [
-        Positioned(left: 0, top: 0, child: Avatars.host()),
-        if (child != null) Positioned.fill(child: child),
-      ]),
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        final w = mq.size.width;
+        // الخطوط: نتجاهل تكبير خط الجوال الزايد عشان التصميم ما يتكسّر، ونصغّر شوي على الجوالات الضيقة
+        final sys = mq.textScaler.scale(1).clamp(.85, 1.1);
+        final fit = w < 360 ? .86 : w < 420 ? .92 : 1.0;
+        // التابلت: المحتوى في عمود بعرض مريح في النص (مثل نسخة الويب)
+        const maxW = 720.0;
+        final wide = w > maxW + 40;
+        Widget app = MediaQuery(
+          data: mq.copyWith(textScaler: TextScaler.linear(sys * fit), size: wide ? Size(maxW, mq.size.height) : mq.size),
+          child: child ?? const SizedBox(),
+        );
+        if (wide) {
+          app = DecoratedBox(
+            decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+            child: Center(child: SizedBox(width: maxW, child: ClipRect(child: app))),
+          );
+        }
+        return Stack(children: [
+          Positioned(left: 0, top: 0, child: Avatars.host()),
+          Positioned.fill(child: app),
+        ]);
+      },
       home: Profile.hero == null && !Family.I.linked ? const WelcomeScreen() : const Shell(),
       navigatorKey: Shell.nav,
     );
@@ -88,7 +109,11 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) Remote.check(context);
       Family.I.syncNow();
-      _tour();
+      _tour().then((_) async {
+        // جهاز الطفل: نطلب إذن الإشعارات مرة عشان يوصله تذكير وقت القصة
+        if (Family.I.isChild && Family.I.fam['remind'] != false) await Notify.ask();
+        Notify.schedule();
+      });
     });
   }
 
@@ -126,7 +151,7 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
             Text(steps[i].$1, style: const TextStyle(fontSize: 60)),
-            Text(steps[i].$2, textAlign: TextAlign.center, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800)),
+            Text(steps[i].$2, textAlign: TextAlign.center, style: const TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800)),
             const SizedBox(height: 6),
             Text(steps[i].$3, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16.5, color: C.soft, height: 1.6, fontWeight: FontWeight.w600)),
             const SizedBox(height: 16),
@@ -283,7 +308,7 @@ class _LockScreen extends StatelessWidget {
             padding: const EdgeInsets.all(28),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Text('🌙', style: TextStyle(fontSize: 90)),
-              const Text('حان وقت النوم', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
+              const Text('حان وقت النوم', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
               Text('تصبح على خير يا $n 💤\nموعدنا بكرة مع حكاية جديدة', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 18, height: 1.7, fontWeight: FontWeight.w600)),
               const SizedBox(height: 40),

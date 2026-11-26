@@ -114,7 +114,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 Row(children: [
                   IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),
                   const SizedBox(width: 10),
-                  Text('مكتبة القصص 📚 ${Learn.ar(Library.stories.length)}', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+                  Text('مكتبة القصص 📚 ${Learn.ar(Library.stories.length)}', style: const TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
                 ]),
                 const SizedBox(height: 10),
                 TextField(

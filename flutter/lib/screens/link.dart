@@ -72,7 +72,7 @@ class _JoinScreenState extends State<JoinScreen> {
             ),
             const SizedBox(height: 8),
             Text(widget.as == 'child' ? '🧒' : '🔑', textAlign: TextAlign.center, style: const TextStyle(fontSize: 54)),
-            Text(widget.as == 'child' ? 'ربط جهاز الطفل' : 'استرجاع العائلة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+            Text(widget.as == 'child' ? 'ربط جهاز الطفل' : 'استرجاع العائلة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
             Text(
                 widget.as == 'child'
                     ? 'أدخل رمز العائلة اللي يظهر في جوال وليّ الأمر (الإعدادات ← العائلة)'
@@ -94,7 +94,7 @@ class _JoinScreenState extends State<JoinScreen> {
                     keyboardType: TextInputType.visiblePassword,
                     inputFormatters: [_CodeFormatter()],
                     onSubmitted: (_) => _join(),
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: 3, fontFamily: 'monospace'),
+                    style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w700, letterSpacing: 3, fontFamily: 'monospace'),
                     decoration: InputDecoration(
                       hintText: 'K7QPM-4XR2D',
                       hintStyle: const TextStyle(color: Color(0xFFC3CAD8), fontWeight: FontWeight.w600),
@@ -171,7 +171,7 @@ class _WhoScreenState extends State<WhoScreen> {
                 child: IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded)),
               ),
             const SizedBox(height: 10),
-            const Text('مين يستخدم هالجهاز؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+            const Text('مين يستخدم هالجهاز؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
             const Text('اختر طفل أو أكثر', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Color(0xFF34406E), fontWeight: FontWeight.w600)),
             const SizedBox(height: 18),
             GridView.count(

@@ -145,7 +145,7 @@ class _TonightScreenState extends State<TonightScreen> {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Text('سراج', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF26305A), height: 1.05)),
+                    const Text('سراج', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Color(0xFF26305A), height: 1.05)),
                     const SizedBox(width: 8),
                     ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/brand/icon.png', width: 38, height: 38)),
                   ]),
@@ -170,7 +170,7 @@ class _TonightScreenState extends State<TonightScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Wrap(spacing: 8, runSpacing: 8, children: [
-              chip('📅 ${_days[now.weekday - 1]} ${Learn.ar('${now.day}/${now.month}/${now.year}')}'),
+              chip('${_days[now.weekday - 1]} ${Learn.ar('${now.day}/${now.month}/${now.year}')}'),
               chip('${season.$2} ${season.$1}'),
               chip('⭐ ${Learn.ar(f.monthNights(k0))} ${f.monthNights(k0) == 1 ? 'نجمة' : 'نجوم'} هالشهر'),
               chip('🔥 ${Learn.ar(f.streakOf(k0))} ${f.streakOf(k0) == 1 ? 'ليلة' : 'ليالٍ'} متتالية'),
@@ -228,7 +228,7 @@ class _TonightScreenState extends State<TonightScreen> {
                   ),
                   const SizedBox(height: 6),
                   SizedBox(
-                    height: 104,
+                    height: 116,
                     child: ListView(scrollDirection: Axis.horizontal, children: [
                       for (final k in shown) _kidPick(k),
                     ]),
@@ -255,7 +255,7 @@ class _TonightScreenState extends State<TonightScreen> {
                       _tag('${Tonight.catOf(st).$2} ${Tonight.catOf(st).$3}', const Color(0xFFF4F7FC), C.soft),
                     ]),
                     const SizedBox(height: 6),
-                    Text(fill(st.title), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, height: 1.3)),
+                    Text(fill(st.title), style: const TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800, height: 1.3)),
                     if (resumeAt > 0) Text('📖 بتكمّل من الصفحة ${Learn.ar(resumeAt + 1)}', style: const TextStyle(color: C.orange, fontWeight: FontWeight.w800)),
                     Text('${Learn.ar(np)} صفحات · ${Learn.ar(mins)} دقائق · ${sh ? 'نسخة قصيرة للصغار ✂️' : 'قيمة: ${st.value}'}',
                         style: const TextStyle(fontSize: 14, color: C.soft, fontWeight: FontWeight.w600)),
@@ -357,18 +357,16 @@ class _TonightScreenState extends State<TonightScreen> {
             decoration: BoxDecoration(shape: BoxShape.circle, color: i >= 0 ? C.orange : const Color(0xFFE6EAF2)),
             child: Stack(clipBehavior: Clip.none, children: [
               KidFace(kid: k, size: 64),
-              if (i == 0)
-                Positioned(
-                  top: -6,
-                  left: -4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                    decoration: BoxDecoration(color: const Color(0xFFFFD23F), borderRadius: BorderRadius.circular(10)),
-                    child: const Text('البطل ⭐', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800)),
-                  ),
-                ),
             ]),
           ),
+          if (i == 0)
+            Container(
+              margin: const EdgeInsets.only(top: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+              decoration: BoxDecoration(color: const Color(0xFFFFD23F), borderRadius: BorderRadius.circular(10)),
+              child: const Text('⭐ البطل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+            )
+          else
           const SizedBox(height: 3),
           Text(k.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: i >= 0 ? C.ink : C.soft)),
         ]),

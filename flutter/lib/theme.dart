@@ -81,10 +81,15 @@ class BigButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               if (icon != null) ...[Icon(icon, color: Colors.white, size: 24), const SizedBox(width: 8)],
-              Text(label, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(label, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+                ),
+              ),
             ]),
           ),
         ),

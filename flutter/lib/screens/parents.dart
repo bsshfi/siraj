@@ -61,9 +61,9 @@ class _ParentsScreenState extends State<ParentsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('🔑', style: TextStyle(fontSize: 46)),
-          const Text('رمز عائلتك', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
+          const Text('رمز عائلتك', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
-          Text(f.code, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: 2, fontFamily: 'monospace', color: C.purple)),
+          Text(f.code, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, letterSpacing: 2, fontFamily: 'monospace', color: C.purple)),
           const SizedBox(height: 8),
           const Text('في التابلت: افتح سراج ← «جهاز طفل» ← أدخل الرمز.', textAlign: TextAlign.center, style: TextStyle(color: C.soft)),
           const SizedBox(height: 12),
@@ -115,11 +115,25 @@ class _ParentsScreenState extends State<ParentsScreen> {
     String names(List ids) => ids.map((id) => f.kidById(id.toString())?.name).whereType<String>().join(' و');
 
     Widget quick(String e, String t, VoidCallback onTap) => Expanded(
-          child: SoftCard(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            onTap: onTap,
-            child: Column(children: [Text(e, style: const TextStyle(fontSize: 30)), Text(t, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5))]),
+          child: SizedBox(
+            height: 92,
+            child: SoftCard(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              onTap: onTap,
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(e, style: const TextStyle(fontSize: 28, height: 1.15)),
+                const SizedBox(height: 4),
+                FittedBox(fit: BoxFit.scaleDown, child: Text(t, maxLines: 1, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5))),
+              ]),
+            ),
           ),
+        );
+
+    Widget stat(String e, int n) => Container(
+          margin: const EdgeInsetsDirectional.only(end: 6, top: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(color: const Color(0xFFF4F7FC), borderRadius: BorderRadius.circular(12)),
+          child: Text('$e ${Learn.ar(n)}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5)),
         );
 
     return TabPage(
@@ -137,10 +151,10 @@ class _ParentsScreenState extends State<ParentsScreen> {
         Row(children: [
           quick('⚙️', 'الإعدادات', _settings),
           const SizedBox(width: 8),
-          quick('💌', 'رسالة للعيال', () => _settings(jump: 'msg')),
+          quick('💌', 'رسالة', () => _settings(jump: 'msg')),
           const SizedBox(width: 8),
-          quick('🎁', 'مكافأة الأسبوع', () => _settings(jump: 'reward')),
-          if (f.linked) ...[const SizedBox(width: 8), quick('🔑', 'رمز العائلة', _code)],
+          quick('🎁', 'المكافأة', () => _settings(jump: 'reward')),
+          if (f.linked) ...[const SizedBox(width: 8), quick('🔑', 'الرمز', _code)],
         ]),
         const SectionTitle('الأطفال 👧👦'),
         for (final k in f.kids) () {
@@ -161,7 +175,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(k.name, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
+                      Text(k.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
                       Text(last != null ? 'آخر قصة ${_ago((last['t'] as num?) ?? 0)}' : (k.isGirl ? 'ما قرأت بعد' : 'ما قرأ بعد'), style: const TextStyle(color: C.soft, fontWeight: FontWeight.w700)),
                     ]),
                   ),
@@ -194,11 +208,13 @@ class _ParentsScreenState extends State<ParentsScreen> {
                     ),
                 ]),
                 if (lastSt != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text('آخر قصة: «${fillTemplate(lastSt.title, k, dad: f.dad, mom: f.mom)}»', style: const TextStyle(color: C.soft, fontWeight: FontWeight.w600))),
-                Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Text('⭐ ${Learn.ar(f.monthNights(k))} نجمة هالشهر${a.isNotEmpty ? ' · 🤲 ${Learn.ar(cnt('adhkar'))} · 🔤 ${Learn.ar(cnt('en'))} · 🪐 ${Learn.ar(cnt('space'))} · ✈️ ${Learn.ar(cnt('trip'))}' : ''}',
-                      style: const TextStyle(color: C.soft, fontWeight: FontWeight.w600)),
-                ),
+                Wrap(children: [
+                  stat('⭐ نجوم الشهر', f.monthNights(k)),
+                  stat('🤲', cnt('adhkar')),
+                  stat('🔤', cnt('en')),
+                  stat('🪐', cnt('space')),
+                  stat('✈️', cnt('trip')),
+                ]),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

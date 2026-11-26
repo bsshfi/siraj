@@ -86,7 +86,7 @@ class _MeScreenState extends State<MeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(k.name, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.1)),
+                Text(k.name, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, height: 1.1)),
                 const SizedBox(height: 10),
                 _Stat('⭐', '${Learn.ar(logs.length)} نجمة', 'كل قصة تخلصها نجمة'),
                 _Stat('🔥', '${Learn.ar(streak)} ${streak == 1 ? 'ليلة' : 'ليالٍ'} متتالية', 'لا توقف السلسلة!'),
@@ -279,7 +279,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
         padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('🌙🤲', style: TextStyle(fontSize: 46)),
-          Text('ما شاء الله يا ${widget.kid.name}!', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+          Text('ما شاء الله يا ${widget.kid.name}!', style: const TextStyle(fontSize: 19.5, fontWeight: FontWeight.w800)),
           const Text('خلّصت أذكار النوم، الله يحفظك', style: TextStyle(fontSize: 17, color: C.soft, fontWeight: FontWeight.w600)),
           const SizedBox(height: 16),
           BigButton(label: 'تمام', onTap: () {
@@ -331,9 +331,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(26)),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      Text(a['t'].toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.purple)),
+                      Text(a['t'].toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: C.purple)),
                       const SizedBox(height: 10),
-                      Text(a['x'].toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 21, height: 2, fontWeight: FontWeight.w600)),
+                      Text(a['x'].toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, height: 2, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -357,7 +357,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                           boxShadow: [BoxShadow(color: (c >= need ? const Color(0xFF2FA36B) : C.orange).withValues(alpha: .45), blurRadius: 24)],
                         ),
                         child: Column(mainAxisSize: MainAxisSize.min, children: [
-                          Text(c >= need ? '✓' : Learn.ar(c), style: const TextStyle(fontSize: 42, color: Colors.white, fontWeight: FontWeight.w800, height: 1.1)),
+                          Text(c >= need ? '✓' : Learn.ar(c), style: const TextStyle(fontSize: 26, color: Colors.white, fontWeight: FontWeight.w800, height: 1.1)),
                           Text(c >= need ? 'تم' : 'من ${Learn.ar(need)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                         ]),
                       ),

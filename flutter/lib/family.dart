@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data.dart';
+import 'notify.dart';
 import 'sync.dart';
 
 /// حالة سراج على هالجهاز — نفس بنية نسخة الويب (app.js → S) عشان الأجهزة تتفاهم:
@@ -159,6 +160,7 @@ class Family extends ChangeNotifier {
     dirty = true;
     _touch();
     syncNow();
+    Notify.schedule();
   }
 
   void setFam(String key, Object? value) {
@@ -288,6 +290,7 @@ class Family extends ChangeNotifier {
     _progDirty = true;
     _touch();
     syncNow();
+    Notify.schedule();
   }
 
   Future<void> setHeroes(List<String> ids) async {
@@ -582,7 +585,7 @@ class Family extends ChangeNotifier {
           'trips': <dynamic>[],
           'kids': devKids,
           'plat': 'تطبيق أندرويد',
-          'ver': '2.2.0',
+          'ver': '2.3.0',
           'notif': false,
           'seen': now,
         });
@@ -593,6 +596,7 @@ class Family extends ChangeNotifier {
         final all = await Sync.pullProgress(code);
         remote = all.where((p) => p['dev'] != dev).map(_slim).toList();
       } catch (_) {}
+      Notify.schedule();
       final fa = (fam['forceAt'] as num?)?.toInt() ?? 0;
       if (fa > forceSeen) {
         forceSeen = fa;

@@ -8,6 +8,7 @@ import '../avatars.dart';
 import '../data.dart';
 import '../family.dart';
 import '../learn.dart';
+import '../notify.dart';
 import '../remote.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -52,7 +53,7 @@ class TimePick extends StatelessWidget {
             HapticFeedback.selectionClick();
             onChanged(_bump(d));
           },
-          icon: Text(t, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.orange)),
+          icon: Text(t, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: C.orange)),
           style: IconButton.styleFrom(backgroundColor: const Color(0xFFFFF1E2), minimumSize: const Size(52, 52)),
         );
     return Column(children: [
@@ -60,7 +61,7 @@ class TimePick extends StatelessWidget {
         btn('−', -15),
         Expanded(
           child: Column(children: [
-            Text(fmt(value), style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, height: 1.1)),
+            Text(fmt(value), style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, height: 1.1)),
             Text('${part(value)} 🌙', style: const TextStyle(color: C.soft, fontWeight: FontWeight.w700)),
           ]),
         ),
@@ -279,7 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),
             const SizedBox(width: 10),
-            const Text('⚙️ الإعدادات', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+            const Text('⚙️ الإعدادات', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
           ]),
           const SizedBox(height: 14),
           if (f.linked)
@@ -304,7 +305,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(color: const Color(0xFFF3EEFF), borderRadius: BorderRadius.circular(18)),
-                child: Text(f.code, textAlign: TextAlign.center, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, letterSpacing: 3, fontFamily: 'monospace', color: C.purple)),
+                child: Text(f.code, textAlign: TextAlign.center, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, letterSpacing: 3, fontFamily: 'monospace', color: C.purple)),
               ),
               const SizedBox(height: 12),
               Center(child: QrImageView(data: '${Info.site}/#join=${f.code}', size: 170, backgroundColor: Colors.white)),
@@ -369,7 +370,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             CallChips(value: f.mom, opts: Family.momOpts, onChanged: (v) => f.setFam('mom', v)),
           ]),
           _Card('وقت القصة 🔔', sub: f.isChild ? 'التذكير يوصل لهذا الجهاز في الوقت المحدد.' : 'التذكير يوصل لأجهزة الأطفال المربوطة.', children: [
-            SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('تذكير وقت القصة', style: TextStyle(fontWeight: FontWeight.w800)), value: _remind, onChanged: (v) => setState(() => _remind = v)),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('🔔 تذكير وقت القصة', style: TextStyle(fontWeight: FontWeight.w800)),
+              value: _remind,
+              onChanged: (v) async {
+                setState(() => _remind = v);
+                if (v && !await Notify.ask() && context.mounted) toast(context, 'فعّل إشعارات سراج من إعدادات الجوال');
+              },
+            ),
+            if (!f.isChild)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('ذكّرني على هذا الجوال بعد', style: TextStyle(fontWeight: FontWeight.w700)),
+                value: f.fam['remindParent'] == true,
+                onChanged: (v) async {
+                  if (v) await Notify.ask();
+                  f.setFam('remindParent', v);
+                },
+              ),
             TimePick(value: _bed, onChanged: (v) => setState(() => _bed = v)),
             const SizedBox(height: 10),
             OutlinedButton(
@@ -380,6 +399,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 toast(context, 'تم الحفظ ✓');
               },
               child: const Text('حفظ', style: TextStyle(fontWeight: FontWeight.w800)),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (!await Notify.ask()) {
+                  if (context.mounted) toast(context, 'الإشعارات مقفلة — فعّلها من إعدادات الجوال ← التطبيقات ← سراج');
+                  return;
+                }
+                Notify.test();
+              },
+              child: const Text('🔔 جرّب الإشعار الحين', style: TextStyle(fontWeight: FontWeight.w800)),
             ),
           ]),
           Container(
@@ -520,7 +549,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     obscureText: true,
                     textAlign: TextAlign.center,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    style: const TextStyle(fontSize: 22, letterSpacing: 8, fontWeight: FontWeight.w800),
+                    style: const TextStyle(fontSize: 18, letterSpacing: 8, fontWeight: FontWeight.w800),
                     decoration: InputDecoration(
                       counterText: '',
                       hintText: 'رمز جديد',
