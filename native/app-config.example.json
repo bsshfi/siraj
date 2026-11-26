@@ -1,0 +1,14 @@
+{
+  "android": {
+    "minBuild": 0,
+    "latestBuild": 0,
+    "storeUrl": "https://play.google.com/store/apps/details?id=com.wamdarc.siraj",
+    "title": "",
+    "message": ""
+  },
+  "flags": {
+    "ads": false,
+    "accounts": false,
+    "analytics": false
+  }
+}
