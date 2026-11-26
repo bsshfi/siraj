@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -38,6 +39,16 @@ class Notify {
     } catch (_) {
       return false;
     }
+  }
+
+  /// أول دخول بعد التسجيل أو الربط: نطلب الإذن مرة وحدة
+  static Future<void> askOnce() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      if (p.getBool('notifAsked') == true) return;
+      await p.setBool('notifAsked', true);
+      await ask();
+    } catch (_) {}
   }
 
   static Future<bool> enabled() async {

@@ -111,8 +111,8 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
       if (mounted) Remote.check(context);
       Family.I.syncNow();
       _tour().then((_) async {
-        // جهاز الطفل: نطلب إذن الإشعارات مرة عشان يوصله تذكير وقت القصة
-        if (Family.I.isChild && Family.I.fam['remind'] != false) await Notify.ask();
+        // نطلب إذن الإشعارات أول ما يدخل (وليّ أمر أو طفل)، ومرة وحدة بس
+        await Notify.askOnce();
         Notify.schedule();
       });
     });
