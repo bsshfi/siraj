@@ -12,6 +12,8 @@ import 'theme.dart';
 class Remote {
   static const url = 'https://siraj.wamdarc.com/app-config.json';
   static const store = 'https://play.google.com/store/apps/details?id=com.wamdarc.siraj';
+  /// نسخة المتجر: Google Play يتكفّل بالتحديثات، وإعداداتها في قسم play بملف التحكم
+  static const isPlay = String.fromEnvironment('STORE') == 'play';
   static Map<String, dynamic> flags = {'ads': false, 'accounts': false, 'analytics': false};
   static bool _shown = false;
 
@@ -26,7 +28,8 @@ class Remote {
       if (r.statusCode != 200) return say('ما قدرت أتحقق، جرّب بعد شوي');
       final cfg = Map<String, dynamic>.from(jsonDecode(utf8.decode(r.bodyBytes)) as Map);
       if (cfg['flags'] is Map) flags = {...flags, ...Map<String, dynamic>.from(cfg['flags'] as Map)};
-      final a = Map<String, dynamic>.from((cfg['android'] as Map?) ?? {});
+      final a = Map<String, dynamic>.from((cfg[isPlay ? 'play' : 'android'] as Map?) ?? {});
+      if (isPlay) a['storeUrl'] = store;
       final build = int.tryParse((await PackageInfo.fromPlatform()).buildNumber) ?? 0;
       final minB = (a['minBuild'] as num?)?.toInt() ?? 0, latest = (a['latestBuild'] as num?)?.toInt() ?? 0;
       if ((_shown && !manual) || !context.mounted) return;

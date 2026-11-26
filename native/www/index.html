@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>سراج | SIRAJ</title>
+<meta name="description" content="قصص ما قبل النوم بأسماء أطفالك">
+<meta name="theme-color" content="#4FA3EC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="سراج | SIRAJ">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg1:#5B4BDB;--bg2:#8E44C9;--bg3:#E0559A;
+  --card:#ffffff;--ink:#2B2350;--soft:#6E668F;
+  --orange:#FF6B1A;--yellow:#FFD93D;--mint:#4CD97B;--sky:#4DB8F0;--pink:#FF7AB6;
+  --night:#120F33;--night2:#221B55;
+  --r:24px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Baloo Bhaijaan 2",system-ui,sans-serif;color:var(--ink);
+  background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,var(--bg3));
+  background-attachment:fixed;overflow-x:hidden;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+button{font-family:inherit;cursor:pointer;border:0;color:var(--ink)}
+input,select{font-family:inherit}
+.screen{display:none;min-height:100vh;padding:20px 16px 40px;max-width:760px;margin:0 auto}
+.screen.on{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:24px}
+.brand img{width:44px;height:44px;border-radius:12px;box-shadow:0 4px 12px #0003}
+.iconbtn{background:#ffffff26;color:#fff;width:46px;height:46px;border-radius:14px;font-size:22px;display:grid;place-items:center}
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 10px 30px #2b235033;margin-bottom:16px}
+h2{margin:0 0 6px;font-size:22px}
+.muted{color:var(--soft);font-size:15px;margin:0 0 12px}
+.btn{display:block;width:100%;padding:14px 18px;border-radius:18px;font-size:19px;font-weight:700;color:#fff;background:var(--orange);box-shadow:0 6px 0 #d4520e}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #d4520e}
+.btn.alt{background:#EFEAFF;color:var(--bg1);box-shadow:0 6px 0 #d5ccf7}
+.btn.ghost{background:transparent;color:var(--soft);box-shadow:none;font-weight:600}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+/* home */
+.hello{color:#fff;font-size:20px;margin:4px 4px 12px;font-weight:600}
+.kids{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.kid{background:#fff;border-radius:22px;padding:8px 10px 6px;text-align:center;width:110px;border:4px solid transparent;transition:.2s;position:relative}
+.kid.sel{border-color:var(--yellow);transform:scale(1.04);box-shadow:0 0 0 4px #FFD93D55}
+.kid .nm{font-weight:800;font-size:18px}
+.kid .badge{position:absolute;top:-10px;left:-6px;background:var(--orange);color:#fff;border-radius:12px;font-size:12px;padding:1px 8px;display:none}
+.kid.hero .badge{display:block}
+.tonight{position:relative;overflow:hidden;padding:0}
+.tonight .art{display:block;width:100%;height:auto;aspect-ratio:400/260}
+.tonight .info{padding:14px 18px 18px}
+.tonight .title{font-size:24px;font-weight:800;margin:0}
+.tag{display:inline-block;background:#FFF1D6;color:#B4630E;border-radius:10px;padding:2px 10px;font-size:14px;font-weight:700;margin-top:4px}
+.tabs{display:flex;gap:8px;margin:6px 0 14px}
+.tabs button{flex:1;padding:10px;border-radius:14px;background:#ffffff26;color:#fff;font-size:17px;font-weight:700}
+.tabs button.on{background:#fff;color:var(--bg1)}
+.lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.lib .item{background:#fff;border-radius:18px;overflow:hidden;text-align:right;padding:0}
+.lib .item .art{display:block;width:100%;height:auto;aspect-ratio:400/260}
+.lib .item div{padding:8px 10px;font-weight:700;font-size:15px}
+.empty{color:#fff;text-align:center;opacity:.85;padding:24px}
+/* reader */
+#reader{background:radial-gradient(circle at 50% 0,var(--night2),var(--night));color:#F4EFFF;padding:0;max-width:none;min-height:100vh}
+#reader.on{display:flex;flex-direction:column}
+.rtop{display:flex;justify-content:space-between;align-items:center;padding:14px 16px}
+.rtop .iconbtn{background:#ffffff1a}
+.stage{flex:1;display:flex;flex-direction:column;max-width:760px;width:100%;margin:0 auto;padding:0 16px}
+.stage .art{width:100%;height:auto;aspect-ratio:400/260;border-radius:24px;box-shadow:0 10px 40px #0006}
+.ptext{font-size:clamp(21px,4.6vw,28px);line-height:1.85;margin:20px 4px;font-weight:600}
+.ptext.anim{animation:fade .5s ease}
+.dots{display:flex;gap:6px;justify-content:center;margin:6px 0 4px}
+.dots i{width:9px;height:9px;border-radius:9px;background:#ffffff40}
+.dots i.on{background:var(--yellow);width:22px}
+.nav{display:flex;gap:12px;padding:14px 16px 22px;max-width:760px;width:100%;margin:0 auto}
+.nav .btn{font-size:20px}
+.q{background:#ffffff14;border:2px dashed #ffffff40;border-radius:22px;padding:18px;font-size:22px;line-height:1.8;text-align:center}
+.goodnight{text-align:center;padding-top:20px}
+.goodnight .moon{font-size:90px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.goodnight h1{font-size:34px;margin:8px 0}
+/* forms */
+label{display:block;font-weight:700;margin:12px 0 6px}
+.inp{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #E3DDF7;font-size:18px;background:#FBFAFF}
+.inp:focus{outline:none;border-color:var(--bg1)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:10px;border-radius:14px;background:#F2EFFC;font-size:17px;font-weight:700;color:var(--soft)}
+.seg button.on{background:var(--bg1);color:#fff}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #E3DDF7}
+.sw.on{box-shadow:0 0 0 3px var(--bg1)}
+.preview{min-height:180px;display:grid;place-items:center;background:linear-gradient(160deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px;margin-bottom:6px}
+.list .li{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #EEE}
+.list .li:last-child{border:0}
+.list .li .nm{flex:1;font-weight:700;font-size:18px}
+.small{padding:8px 12px;border-radius:12px;font-size:15px;font-weight:700;background:#F2EFFC;color:var(--bg1)}
+.small.del{background:#FFE5E5;color:#D33}
+/* modal */
+.modal{position:fixed;inset:0;background:#120F33cc;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:420px;margin:0}
+.pin{display:flex;gap:10px;justify-content:center;direction:ltr;margin:12px 0}
+.pin span{width:46px;height:56px;border-radius:14px;background:#F2EFFC;display:grid;place-items:center;font-size:28px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;direction:ltr}
+.pad button{padding:14px;border-radius:16px;background:#F2EFFC;font-size:24px;font-weight:700;color:var(--ink)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2B2350;color:#fff;padding:10px 18px;border-radius:14px;font-weight:700;z-index:60;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}
+/* welcome */
+#welcome{text-align:center;color:#fff;padding-top:8vh}
+#welcome img{width:130px;height:130px;border-radius:30px;box-shadow:0 12px 30px #0004}
+#welcome h1{font-size:40px;margin:14px 0 0}
+#welcome .steps{background:#fff;color:var(--ink);border-radius:var(--r);padding:16px;text-align:right;margin:20px 0;line-height:1.9}
+.foot{text-align:center;color:#ffffffaa;font-size:13px;margin-top:20px}
+.foot a{color:#fff}
+.pill{display:inline-block;background:var(--orange);color:#fff;border-radius:20px;padding:2px 12px;font-weight:800;letter-spacing:1px;font-family:Poppins,sans-serif}
+/* v1.1 */
+/* v2.5 التصنيفات + قصص الأنبياء + إنجليزي متقدم */
+.cats{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.cat{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 11px;font-size:13.5px;font-weight:800;background:#FFF1D6;color:#B4630E;font-style:normal;white-space:nowrap}
+.cats .val{font-size:13px;color:var(--soft);font-weight:700}
+.c-pro{background:#E3F6EC;color:#13784A}.c-occ{background:#E5FBEA;color:#1E8E4A}.c-truth{background:#E6F0FF;color:#2456B8}
+.c-share{background:#FFF1D6;color:#B4630E}.c-mercy{background:#FFE6F0;color:#C2296B}.c-brave{background:#FFEBDD;color:#C2410C}
+.c-patience{background:#EAF7E1;color:#3F7D1F}.c-faith{background:#EFEAFF;color:#5B4BDB}.c-know{background:#E2F5FB;color:#0E7490}
+.c-family{background:#FDEBE7;color:#B23B2A}.c-habits{background:#FFF8D6;color:#8A6D00}.c-manners{background:#F2EFFC;color:#6B5FA8}
+.lib .item div.cats{padding:0 10px 10px;margin:0}.lib .item .cat{font-size:11.5px;padding:2px 8px}
+.sitem .cat{font-size:11.5px;padding:2px 8px}.sitem .cats{margin:0}
+.tl{margin-top:12px;background:#F8F6FF;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.tl>b{font-size:13px;color:var(--soft)}
+.tlr{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:8px 10px;text-align:right;color:var(--ink);border:2px solid transparent}
+.tlr i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#EFEAFF;color:#5B4BDB;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.tlr span{flex:1;font-weight:700;font-size:14.5px}.tlr .cat{font-size:11px;padding:2px 7px}
+.tlr.now{border-color:var(--bg1)}.tlr.done{opacity:.6}.tlr.done i{background:#DDF5E5;color:#1E8E4A}
+.shortchip{text-align:center;margin:-2px 0 8px}.shortchip button{border:0;background:#ffffff1f;color:inherit;font:inherit;font-size:13px;padding:5px 12px;border-radius:99px;cursor:pointer}
+.src{text-align:center;color:#ffffffaa;font-size:13.5px;margin:12px 0 0}
+.ensub{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:4px 0 10px}
+.ensub .chip{white-space:nowrap;font-size:14.5px;padding:6px 12px}
+.rlist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rcard{background:#F6F3FF;border-radius:16px;padding:12px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:4px}
+.rcard span{font-size:30px}.rcard b{font-family:Poppins,sans-serif;font-size:15px}.rcard small{color:var(--soft);font-size:12.5px;text-align:right}
+.passage{text-align:left;direction:ltr;font-family:Poppins,sans-serif;font-size:17px;line-height:1.9;color:var(--ink);background:#FBFAFF;border-radius:16px;padding:12px 14px;margin:10px 0}
+.passage .sx{cursor:pointer;border-radius:6px;padding:0 2px}.passage .sx:active,.passage .sx.on{background:#FFE9A8}
+.artr{direction:rtl;text-align:right;color:var(--soft);font-size:15px;line-height:1.9;background:#FFF8E8;border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.vlist{display:flex;flex-direction:column;gap:8px}
+.vrow{background:#F6F3FF;border-radius:14px;padding:9px 12px;display:flex;gap:10px;align-items:center;color:var(--ink);text-align:left;direction:ltr}
+.vrow>span{font-size:26px}.vrow b{font-family:Poppins,sans-serif;font-size:16px}.vrow small{display:block;color:var(--soft);font-size:13px}.vrow em{display:block;direction:rtl;text-align:left;font-style:normal;color:#B4630E;font-size:13px}
+.gl{background:#F6F3FF;border-radius:16px;padding:12px;margin-bottom:8px;text-align:right}
+.gl h3{margin:0 0 4px;font-size:16px}.gl p{margin:0 0 6px;color:var(--soft);font-size:14px;line-height:1.7}
+.gl .ex{direction:ltr;text-align:left;font-family:Poppins,sans-serif;font-size:15px;background:#fff;border-radius:10px;padding:6px 10px;margin:4px 0;cursor:pointer}
+.gl .ex small{display:block;direction:rtl;text-align:right;font-family:inherit;color:var(--soft);font-size:12.5px}
+.dlg{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.dl{max-width:85%;border-radius:16px;padding:8px 12px;direction:ltr;text-align:left;font-family:Poppins,sans-serif;font-size:15px;cursor:pointer;color:var(--ink)}
+.dl small{display:block;direction:rtl;text-align:right;font-family:inherit;color:var(--soft);font-size:12.5px}
+.dl b{display:block;font-size:12px;color:var(--soft)}
+.dl.a{background:#EFEAFF;align-self:flex-start}.dl.b{background:#FFF1D6;align-self:flex-end}
+.spell{direction:ltr;font-family:Poppins,sans-serif;font-size:24px;text-align:center;width:100%;border:3px solid #E6E0FF;border-radius:16px;padding:10px;margin:10px 0;letter-spacing:2px}
+.gq{direction:ltr;font-family:Poppins,sans-serif;font-size:20px;font-weight:700;color:var(--ink);background:#F6F3FF;border-radius:14px;padding:12px;margin:8px 0}
+.opts.en .opt{direction:ltr;font-family:Poppins,sans-serif}
+/* v2.4 تقويم الشهر */
+.skyhead{display:flex;align-items:flex-end;gap:12px;background:linear-gradient(135deg,#EFEAFF,#FFE9F3);border-radius:20px;padding:10px 12px 0;position:relative}
+.skyhead svg{flex:none;margin-bottom:-2px}
+.shinfo{flex:1;padding-bottom:12px}.shinfo h2{margin:0 0 6px}
+.shchips{display:flex;gap:6px;flex-wrap:wrap}.shchips span{background:#fff;border-radius:12px;padding:2px 10px;font-weight:800;font-size:15px}
+.skyhead .small{position:absolute;top:10px;left:10px}
+.month{background:linear-gradient(180deg,#2A2066,#3B2A7A);border-radius:22px;padding:12px;margin-top:12px;color:#fff}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:8px}.mhead b{font-size:19px}
+.goal{background:#ffffff1f;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:800;color:#FFE27A}
+.mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.mstats div{background:#ffffff14;border-radius:14px;text-align:center;padding:6px 2px}.mstats b{display:block;font-size:22px;color:#FFD93D}.mstats span{font-size:12px;opacity:.85}
+.mbar{position:relative;height:16px;background:#ffffff1a;border-radius:10px;overflow:hidden;margin-bottom:10px}
+.mbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#FFD93D,#FF9F1C);border-radius:10px;transition:width .8s}
+.mbar span{position:absolute;inset:0;text-align:center;font-size:11px;font-weight:800;line-height:16px;color:#2B2350}
+.mdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.mw{font-style:normal;text-align:center;font-size:11px;font-weight:800;opacity:.7;padding-bottom:2px}
+.md{position:relative;font-style:normal;aspect-ratio:1;border-radius:12px;background:#ffffff12;display:grid;place-items:center;overflow:hidden;transition:transform .15s}
+.md b{position:absolute;top:2px;right:5px;font-size:10px;font-weight:700;opacity:.75}
+.md span{font-size:clamp(16px,5.4vw,26px);line-height:1}
+.md .mb{position:absolute;bottom:1px;left:2px;font-style:normal;font-size:clamp(10px,3vw,14px)}
+.md u{position:absolute;bottom:2px;right:3px;text-decoration:none;font-size:9px;font-weight:800;background:#fff;color:#5B4BDB;border-radius:6px;padding:0 3px}
+.md.lit{background:radial-gradient(circle at 50% 45%,#7B5CE6,#4A33A8);box-shadow:inset 0 0 0 2px #FFD93D,0 0 12px #FFD93D55}
+.md.lit span{animation:twk 2.4s ease-in-out infinite}
+.md.got{background:#ffffff26}
+.md.today{box-shadow:0 0 0 3px #fff;animation:tpulse 1.8s ease-in-out infinite}
+.md.lit.today{box-shadow:0 0 0 3px #fff,0 0 14px #FFD93D}
+.md.future{opacity:.35}.md.empty{background:transparent}
+.md[role=button]:active{transform:scale(.88)}
+.mhint{text-align:center;font-size:13px;margin:10px 0 0;opacity:.85}
+@keyframes twk{50%{transform:scale(1.12) rotate(8deg)}}
+@keyframes tpulse{50%{box-shadow:0 0 0 5px #ffffff88}}
+.accb{position:relative}.accb.lock{opacity:1!important}.accb.lock span{filter:grayscale(1);opacity:.35}
+.accb .lk{position:absolute;top:4px;right:6px;font-style:normal;font-size:14px}
+/* v2.3 info */
+.md[role=button]{cursor:pointer}.md[role=button]:active{transform:scale(.92)}
+button.stk{border:0;padding:0;cursor:pointer;color:inherit;font-family:inherit}
+.infocard{text-align:center}
+.infocard .bigi{font-size:72px;line-height:1.1;margin:4px auto}
+.infocard .bigi.stk{width:110px;height:110px;font-size:64px;border-radius:24px}
+.infocard .lockq{color:#CFC8E8;font-weight:800}
+.ilist{list-style:none;padding:0;margin:10px 0;text-align:right}
+.ilist li{display:flex;gap:10px;align-items:center;background:#F6F3FF;border-radius:14px;padding:8px 10px;margin-bottom:8px}
+.ilist .ii{font-size:30px}
+.cheer{background:linear-gradient(135deg,#FFF1D6,#FFE1EE);border-radius:16px;padding:10px 12px;font-weight:800;color:#B4410E;font-size:17px}
+.pbar{height:12px;background:#EFEAFF;border-radius:10px;overflow:hidden;margin:10px 0}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#FFD93D,#FF9F1C)}
+/* v2.2 */
+.seg.wrap{flex-wrap:wrap}.seg.wrap button{flex:1 0 28%}
+/* زر التالي ثابت تحت مهما طال الكلام */
+#reader .stage{padding-bottom:130px}
+#reader .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;justify-content:center;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--night) 70%,transparent);max-width:none}
+#reader .nav>*{max-width:364px}
+#reader .recbar{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom));left:0;right:0;z-index:20}
+.viewtag{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+/* حركة خفيفة في الرسومات */
+.art .bob{animation:bob 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.art .b2{animation-delay:-.8s}.art .b3{animation-delay:-1.6s}.art .b4{animation-delay:-2.4s}
+.art .floaty{animation:floaty 3.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.art .scene circle[fill="#fff"]{animation:tw 2.8s ease-in-out infinite}
+.art .scene circle[fill="#fff"]:nth-of-type(3n){animation-delay:-1s}.art .scene circle[fill="#fff"]:nth-of-type(3n+1){animation-delay:-2s}
+.stage .art{animation:artin .6s ease}
+@keyframes bob{50%{transform:translateY(-4px) rotate(-1deg)}}
+@keyframes floaty{50%{transform:translateY(-8px) rotate(4deg)}}
+@keyframes tw{50%{opacity:.25}}
+@keyframes artin{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+.art.color .bob,.art.color .floaty,.art.color circle{animation:none!important}
+@media (prefers-reduced-motion:reduce){.art *,.stage .art{animation:none!important}}
+/* سمائي: الشهر والملصقات */
+.album{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.stk{position:relative;background:#F6F3FF;border-radius:12px;aspect-ratio:1;display:grid;place-items:center;font-size:24px}
+.stk small{position:absolute;bottom:0;left:2px;font-size:10px;font-weight:800;color:var(--soft)}
+.stk.r{background:#F0E6FF;box-shadow:inset 0 0 0 2px #9B6BF2}.stk.l{background:#FFF4CC;box-shadow:inset 0 0 0 2px #FFB800}
+.stk.none{font-size:16px;color:#CFC8E8;box-shadow:none;background:#F6F3FF}
+.newstk{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;color:var(--ink);border-radius:18px;padding:10px;margin:10px 0;animation:pop .5s ease}
+.newstk span{font-size:54px}.newstk b{font-size:17px}.newstk small{color:var(--soft)}
+.newstk.r{box-shadow:0 0 0 3px #9B6BF2}.newstk.l{box-shadow:0 0 0 3px #FFB800;background:#FFF8D6}
+/* English */
+.enlv{margin-bottom:12px;background:#ffffff26;border-radius:16px;padding:4px}
+.enlv button{display:flex;flex-direction:column;align-items:center;background:transparent;color:#fff}.enlv button small{font-size:11px;opacity:.8}
+.enlv button.on{background:#fff;color:var(--bg1)}
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;direction:ltr}
+.lt{background:#F6F3FF;border-radius:16px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;color:var(--ink)}
+.lt b{font-family:Poppins,sans-serif;font-size:26px;line-height:1}.lt b small{font-size:16px;color:var(--soft);margin-inline-start:3px}.lt span{font-size:22px}
+.words{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.wd{background:#F6F3FF;border-radius:16px;padding:10px;display:flex;flex-direction:column;align-items:center;color:var(--ink)}
+.wd span{font-size:34px}.wd b{font-family:Poppins,sans-serif;font-size:20px;direction:ltr}.wd small{color:var(--soft)}
+.sents{display:flex;flex-direction:column;gap:8px}
+.sn{background:#F6F3FF;border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:center;text-align:right;color:var(--ink)}
+.sn span{font-size:28px}.sn b{display:block;font-family:Poppins,sans-serif;font-size:16px;text-align:left}.sn small{color:var(--soft)}
+.encard{text-align:center}.encard .big{font-family:Poppins,sans-serif;font-size:90px;font-weight:800;color:var(--bg1);line-height:1}.encard .big small{font-size:56px;color:var(--soft)}
+.encard .bige{font-size:90px}.ent{font-family:Poppins,sans-serif;font-size:28px;font-weight:800;margin:6px 0}
+.buildline,.buildpool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;border-radius:14px;margin:8px 0}
+.buildline{background:#F6F3FF;border:2px dashed #D5CCF7}
+.bw{font-family:Poppins,sans-serif;font-size:18px;font-weight:700;padding:8px 12px;border-radius:12px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #D5CCF7}
+.bw.on{background:var(--bg1);color:#fff;box-shadow:none}
+/* v2.0 */
+.modebar{display:flex;gap:6px;background:#ffffff26;border-radius:16px;padding:4px;margin:0 0 4px}
+.modebar button{flex:1;padding:8px;border-radius:12px;background:transparent;color:#fff;font-size:15px;font-weight:700}
+.modebar button.on{background:#fff;color:var(--bg1)}
+.modehint{color:#ffffffcc;font-size:13px;text-align:center;margin:2px 0 6px}
+.modehint:empty{display:none}
+.viewtag{background:#FFD93D;color:#2B2350;border-radius:12px;padding:4px 10px;font-size:13px;font-weight:800;align-self:center}
+/* v1.7 */
+.tabs{overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{white-space:nowrap;font-size:15px;padding:9px 10px;min-width:max-content}
+.tabs button.dim{opacity:.6}
+.skycard .skywrap{position:relative;margin-top:12px}
+.skyart{width:100%;height:auto;display:block;border-radius:18px}
+.skylbl{position:absolute;bottom:10px;right:12px;color:#FFE27A;font-weight:800;font-size:15px;background:#120F3399;padding:2px 10px;border-radius:10px}
+.cchips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.cchip{background:#FFF1D6;color:#B4630E;border-radius:10px;padding:2px 10px;font-size:13px;font-weight:700}
+h3.sub{font-size:17px;margin:14px 0 8px}
+.accs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.accb{background:#F6F3FF;border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;border:3px solid transparent;color:var(--ink)}
+.accb span{font-size:26px}.accb small{font-size:11px;font-weight:700;color:var(--soft)}
+.accb.on{border-color:var(--yellow);background:#FFF8D6}
+.accb.lock{opacity:.55}
+.celebrate{background:linear-gradient(135deg,#FFD93D,#FF9F1C);color:#2B2350;border-radius:18px;padding:12px;text-align:center;font-weight:800;font-size:18px;margin:8px 0;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.05)}100%{transform:none;opacity:1}}
+.nightcard{text-align:center}
+.playhead{padding:0;overflow:hidden}.playhead .art{display:block;width:100%;height:auto;aspect-ratio:400/200}.playhead .info{padding:12px 16px 16px}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.game{background:#fff;border-radius:22px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 10px 30px #2b235033;color:var(--ink)}
+.game span{font-size:44px}.game b{font-size:18px}.game small{color:var(--soft);font-size:13px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.gi{display:flex;flex-direction:column;gap:6px}.gi svg{width:100%;height:auto;border-radius:12px;border:2px solid #EEE9FF}
+.gamecard{max-height:94vh;overflow:auto;position:relative;max-width:560px!important}
+.gclose{position:absolute;top:10px;left:10px;background:#F2EFFC;color:var(--ink);width:40px;height:40px}
+.canvas svg{width:100%;height:auto;border-radius:16px;border:2px solid #EEE9FF;touch-action:manipulation}
+.canvas .paintable{cursor:pointer}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;justify-content:center}
+.pal .sw{width:38px;height:38px}
+.puzzle{direction:ltr;display:grid;gap:3px;background:#2B2350;border-radius:14px;padding:3px;aspect-ratio:400/260}
+.tile{border-radius:6px;background-repeat:no-repeat;border:3px solid transparent;padding:0}
+.tile.sel{border-color:var(--yellow);transform:scale(.95)}
+.tile.done{border-radius:0;border-width:0}
+.opts{display:grid;gap:10px;margin:10px 0}
+.opts.big{grid-template-columns:repeat(3,1fr)}.opts.big .opt{font-size:46px;padding:10px}
+.opt{background:#F2EFFC;border-radius:16px;padding:14px;font-size:18px;font-weight:700;color:var(--ink);border:3px solid transparent}
+.opt.ok{background:#E5FBEA;border-color:var(--mint)}.opt.no{background:#FFE5E5;border-color:#FF6B6B}
+.fb{font-weight:800;font-size:18px;text-align:center}
+.recbar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:0 16px;max-width:760px;margin:0 auto;width:100%}
+.recbar .btn{width:auto;flex:1;min-width:140px}
+.btn.rec{background:#FF4D6D;box-shadow:0 6px 0 #C9304D}
+.btn.rec.live{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.7}}
+.recby{color:#FFE27A;font-weight:700;width:100%;text-align:center}
+#recBtn.on{background:#FF4D6D}
+#lock{position:fixed;inset:0;z-index:70;display:none;background:radial-gradient(circle at 50% 20%,#2A2066,#0B0920);color:#F4EFFF;text-align:center;align-items:center;justify-content:center;padding:24px}
+#lock.on{display:flex}
+.lockin{max-width:440px}
+.lmoon{font-size:110px;animation:float 3s ease-in-out infinite}
+#lock h1{font-size:34px;margin:8px 0}
+#lockText{font-size:22px;line-height:1.8;font-weight:600}
+.lsub{color:#ffffff99}
+.zzz{font-size:30px;color:#FFE27A;font-weight:800;letter-spacing:6px;margin:10px 0 24px;animation:float 2.4s ease-in-out infinite}
+.zzz span:nth-child(1){font-size:24px}.zzz span:nth-child(2){font-size:18px}
+#lock .btn.ghost{color:#ffffff88;font-size:15px}
+
+.devbadge{display:block;width:100%;text-align:right;margin-top:10px;padding:8px 12px;border-radius:12px;background:#F2EFFC;color:var(--soft);font-size:14px;font-weight:700;font-family:inherit}
+.devbadge.on{background:#E5FBEA;color:#1E8E4A}
+.dot{width:10px;height:10px;border-radius:50%;background:#CFC8E8;flex:none}
+.dot.on{background:var(--mint);box-shadow:0 0 0 4px #4CD97B33}
+#whoKids .kid{width:100px}
+#whoOk:disabled{opacity:.5}
+
+.timepick{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2B2370,#5B4BDB);border-radius:22px;padding:14px;color:#fff;direction:ltr}
+.timepick .tv{flex:1;text-align:center;direction:rtl}
+.timepick .tv b{display:block;font-size:42px;line-height:1.1;font-family:Poppins,sans-serif;letter-spacing:1px}
+.timepick .tv span{font-size:16px;opacity:.85}
+.tbtn{width:56px;height:56px;border-radius:18px;background:#ffffff26;color:#fff;font-size:30px;font-weight:700;display:grid;place-items:center;flex:none}
+.tbtn:active{background:#ffffff40}
+.tquick{display:flex;gap:8px;margin-top:10px}
+.tquick button{flex:1;padding:8px 0;border-radius:12px;background:#F2EFFC;color:var(--soft);font-weight:700;font-size:15px;font-family:Poppins,sans-serif}
+.tquick button.on{background:var(--bg1);color:#fff}
+label.toggle{cursor:pointer;margin:12px 0;font-weight:400}
+.switch{appearance:none;-webkit-appearance:none;width:54px!important;height:32px!important;border-radius:32px;background:#DCD6F2;position:relative;transition:.2s;flex:none;margin:0}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0003;transition:.2s}
+.switch:checked{background:var(--mint)}
+.switch:checked::after{right:25px}
+
+.inp::placeholder,.codein::placeholder{letter-spacing:normal;font-size:16px;font-family:"Baloo Bhaijaan 2",system-ui,sans-serif}
+.count{display:inline-block;background:var(--bg1);color:#fff;border-radius:12px;font-size:15px;padding:0 10px;vertical-align:middle}
+.libchips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:none}
+.libchips::-webkit-scrollbar{display:none}
+.libchips .chip{white-space:nowrap;font-size:15px;padding:6px 12px}
+.slist{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.sitem{background:#F8F6FF;border-radius:16px;overflow:hidden;padding:0;text-align:right;color:var(--ink);border:2px solid #EEE9FF}
+.sitem .art{display:block;width:100%;height:auto;aspect-ratio:400/220}
+.sitem .st{font-weight:800;font-size:15px;padding:6px 10px 0;line-height:1.4}
+.sitem .sv{padding:4px 10px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sitem .tag{font-size:12px;margin:0}
+.sitem .rd{font-size:12px;color:#1E8E4A;font-weight:700}
+
+.choice{display:block;width:100%;text-align:right;background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px #2b235033;font-family:inherit;color:var(--ink)}
+.choice .ic{font-size:40px;float:left}
+.choice b{font-size:22px;display:block}
+.choice span{color:var(--soft);font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:14px;background:#F2EFFC;font-size:17px;font-weight:700;color:var(--soft)}
+.chip.on{background:var(--bg1);color:#fff}
+.chipin{width:110px;padding:8px 12px;border-radius:14px;border:2px solid #E3DDF7;font-size:16px;font-family:inherit}
+.chipin.on{border-color:var(--bg1)}
+.code{font-family:Poppins,monospace;font-size:30px;font-weight:800;letter-spacing:3px;direction:ltr;text-align:center;color:var(--bg1);background:#F2EFFC;border-radius:16px;padding:12px;margin:8px 0}
+.codein{width:100%;font-family:Poppins,monospace;font-size:26px;font-weight:700;letter-spacing:3px;direction:ltr;text-align:center;padding:12px;border-radius:16px;border:3px solid #E3DDF7;text-transform:uppercase}
+.qr{display:grid;place-items:center;margin:8px auto;max-width:200px}
+.qr svg{width:100%;height:auto;background:#fff;border-radius:12px}
+.dk .stats{display:flex;gap:8px;margin:12px 0 8px}
+.dk .stats div{flex:1;background:#F6F3FF;border-radius:14px;text-align:center;padding:8px 4px}
+.dk .stats b{display:block;font-size:22px;color:var(--bg1)}
+.dk .stats span{font-size:13px;color:var(--soft)}
+.week{display:flex;gap:6px}
+.week i{flex:1;font-style:normal;text-align:center;font-size:12px;padding:6px 0;border-radius:10px;background:#F2EFFC;color:var(--soft)}
+.week i.on{background:var(--mint);color:#fff;font-weight:700}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+.toggle input{width:24px;height:24px;accent-color:var(--bg1)}
+#sleep{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 30s ease;z-index:40}
+#sleep.on{opacity:.93;pointer-events:auto}
+.search{width:100%;padding:10px 14px;border-radius:14px;border:2px solid #E3DDF7;font-size:16px;margin-bottom:8px;font-family:inherit}
+
+/* ================= v3.0 الواجهة الجديدة (نفس عائلة سهم وفلق، بروح أطفال) ================= */
+:root{--bg1:#F2851E;--orange:#F2851E;--or2:#FFA03E;--ink:#2A2F45;--soft:#7A8098;--glass:rgba(255,255,255,.74);--gline:rgba(255,255,255,.95)}
+body{background:linear-gradient(180deg,#93AECF 0%,#B7C8DC 28%,#E6DBCB 68%,#EFE5D6 100%);background-attachment:fixed}
+body:before{content:"";position:fixed;inset:auto 0 0 0;height:42vh;pointer-events:none;z-index:-1;background:
+ radial-gradient(120% 60% at 15% 100%,#E3D0B7 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#E9D9C3 0 45%,transparent 46%)}
+.card{background:var(--glass);border:1.5px solid var(--gline);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 10px 28px #50628a1c;border-radius:26px}
+.btn{background:linear-gradient(180deg,var(--or2),var(--orange));box-shadow:0 7px 16px #F2851E4d,inset 0 -4px 0 #0000001a;border-radius:20px}
+.btn:active{transform:translateY(2px);box-shadow:0 3px 8px #F2851E4d}
+.btn.alt{background:#fff;color:#C9650C;box-shadow:0 4px 10px #50628a1a;border:1.5px solid #F6E3CF}
+.btn.ghost{color:var(--soft)!important;background:transparent;box-shadow:none;border:0}
+.chip{background:#ffffffb0;color:var(--soft);border:1.5px solid var(--gline)}.chip.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.seg button.on,.tquick button.on,.count{background:var(--orange)}
+.top,.hello:not(#hello),#welcome,.empty{color:var(--ink)}
+.foot{color:var(--soft)}.foot a{color:var(--ink)}
+.iconbtn{background:#ffffffb0;color:var(--ink);border:1.5px solid var(--gline)}
+#reader .iconbtn{background:#ffffff1f;color:#fff;border:0}
+.modehint{color:var(--soft)}
+.modebar{background:#ffffff80;border:1.5px solid var(--gline)}.modebar button{color:var(--soft)}.modebar button.on{background:var(--orange);color:#fff}
+.enlv{background:#ffffff80!important;border:1.5px solid var(--gline)}.enlv button{color:var(--soft)}.enlv button.on{background:#fff;color:var(--orange)}
+/* الرأس */
+.hd3{display:flex;justify-content:space-between;align-items:flex-start;margin:4px 2px 12px}
+.brand3{display:flex;flex-direction:column}
+.brand3 b{font-size:40px;font-weight:800;line-height:1;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.brand3 img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 10px #0002}
+.brand3 small{color:#4B5470;font-size:14.5px;font-weight:600;margin-top:4px;max-width:210px;line-height:1.4}
+.hd3l{display:flex;align-items:center;gap:10px}
+.clock{text-align:right}.clock b{display:block;font-size:22px;font-weight:800;color:var(--ink);line-height:1.1}.clock small{display:block;font-size:13px;color:#4B5470;font-weight:700;margin-top:2px}.clock #season{color:var(--orange);font-weight:800;font-size:12.5px}
+.moonbtn{width:78px;height:78px;border-radius:50%;background:transparent;padding:0;position:relative;filter:drop-shadow(0 4px 10px #2A2F4544);animation:moonpulse 4s ease-in-out infinite}
+.moonbtn svg{width:78px;height:78px;display:block}
+.moonbtn:after{content:"🪐";position:absolute;bottom:0;left:-2px;font-size:18px}
+@keyframes moonpulse{50%{transform:scale(1.06)}}
+.hchips{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.hchip{flex:1;background:var(--glass);border:1.5px solid var(--gline);border-radius:999px;padding:7px 8px;font-size:13.5px;font-weight:700;display:flex;justify-content:center;gap:5px;color:var(--ink);white-space:nowrap}
+.hchip em{font-style:normal;color:#1F9D57;font-weight:800}
+.hicon.on{background:var(--orange);border-color:var(--orange)}
+.hicon{width:40px;height:40px;flex:none;border-radius:50%;background:var(--glass);border:1.5px solid var(--gline);font-size:18px;display:grid;place-items:center}
+/* الأبطال */
+.kidsbar{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:12px}
+.kidsbar .kids{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:10px;scrollbar-width:none}
+.klbl{margin-right:auto;font-size:13.5px;color:var(--soft);font-weight:800;text-align:left;line-height:1.3}.klbl small{display:block;font-size:11px;font-weight:600}
+.kid{background:transparent;border:0;width:auto;padding:0;display:flex;flex-direction:column;align-items:center;box-shadow:none}
+.kid svg{width:60px;height:60px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 3px 8px #50628a26;transition:.2s}
+.kid.sel{transform:none;box-shadow:none}.kid.sel svg{border-color:var(--orange);box-shadow:0 0 0 4px #F2851E33}
+.kid .nm{font-size:14px;margin-top:3px}
+.kid .badge{top:-6px;left:-8px;font-size:10.5px}
+/* قصة الليلة */
+.tonight{padding:0}.tonight .art{border-radius:0}
+.tonight .info{padding:12px 16px 16px}
+.tonight .title{font-size:25px;margin:6px 0 2px}
+.tonight .tmeta{font-size:13px;color:var(--soft);font-weight:600;margin:2px 0 0}
+.tonight .btn{height:56px;font-size:20px;font-weight:800}
+/* شريط وقت النوم */
+.bedbar{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13.5px;font-weight:700;margin-bottom:12px}
+.bedbar .bar{flex:1;height:7px;border-radius:7px;background:#E6E0D6;position:relative;overflow:hidden}
+.bedbar .bar i{position:absolute;top:0;bottom:0;right:0;border-radius:7px;background:linear-gradient(270deg,#F2851E,#FFC37A)}
+.bedbar em{font-style:normal;color:var(--orange);white-space:nowrap}
+/* البلاطات */
+.qtiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.qtiles button{background:var(--glass);border:1.5px solid var(--gline);border-radius:20px;padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:700;color:var(--ink)}
+.qtiles span{font-size:27px;line-height:1.15}.qtiles small{font-size:11px;color:var(--orange);font-weight:800}
+/* الشريط السفلي */
+#home{padding-bottom:110px}
+.bnav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:740px;z-index:30;
+ margin:0;padding:7px;gap:2px;display:flex;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid #fff;border-radius:30px;box-shadow:0 10px 30px #50628a33}
+.bnav button{flex:1;min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px;border-radius:22px;background:transparent;color:#8A8FA3;font-size:12px;font-weight:700}
+.bnav button span{font-size:21px;line-height:1.1;filter:grayscale(1);opacity:.6;transition:.2s}
+.bnav button.on{background:linear-gradient(180deg,var(--or2),var(--orange));color:#fff;box-shadow:0 6px 14px #F2851E55}
+.bnav button.on span{filter:none;opacity:1}
+.bnav button.dim{opacity:.55}
+/* الوضع الليلي التلقائي وقت النوم */
+body.nt{background:linear-gradient(180deg,#1E2348 0%,#2C2F5C 45%,#4A3F6B 100%)}
+body.nt:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#433760 0 45%,transparent 46%)}
+body.nt{--glass:rgba(255,255,255,.9);--gline:rgba(255,255,255,.35)}
+body.nt .brand3 b,body.nt .clock b{color:#F4F1FF}
+body.nt .brand3 small,body.nt .clock small,body.nt .modehint,body.nt .foot{color:#C9C4E8}
+body.nt .bnav{background:rgba(28,30,66,.9);border-color:#ffffff22}
+body.nt .bnav button{color:#AFAACF}
+body.nt .bnav button span{opacity:.75}
+body.nt .modebar{background:#ffffff1f;border-color:#ffffff2e}body.nt .modebar button{color:#D9D5F2}body.nt .modebar button.on{color:#fff}
+body.nt .tonight .art{opacity:.94}
+/* الكواكب */
+.mooncard{background:linear-gradient(160deg,#1E2350,#3B2F7A)!important;color:#fff;display:flex;gap:12px;align-items:center;padding:16px;border:0!important}
+.mc-art{flex:none;animation:moonpulse 6s ease-in-out infinite}
+.mc-in{flex:1}.mc-in small{color:#C9C4FF;font-weight:700}.mc-in h2{font-size:28px;margin:0;color:#FFE9A8}.mc-in p{margin:2px 0 8px;font-size:14px;color:#E4E0FF;line-height:1.6}
+.mc-stats{display:flex;gap:6px;margin-bottom:10px}.mc-stats div{flex:1;background:#ffffff14;border-radius:12px;padding:5px 4px;text-align:center}
+.mooncard .btn{font-size:16px;padding:10px 12px;white-space:nowrap}
+.mc-stats b{display:block;font-size:16px;color:#FFE9A8}.mc-stats span{font-size:10.5px;color:#C9C4FF}
+@media (max-width:420px){.mooncard{flex-direction:column;text-align:center}}
+.spsub{margin:0 0 10px}
+.phstrip{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;background:linear-gradient(160deg,#1E2350,#3B2F7A);border-radius:18px;padding:8px;margin-bottom:12px}
+@media (max-width:560px){.phstrip{grid-template-columns:repeat(4,1fr);row-gap:6px}}
+.phstrip div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:12px;min-width:0}
+.phstrip small{font-size:11px;color:#C9C4FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.phstrip div.on{background:#ffffff22}.phstrip div.on small{color:#FFE9A8;font-weight:800}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.mz{background:#fff;border-radius:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;color:var(--ink);border:2px solid #F2EEE6;position:relative}
+.mz i{font-style:normal;font-size:11px;color:var(--soft)}.mz b{font-size:13.5px}.mz em{font-style:normal;font-size:10.5px;color:#fff;background:var(--orange);border-radius:8px;padding:0 6px;margin-top:2px}
+.mz.on{border-color:var(--orange);background:#FFF4E8}
+.ayah{text-align:center;font-size:18px;line-height:1.9;margin:14px 0 0;color:var(--ink)}.ayah small{display:block;font-size:12px;color:var(--soft)}
+.solar{display:flex;align-items:center;gap:2px;overflow-x:auto;background:linear-gradient(90deg,#141838,#2D2A66);border-radius:18px;padding:10px 8px;margin-bottom:12px;direction:ltr;scrollbar-width:none}
+.solar .sun{flex:none;width:46px;height:92px;border-radius:0 92px 92px 0;margin-left:-8px;background:radial-gradient(circle at 0 50%,#FFF3B0,#FFB43B 60%,#FF8A1E);box-shadow:0 0 24px #FFB43B88}
+.solar button{background:none;padding:0;flex:none}
+.plist,.slist{display:flex;flex-direction:column;gap:8px}
+.pcard,.scard{display:flex;gap:10px;align-items:center;background:#fff;border-radius:18px;padding:8px 10px;text-align:right;color:var(--ink);border:2px solid #F2EEE6}
+.pcard b,.scard b{font-size:17px}.pcard small{color:var(--soft);font-size:12px;margin-right:6px}.pcard span{display:block;font-size:13px;color:var(--soft);line-height:1.5}
+.scard>span{font-size:34px}.scard small{display:block;color:var(--soft);font-size:13px;line-height:1.55}
+.spin svg{animation:spin 18s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.pstats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:8px 0}
+.pstats div{background:#F4F1FF;border-radius:12px;padding:7px 8px;text-align:right;font-size:13px;color:var(--soft);line-height:1.4}.pstats b{display:block;font-size:15px;color:var(--ink)}
+.cmp{display:flex;align-items:flex-end;justify-content:center;gap:18px;background:linear-gradient(160deg,#1E2350,#3B2F7A);border-radius:16px;padding:12px;margin:8px 0;color:#E4E0FF;font-size:12.5px}
+.cmp div{display:flex;flex-direction:column;align-items:center;gap:4px}.cmp i{display:block;border-radius:50%}
+.myage{background:#FFF0E0;border-radius:12px;padding:8px 12px;font-size:14.5px;color:#9A4D08;font-weight:700;margin:6px 0}
+.facts p{background:#FFF7EC;border-radius:12px;padding:8px 12px;margin:6px 0;text-align:right;font-size:15px;line-height:1.7}
+/* القصص المتحركة ✨ */
+.art .fx-cl{animation:fxcl 16s ease-in-out infinite alternate}
+.art .fx-sun{animation:fxsun 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.art .fx-wv{animation:fxwv 5s ease-in-out infinite alternate}
+.art .fx-wv2{animation:fxwv 3.6s ease-in-out infinite alternate-reverse}
+.art .fx-bd{animation:fxbd 9s linear infinite}
+.art .fx-rn{animation:fxrn .9s linear infinite}
+.art .fx-fl,.art .fx-flame{animation:fxfl .7s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.art .fx-sw{animation:fxsw 4.5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.art .fx-enter{animation:fxenter 1.1s cubic-bezier(.3,1.4,.5,1) both}.art .fx-enter.d2{animation-delay:.2s}.art .fx-enter.d3{animation-delay:.35s}.art .fx-enter.d4{animation-delay:.5s}
+.art .fx-jump{animation:fxjump 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}.art .fx-jump.d2{animation-delay:.25s}.art .fx-jump.d3{animation-delay:.5s}
+@keyframes fxcl{to{transform:translateX(-46px)}}
+@keyframes fxsun{50%{transform:scale(1.08);filter:drop-shadow(0 0 10px #FFE066)}}
+@keyframes fxwv{to{transform:translateX(-16px)}}
+@keyframes fxbd{0%{transform:translate(60px,8px)}50%{transform:translate(-80px,-10px)}100%{transform:translate(-220px,6px)}}
+@keyframes fxrn{to{transform:translateY(14px)}}
+@keyframes fxfl{to{transform:scaleY(1.18) scaleX(.9)}}
+@keyframes fxsw{to{transform:rotate(3deg)}}
+@keyframes fxenter{from{transform:translateX(-120px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fxjump{0%,60%,100%{transform:none}30%{transform:translateY(-16px)}}
+.stage .art{animation:pageturn .7s ease both;transform-origin:100% 50%}
+@keyframes pageturn{from{opacity:0;transform:perspective(900px) rotateY(-28deg) translateX(-20px)}to{opacity:1;transform:none}}
+.ptext .w{transition:.2s;border-radius:6px;padding:0 1px}.ptext .w.on{background:#FFD93D;color:#2A2F45}
+@media (prefers-reduced-motion:reduce){.art [class*="fx-"],.moonbtn,.mc-art,.spin svg{animation:none!important}}
+
+/* ================= v3.3 ألوان الخلفية + رأس أنظف ================= */
+body,body[data-pal="sky"]{background:linear-gradient(180deg,#7FBFEF 0%,#A8D4F5 30%,#D3E9FA 65%,#EEF6FD 100%);background-attachment:fixed}
+body:before,body[data-pal="sky"]:before{background:radial-gradient(120% 60% at 15% 100%,#C8E2F7 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#D9ECFA 0 45%,transparent 46%)}
+body[data-pal="pink"]{background:linear-gradient(180deg,#F3A6C8 0%,#F7C3DA 32%,#FBE0EC 68%,#FFF3F8 100%)}
+body[data-pal="pink"]:before{background:radial-gradient(120% 60% at 15% 100%,#F6CFE0 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#FADCE9 0 45%,transparent 46%)}
+body[data-pal="green"]{background:linear-gradient(180deg,#86D2AE 0%,#ADE2C7 32%,#D6F1E3 68%,#F1FBF6 100%)}
+body[data-pal="green"]:before{background:radial-gradient(120% 60% at 15% 100%,#C4EBD6 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#D7F3E4 0 45%,transparent 46%)}
+body[data-pal="sand"]{background:linear-gradient(180deg,#93AECF 0%,#B7C8DC 28%,#E6DBCB 68%,#EFE5D6 100%)}
+body[data-pal="sand"]:before{background:radial-gradient(120% 60% at 15% 100%,#E3D0B7 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#E9D9C3 0 45%,transparent 46%)}
+.brand3 small{color:#3F4865}
+/* بطاقة التاريخ: القمر يمين، وجنبه اليوم والتاريخ والفصل */
+.hd3l{gap:10px;background:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.9);border-radius:24px;padding:6px 12px 6px 8px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 22px #3a5a8a1f}
+.moonbtn{width:64px;height:64px;flex:none}.moonbtn svg{width:64px;height:64px}
+.moonbtn:after{bottom:-2px;left:-4px;font-size:15px}
+.clock{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.clock b{font-size:20px;line-height:1.1}
+.clock small{font-size:13px;color:#4B5470;margin:0;font-weight:700;letter-spacing:.3px}
+.season{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:800;color:#fff;margin-top:2px;box-shadow:0 3px 8px #0000001f}
+.season.autumn{background:linear-gradient(135deg,#F0913A,#D9622B)}
+.season.winter{background:linear-gradient(135deg,#6AA8F5,#3D6FE0)}
+.season.spring{background:linear-gradient(135deg,#F37BB0,#D8478A)}
+.season.summer{background:linear-gradient(135deg,#FFC93D,#F59E0B);color:#5A3A00}
+@media (max-width:380px){.brand3 b{font-size:34px}.moonbtn,.moonbtn svg{width:56px;height:56px}}
+/* الداكن: عنوان الإعدادات وبطاقة التاريخ */
+body.nt .top,body.nt .top .brand{color:#F4F1FF}
+body.nt .top .iconbtn{background:#ffffff1f;color:#fff;border-color:#ffffff2e}
+body.nt .hd3l{background:#ffffff14;border-color:#ffffff26}
+/* اختيار لون الخلفية */
+.pals{display:flex;gap:10px}
+.pals button{flex:1;border-radius:16px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13.5px;font-weight:700;background:#fff;border:2px solid #EEE;color:var(--ink)}
+.pals button i{width:34px;height:34px;border-radius:50%;display:block;box-shadow:inset 0 0 0 2px #ffffffaa}
+.pals button.on{border-color:var(--orange);box-shadow:0 0 0 3px #F2851E33}
+
+.clock #season.season{color:#fff}.clock #season.season.summer{color:#5A3A00}
+body.nt[data-pal]{background:linear-gradient(180deg,#1E2348 0%,#2C2F5C 45%,#4A3F6B 100%)}
+body.nt[data-pal]:before{background:radial-gradient(120% 60% at 15% 100%,#3A2F55 0 40%,transparent 41%),radial-gradient(100% 50% at 90% 100%,#433760 0 45%,transparent 46%)}
+
+/* ================= v3.4 قمر كبير بلا مربع، مع نجوم وسحاب وزحل ================= */
+.hd3{align-items:center;margin:0 0 10px}
+.hd3l{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0;gap:4px;margin-left:-8px}
+.clock{align-items:flex-end;text-align:left}
+.clock b{font-size:26px;font-weight:800}
+.clock small{font-size:15px;font-weight:800;color:#2F3754;direction:ltr}
+.season{white-space:nowrap;font-size:14px;padding:4px 12px 4px 30px;margin-top:6px;position:relative;box-shadow:0 6px 14px #E0782A40}
+.season em{position:absolute;left:-10px;top:50%;transform:translateY(-50%) rotate(-12deg);font-style:normal;font-size:26px;filter:drop-shadow(0 2px 2px #0002)}
+.moonbtn{width:128px!important;height:128px!important;position:relative;filter:none;animation:none;overflow:visible}
+.moonbtn:after{content:none}
+.moonbtn .mn{position:absolute;inset:10px;animation:moonpulse 6s ease-in-out infinite}
+.moonbtn .mn svg{width:108px!important;height:108px!important;filter:drop-shadow(0 0 16px #FFE9A8aa)}
+.moonbtn .spk{position:absolute;width:16px;height:16px;animation:spk 2.6s ease-in-out infinite}
+.moonbtn .spk svg{width:100%;height:100%}
+.moonbtn .cld{position:absolute;left:-18px;right:-14px;bottom:-10px;width:auto;height:52px;pointer-events:none}
+.moonbtn .sat{position:absolute;left:-10px;bottom:2px;width:58px;animation:satb 5s ease-in-out infinite}
+.moonbtn .sat svg{width:58px;height:auto}
+@keyframes spk{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.1);opacity:1}}
+@keyframes satb{50%{transform:translateY(-4px) rotate(-4deg)}}
+@media (max-width:390px){.moonbtn{width:110px!important;height:110px!important}.moonbtn .mn svg{width:92px!important;height:92px!important}.clock b{font-size:22px}.brand3 b{font-size:34px}}
+body.nt .clock small{color:#D9D5F2}
+body.nt .moonbtn .cld{opacity:.25}
+
+#home{overflow-x:clip}
+.brand3{flex:1;min-width:0}.brand3 small{max-width:none}
+.hd3l{flex:none}
+@media (max-width:440px){.moonbtn{width:112px!important;height:112px!important}.moonbtn .mn{inset:8px}.moonbtn .mn svg{width:96px!important;height:96px!important}.moonbtn .sat,.moonbtn .sat svg{width:50px}.season{font-size:13px;padding:3px 10px 3px 26px}.season em{font-size:22px}}
+@media (max-width:390px){.moonbtn{width:100px!important;height:100px!important}.moonbtn .mn svg{width:84px!important;height:84px!important}.brand3 b{font-size:32px}.brand3 img{width:28px;height:28px}}
+
+/* v3.5: منع تحديد النص (يمنع بحث قوقل في التابلت) ومنع التكبير بالضغط المزدوج */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
+
+/* v3.6 غرفة الملابس */
+.wtabs{display:flex;gap:6px;margin:14px 0 4px}
+.wtabs button{flex:1;border-radius:14px;padding:9px 4px;font-size:14px;font-weight:800;background:#F2EFFA;color:var(--soft)}
+.wtabs button.on{background:var(--orange);color:#fff}
+.clubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:8px}
+.clubs button{border-radius:14px;background:#fff;border:2px solid #EEE;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.clubs button.on{border-color:var(--orange);box-shadow:0 0 0 3px #F2851E33}
+.clubs svg{width:38px;height:34px}
+.seg.lg button{font-size:13px;padding:7px 9px}
+.enlv button .ei{display:block;font-size:22px;line-height:1.2}.enlv button b{display:block;font-size:15px}
+
+/* v3.7 أذكار النوم وأصوات النوم والمكافأة والرسالة */
+.qtiles{grid-template-columns:repeat(3,1fr)}
+.adk{text-align:center}.adk h2{margin:6px 0}
+.adprog{display:flex;gap:5px;justify-content:center;margin-bottom:6px}.adprog i{width:22px;height:6px;border-radius:6px;background:#E6E0F5}.adprog i.ok{background:#4CD97B}.adprog i.now{background:var(--orange)}
+.adx{font-size:21px;line-height:2.1;background:#FFFBF2;border-radius:16px;padding:12px 14px;margin:10px 0;color:var(--ink);text-align:center;max-height:46vh;overflow:auto}
+.adsrc{font-size:12px;color:var(--soft);margin:10px 0 0}
+.tsb{width:150px;height:150px;border-radius:50%;margin:8px auto;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#FFC37A,#F2851E);color:#fff;box-shadow:0 10px 24px #F2851E55,inset 0 -6px 0 #0000001a}
+.tsb:active{transform:scale(.95)}.tsb b{font-size:46px;line-height:1}.tsb small{font-size:14px;opacity:.9}
+.tsrow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.tsrow span{font-size:13px;border-radius:999px;padding:3px 10px;background:#F2EFFA;color:var(--soft)}.tsrow .ok{background:#DDF5E5;color:#1E8E4A}.tsrow .now{background:#FFF0E0;color:#C9650C}
+.snd{text-align:center}
+.snd-sky{position:relative;height:110px;border-radius:18px;background:linear-gradient(180deg,#141838,#2D2A66);overflow:hidden;margin-bottom:10px}
+.snd-sky i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;animation:spk 2.6s ease-in-out infinite}
+.snd-moon{position:absolute;top:18px;left:24px;font-size:48px;animation:moonpulse 6s ease-in-out infinite}
+.sndg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sndg button{border-radius:16px;background:#F4F1FF;padding:10px 2px;display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:700;color:var(--ink);border:2px solid transparent}
+.sndg button span{font-size:28px}.sndg button.on{border-color:var(--orange);background:#FFF4E8}
+.snd-left{font-weight:800;color:var(--orange);margin:12px 0 6px}
+.rwd{padding:12px 14px;margin-bottom:12px}
+.rwd-h{display:flex;gap:10px;align-items:center;margin-bottom:6px}.rwd-h>span{font-size:34px}.rwd-h small{display:block;color:var(--soft);font-size:12px;font-weight:700}.rwd-h b{font-size:17px}
+.rwd-k{display:flex;align-items:center;gap:8px;padding:4px 0;font-weight:700;font-size:14px}.rwd-k>span{min-width:52px}
+.rwd-s{flex:1;display:flex;gap:2px;flex-wrap:wrap}.rwd-s i{font-style:normal;font-size:16px;filter:grayscale(1);opacity:.3}.rwd-s i.on{filter:none;opacity:1}
+.rwd-k em{font-style:normal;font-size:12.5px;color:var(--orange);font-weight:800;white-space:nowrap}
+.msg{display:flex;gap:10px;align-items:center;padding:12px 14px;margin-bottom:12px;background:linear-gradient(135deg,#FFE3EF,#FFF4E8)!important;animation:msgin .6s ease both}
+.msg>span{font-size:34px}.msg small{display:block;font-size:12px;color:#C2296B;font-weight:800}.msg p{margin:2px 0 0;font-size:16px;font-weight:700;line-height:1.6;color:var(--ink)}.msg>div{flex:1}
+.msg button{font-size:24px;background:#fff;border-radius:50%;width:44px;height:44px;flex:none;box-shadow:0 3px 8px #0001}
+.msg.mine{opacity:.85}
+@keyframes msgin{from{opacity:0;transform:translateY(-10px)}}
+.donebtns{display:flex;gap:8px;margin-top:10px}.donebtns .btn{flex:1;font-size:15px;padding:10px 6px}
+#msgText{letter-spacing:normal;font-family:inherit;font-size:16px;text-align:right;direction:rtl;resize:none}
+
+/* v3.8 عائلتي */
+.famstrip{padding:12px}.famstrip h3{margin:0 0 8px;font-size:16px}
+.fams{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.fm{flex:none;width:78px;display:flex;flex-direction:column;align-items:center;gap:1px;background:#fff;border-radius:18px;padding:6px 2px 6px;border:2px solid #F0ECF7;position:relative;color:var(--ink)}
+.fm svg{width:56px;height:58px;border-radius:50%;background:#F6F3FF}
+.fm b{font-size:13.5px;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fm small{font-size:11.5px;color:var(--soft);font-weight:700}
+.fm.me{border-color:var(--orange);box-shadow:0 0 0 3px #F2851E2b}.fm i{position:absolute;top:2px;left:4px;font-style:normal;font-size:12px}
+.fm[disabled]{opacity:1;cursor:default}
+.choices{width:100%;display:flex;flex-direction:column;gap:8px}.choices p{margin:0;color:#FFE9A8;font-weight:800;text-align:center}.choices .btn{width:100%}
+.c-sahaba{background:#FFF6D9;color:#9A6B00}.c-choose{background:#E4F4FF;color:#1565A8}.c-series{background:#EFE6FF;color:#6B3FC6}
+
+/* v3.8 إنجليزي */
+.phbig{background:#FFF6E8;border-radius:16px;padding:10px;margin-bottom:10px}.phbig b{font-size:46px;font-family:Poppins,sans-serif}.phbig span{font-size:40px;margin-right:8px}.phbig p{margin:4px 0 0;font-family:Poppins,sans-serif;font-size:16px}.phbig em{color:var(--orange);font-style:normal;font-weight:800}
+.trbox{background:#fff;border-radius:20px;border:3px dashed #E2DCF2;width:min(300px,100%);margin:6px auto}.trbox canvas{width:100%;height:auto;display:block;touch-action:none}
+.famrow{display:flex;gap:8px;align-items:center;margin:6px 0;background:#F6F3FF;border-radius:14px;padding:6px 8px}.famrow>b{font-family:Poppins,sans-serif;font-size:18px;color:var(--orange);min-width:38px}
+.famrow>div{display:flex;gap:6px;flex-wrap:wrap;flex:1}.famrow button{background:#fff;border-radius:12px;padding:4px 8px;display:flex;flex-direction:column;align-items:center;font-family:Poppins,sans-serif;font-size:14px;color:var(--ink)}.famrow button span{font-size:22px}.famrow u{color:var(--orange);text-decoration:none;font-weight:800}
+.sight{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0 12px}.sight button{font-family:Poppins,sans-serif;font-size:18px;font-weight:700;background:#F6F3FF;border-radius:12px;padding:6px 12px;color:var(--ink)}
+.mic{width:96px;height:96px;border-radius:50%;font-size:42px;margin:14px auto 6px;display:block;background:radial-gradient(circle at 35% 30%,#FF8FB8,#E84393);box-shadow:0 8px 20px #E8439355}.mic.on{animation:micp 1s ease-in-out infinite}
+@keyframes micp{50%{transform:scale(1.1);box-shadow:0 0 0 14px #E8439322}}
+.mres{direction:ltr;font-family:Poppins,sans-serif;font-size:18px;line-height:2}.mres .ok{color:#1E8E4A;font-weight:800}.mres .no{color:#C0392B;text-decoration:underline wavy}
+.weekly{display:flex;gap:12px;align-items:center;width:100%;text-align:right;padding:12px 14px;margin-bottom:12px;background:linear-gradient(135deg,#2A2D66,#4B3B8F)!important;color:#fff;border:0!important}
+.weekly>span{font-size:40px}.weekly small{display:block;color:#FFE9A8;font-weight:800;font-size:12.5px}.weekly b{display:block;font-family:Poppins,sans-serif;font-size:18px;text-align:right}.weekly em{display:block;font-style:normal;font-size:12.5px;color:#D9D5F2}
+
+/* v3.9 لوحة الشرف والتقرير */
+.honor{padding:12px}.honor h3{margin:0 0 8px;font-size:16px}.honor h3 small{font-size:12px;color:var(--soft);font-weight:700}
+.hrows{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.hrow{display:flex;gap:10px;align-items:center;background:#FFFBF2;border-radius:16px;padding:6px 10px}.hrow svg{width:44px;height:46px;border-radius:50%;background:#fff;flex:none}
+.hrow>div{flex:1}.hrow b{font-size:15px}.hrow small{display:block;color:var(--soft);font-size:12px;margin-top:2px}
+.htitles{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}.htitles span{font-size:12px;font-weight:800;border-radius:999px;padding:2px 8px;background:linear-gradient(135deg,#FFE27A,#FFB347);color:#6B3F00}.htitles em{font-style:normal;font-size:12px;color:var(--soft)}
+.bdk h3{display:flex;align-items:center;gap:6px;font-size:16px;margin:10px 0 6px}.bdk h3 svg{width:34px;height:36px;border-radius:50%;background:#F6F3FF}
+.bdg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.bdg div{background:#F2EFF8;border-radius:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;opacity:.55}
+.bdg div.on{opacity:1;background:linear-gradient(135deg,#FFF3CC,#FFE0B2)}.bdg span{font-size:26px}.bdg small{font-size:11.5px;font-weight:700;text-align:center}
+.rpbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:right;padding:12px 14px;margin-bottom:12px;background:linear-gradient(135deg,#FFF1DE,#FFE3EF)!important}
+.rpbtn>span{font-size:32px}.rpbtn b{display:block;font-size:16px}.rpbtn small{display:block;font-size:12.5px;color:var(--soft)}.rpbtn>div{flex:1}.rpbtn em{font-style:normal;font-size:20px;color:var(--orange)}
+.rp{text-align:right}.rpk{background:#FBFAFF;border-radius:16px;padding:10px;margin:8px 0}.rph{display:flex;gap:10px;align-items:center}.rph svg{width:46px;height:48px;border-radius:50%;background:#fff}.rph b{font-size:17px}
+.rps{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:8px 0}.rps div{background:#fff;border-radius:10px;padding:6px 2px;text-align:center}.rps b{display:block;font-size:18px;color:var(--orange)}.rps small{font-size:10.5px;color:var(--soft)}
+.rpd{font-size:13px;font-weight:700;margin:0}
+
+/* v4.1 محرّر الشخصية: الشخصية والحفظ دايم ظاهرين */
+#kidModal .card.ked{max-width:760px;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;background:#fff}
+.kedHead{display:flex;gap:12px;align-items:center;padding:12px 14px;background:linear-gradient(180deg,#F6F2FF,#fff);border-bottom:1.5px solid #EEE9F8;flex:none}
+.kedHead .preview{flex:none;width:96px;height:120px;margin:0;border-radius:18px;background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 4px 12px #5B4BDB1f}
+.kedHead .preview svg{width:100px;height:auto}
+.kedSide{flex:1;min-width:0}.kedSide h2{margin:0 0 8px;font-size:18px}
+.kedBtns{display:flex;gap:8px}.kedBtns .btn{flex:1;padding:10px 6px;font-size:16px}
+.kedBody{overflow:auto;padding:4px 16px 18px;flex:1}
+@media (min-width:640px){
+  #kidModal .card.ked{flex-direction:row}
+  .kedHead{flex-direction:column;width:250px;border-bottom:0;border-left:1.5px solid #EEE9F8;justify-content:flex-start;padding:18px}
+  .kedHead .preview{width:200px;height:260px}.kedHead .preview svg{width:210px}
+  .kedSide{width:100%;text-align:center}.kedBtns{flex-direction:column}
+}
+/* v4.1 شريط الصوت (مثل الواتساب) */
+.nowbar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;gap:10px;padding:calc(6px + env(safe-area-inset-top)) 14px 8px;background:linear-gradient(90deg,#2A2D66,#4B3B8F);color:#fff;font-weight:700;font-size:14.5px;box-shadow:0 4px 14px #0003}
+.nowbar .nb-ic{font-size:20px;animation:moonpulse 1.6s ease-in-out infinite}.nowbar .nb-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nowbar .nb-s{font-variant-numeric:tabular-nums;color:#FFE9A8;direction:ltr}
+.nowbar button{background:#ffffff26;color:#fff;border-radius:50%;width:32px;height:32px;font-size:16px;flex:none}
+body.hasnow{padding-top:46px}
+/* v4.1 إنجازاتي */
+.ach{padding:14px;background:linear-gradient(160deg,#2A2D66,#5B3FA8)!important;color:#fff;border:0!important;position:relative;overflow:hidden}
+.ach h3{margin:0 0 2px;font-size:18px;color:#FFE9A8}.ach>p{margin:0 0 10px;font-size:13px;color:#D9D5F2}
+.achg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.achg div{background:#ffffff1c;border-radius:14px;padding:8px 2px;text-align:center}.achg b{display:block;font-size:22px;color:#FFE9A8}.achg span{font-size:22px;display:block}.achg small{font-size:11px;color:#E4E0FF}
+.achnext{margin-top:10px;background:#ffffff14;border-radius:14px;padding:8px 10px;font-size:13px}.achnext i{display:block;height:8px;border-radius:8px;background:#ffffff22;margin-top:6px;overflow:hidden}.achnext i b{display:block;height:100%;background:linear-gradient(90deg,#FFD93D,#FF9F1C);border-radius:8px}
+.achtrophy{position:absolute;left:-6px;top:-6px;font-size:70px;opacity:.18;transform:rotate(-14deg)}
+.achbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:8px}.achbar span{flex:none;background:#ffffff22;border-radius:999px;padding:3px 10px;font-size:12.5px}
+
+/* ================= v4.2 الهيكلة الجديدة ================= */
+.hchips{display:none!important}
+.hgear{font-size:16px;width:32px;height:32px;border-radius:50%;background:#ffffffa8;border:1.5px solid #fff;margin-right:4px;align-self:center}
+.nightbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.nightbtns button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 6px;color:var(--ink)}
+.nightbtns span{font-size:34px}.nightbtns b{font-size:16px}.nightbtns small{font-size:12px;color:var(--orange);font-weight:800}
+.subnav{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.subnav button{flex:1;white-space:nowrap;border-radius:16px;padding:11px 10px;font-size:15px;font-weight:800;background:var(--glass);border:1.5px solid var(--gline);color:var(--soft)}
+.subnav button.on{background:var(--orange);color:#fff;border-color:var(--orange);box-shadow:0 6px 14px #F2851E44}
+.bnav button{font-size:12.5px;min-width:60px}.bnav button span{font-size:24px}
+.setnav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:5;padding:8px 0;margin-bottom:6px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0))}
+.setnav button{flex:none;border-radius:999px;padding:8px 12px;font-size:13.5px;font-weight:800;background:#fff;border:1.5px solid #EEE;color:var(--ink)}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.pgrid button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 2px;font-size:12.5px;font-weight:800;color:var(--ink)}.pgrid span{font-size:26px}
+.resume{display:block;margin-top:8px;font-size:13px;color:var(--orange);font-weight:800}
+.tour{text-align:center}.tour .big{font-size:72px}.tour h2{margin:6px 0}.tour .dots{display:flex;gap:6px;justify-content:center;margin:12px 0}.tour .dots i{width:9px;height:9px;border-radius:50%;background:#E2DCF2}.tour .dots i.on{background:var(--orange);width:22px;border-radius:9px}
+
+/* v4.2 رحلات حول العالم */
+.trhero{text-align:center;background:linear-gradient(160deg,#E8F4FF,#fff 60%)}.trhero h2{margin:4px 0}.trhero p{margin:4px 0;color:var(--soft)}.trhero small{display:block;color:var(--soft);margin-bottom:12px}
+.trplane{font-size:54px;animation:trfl 3s ease-in-out infinite}@keyframes trfl{50%{transform:translate(-10px,-8px) rotate(-6deg)}}
+.trstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.trstats .card{display:flex;flex-direction:column;align-items:center;padding:14px 6px;margin-bottom:16px}.trstats span{font-size:34px}.trstats b{font-size:19px}.trstats small{color:var(--soft)}
+.trlog{display:flex;flex-direction:column;gap:8px}.trrow{display:flex;align-items:center;gap:10px;background:#F6F3FF;border-radius:16px;padding:10px 12px;text-align:right}.trrow>div{flex:1;min-width:0}.trrow b{display:block;font-size:18px}.trrow small{color:var(--soft);font-size:13px}.trrow i{display:flex;margin-top:2px}.trrow i svg{margin-left:-6px}.trrow em{font-style:normal;color:var(--soft)}
+.trflag{font-size:40px;line-height:1}
+.trw{text-align:center}.trw h2{margin:6px 0}.trdots{display:flex;justify-content:center;gap:8px;margin-bottom:6px}.trdots span{width:38px;height:38px;border-radius:50%;background:#F2EFFC;display:grid;place-items:center;opacity:.45}.trdots span.on{opacity:1;background:#FFE9D6}
+.trppl,.trtypes{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin:12px 0 16px}.trppl button,.trtypes button{position:relative;background:#F6F3FF;border-radius:18px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;border:3px solid transparent}.trppl button.on,.trtypes button.on{border-color:var(--orange);background:#FFF1E6}
+.trppl button.on::after{content:'✓';position:absolute;top:4px;left:8px;background:var(--orange);color:#fff;border-radius:50%;width:22px;height:22px;font-size:14px;line-height:22px}
+.trppl b,.trtypes b{font-size:15px;margin-top:2px}.trppl .add span{font-size:36px;height:58px;display:grid;place-items:center}.trppl i{position:absolute;top:4px;right:6px;font-style:normal;font-size:12px;background:#fff;border-radius:50%;width:22px;height:22px;line-height:22px;color:#c33}
+.trreg{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}.trreg .chip{white-space:nowrap;font-size:14.5px;padding:6px 12px}
+.trgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;max-height:46vh;overflow:auto;margin-top:6px}.trgrid button{position:relative;background:#F6F3FF;border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center}.trgrid span{font-size:38px;line-height:1.1}.trgrid b{font-size:13.5px;line-height:1.3}.trgrid i{position:absolute;top:2px;left:6px;font-style:normal;font-size:11px}
+.trdays{display:flex;justify-content:center;gap:6px;margin:10px 0 14px;flex-wrap:wrap}.trdays button{width:48px;height:48px;border-radius:50%;background:#F2EFFC;font-size:21px;font-weight:800}.trdays button.on{background:var(--orange);color:#fff}
+.bpass{background:#fff;border:2px dashed #CFC6F3;border-radius:20px;padding:12px;margin-bottom:14px}.bph{display:flex;justify-content:space-between;font-weight:700;color:var(--bg1);font-size:14px}.bpr{display:flex;align-items:center;justify-content:space-between;margin:8px 0}.bpr div{display:flex;flex-direction:column;align-items:center}.bpr b{font-family:Poppins,sans-serif;font-size:30px}.bpr small,.bpr em{color:var(--soft);font-style:normal;font-size:13px}.bpline{flex:1;border-top:2px dashed #CFC6F3;margin:0 10px;position:relative;top:4px}
+.bpf{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.bpf span{background:#F6F3FF;border-radius:10px;padding:3px 9px;font-size:13.5px}.bpp{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}.bpp span{display:flex;flex-direction:column;align-items:center;font-size:12px}
+.trart .art,.pcart .art{width:100%;border-radius:18px;display:block}
+.flight{position:relative;display:flex;align-items:center;justify-content:space-between;margin:14px 6px;height:56px}.flight>span:not(.pl){display:flex;flex-direction:column;align-items:center;font-size:30px;z-index:1}.flight small{font-size:12px;color:var(--soft)}.flight i{position:absolute;right:30px;left:30px;top:18px;border-top:3px dashed #CFC6F3}
+.flight .pl{position:absolute;right:28px;top:0;font-size:30px;transform:scaleX(1);transition:right 3s ease-in-out}.flight.go .pl{right:calc(100% - 60px);animation:trbob .6s ease-in-out infinite}@keyframes trbob{50%{top:-8px}}
+.trsay{font-weight:700;color:var(--bg1);min-height:24px}
+.arrive .bigflag,.tgame .bigflag{font-size:96px;line-height:1.1}.arrive .hi{font-size:18px}.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}.facts div{background:#F6F3FF;border-radius:14px;padding:8px;display:flex;flex-direction:column}.facts span{font-size:24px}.facts small{color:var(--soft)}.fact{background:#FFF6D9;border-radius:14px;padding:10px;font-weight:600}
+.trops{display:flex;flex-direction:column;gap:8px;margin:12px 0}.trops button{display:flex;align-items:center;gap:12px;background:#F6F3FF;border-radius:16px;padding:12px 14px;text-align:right;font-size:17px}.trops span{font-size:32px}.trops .rest{background:#EAF7EE}
+.postcard{background:#fff;border-radius:20px;padding:10px;box-shadow:0 6px 18px #2b235022;margin-bottom:14px;transform:rotate(-1deg)}.postcard p{margin:8px 0 2px;font-size:17px}.postcard small{color:var(--soft)}.pcart{position:relative}.pcstamp{position:absolute;top:8px;left:8px;font-size:34px;background:#fff;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;border:3px dashed var(--orange);transform:rotate(-12deg)}
+.albm .postcard:nth-child(even){transform:rotate(1deg)}
+.stampnew{display:inline-flex;flex-direction:column;align-items:center;border:4px double #C8452B;color:#C8452B;border-radius:50%;width:140px;height:140px;justify-content:center;transform:rotate(-10deg);margin:10px;animation:stampin .6s cubic-bezier(.3,1.6,.5,1)}.stampnew span{font-size:44px;line-height:1}@keyframes stampin{from{transform:scale(2.4) rotate(-30deg);opacity:0}}
+.passport{background:linear-gradient(160deg,#0E6B3B,#0A4F2C);border-radius:22px;padding:14px;color:#fff;margin-bottom:14px}.pph{display:flex;flex-direction:column;align-items:center;font-size:36px}.pph b{font-size:20px}.pph small{opacity:.85;font-size:14px}
+.ppbar{display:block;height:10px;background:#ffffff33;border-radius:9px;margin:8px 0 12px;overflow:hidden}.ppbar b{display:block;height:100%;background:#FFD35C}
+.stamps{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;background:#FFF9EC;border-radius:16px;padding:12px;color:var(--ink)}.stamp{border:3px dashed #C8452B;border-radius:16px;padding:6px;display:flex;flex-direction:column;align-items:center;transform:rotate(var(--r));color:#8A2C1A}.stamp span{font-size:36px;line-height:1.1}.stamp b{font-size:13.5px}.stamp small{font-size:11.5px}
+.tops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.tops button{background:#F6F3FF;border-radius:16px;padding:14px 8px;font-size:17px;font-weight:700;border:3px solid transparent}.tops .ok{background:#DDF5E5;border-color:#2BB673}.tops .no{background:#FFE1E1;border-color:#E25555}.tops .dim{opacity:.45}
+
+/* v4.3 عن سراج: نفس ستايل فلق وسهم */
+.gh{font-size:15px;color:var(--soft);margin:22px 8px 8px;font-weight:700}
+.sgrp{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 6px 18px rgba(43,35,80,.08);margin-bottom:8px}
+.slink{display:flex;align-items:center;gap:12px;width:100%;padding:15px 16px;background:transparent;border:0;border-radius:0;font-size:17px;font-weight:600;color:var(--ink);text-align:right;box-shadow:none}
+.slink+.slink{border-top:1px solid #EFEDF5}.slink:active{background:#F6F3FF}
+.slink .v{color:var(--soft);font-weight:500;font-size:14px;margin-inline-start:auto}.slink .v b{font-family:Poppins,sans-serif;font-weight:600}
+.sic{width:34px;height:34px;border-radius:10px;display:inline-grid;place-items:center;color:#fff;font-style:normal;flex:none}.sic svg{width:19px;height:19px}
+.chev{margin-inline-start:auto;width:8px;height:8px;border:solid #B9B3CC;border-width:0 0 2px 2px;transform:rotate(45deg);flex:none}.slink .v+.chev{margin-inline-start:10px!important}.slink span+.chev{margin-inline-start:auto}
+.sfoot,.kidfoot{text-align:center;padding:16px 0 10px;color:var(--soft);font-size:13px;line-height:1.7;display:flex;flex-direction:column;align-items:center}.sfoot b,.kidfoot b{color:var(--ink);font-size:16px}
+.wamdf{display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin-top:12px;text-decoration:none;color:var(--soft)}.wamdf img{width:132px;height:auto;display:block;background:none!important;border-radius:0!important;padding:0!important;box-shadow:none!important;border:0!important}.wamdf .wd{display:none}
+.wamdf span{font-size:9.5px;letter-spacing:.26em;font-family:Poppins,sans-serif;opacity:.8}
+body.nt .sfoot .wl,body.nt .kidfoot .wl{display:none}body.nt .sfoot .wd,body.nt .kidfoot .wd{display:block}body.nt .sfoot b,body.nt .kidfoot b,body.nt .gh{color:#fff}body.nt .sfoot,body.nt .kidfoot{color:#C9C3E6}
+.kidfoot{opacity:.85;padding-top:24px}.kidfoot b{font-size:14px}
+.infos{text-align:right}.ihero{text-align:center;padding-top:34px}.ihero img{width:72px;height:72px;border-radius:20px;box-shadow:0 10px 24px rgba(43,35,80,.18)}.ihero h2{margin:10px 0 0;font-size:21px}.ihero .v{color:var(--soft);font-family:Poppins,sans-serif;font-size:13px;direction:ltr}
+.itag{text-align:center;font-weight:800;color:var(--orange);font-size:15.5px;margin:6px 0}.itext{line-height:1.75;font-size:14.5px}.iby{text-align:center;color:var(--soft);margin:16px 0 0;font-size:13px}.infos .wamdf{display:flex;width:max-content;margin:4px auto 14px}
+.ilist{list-style:none;padding:0;margin:10px 0}.ilist li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #EFEDF5}.ilist li>b{font-size:21px}.ilist li span>b{font-size:15px}.ilist span{display:flex;flex-direction:column}.ilist i{font-style:normal;color:var(--soft);font-size:13px;line-height:1.55}
+.isteps{line-height:2;font-size:15px;padding-inline-start:22px}
+.pv{line-height:1.7}.pv .card{background:#F8F6FF;box-shadow:none;border-radius:16px;padding:12px 14px;margin:10px 0}.pv h2{font-size:15.5px;margin:12px 0 2px}.pv h2 span{margin-inline-end:6px}.pv p,.pv li{font-size:13.5px}.pv code{font-size:12.5px}.pv ul{padding-inline-start:18px;margin:4px 0}
+
+/* v4.4 شريط التبويبات بأيقونات ملصقات (مستوحى من Finch) — نفس مقاسات هوية WAMD ARC */
+#home{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.bnav{--nb:#2A78A6;bottom:calc(6px + env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:452px;padding:6px;gap:2px;border-radius:26px;background:var(--nb);border:0;box-shadow:0 12px 28px rgba(20,50,80,.32);backdrop-filter:none;-webkit-backdrop-filter:none}
+body[data-pal="pink"] .bnav{--nb:#B8487F}body[data-pal="green"] .bnav{--nb:#2C8466}body[data-pal="sand"] .bnav{--nb:#B06F2A}
+body.nt .bnav,body.nt[data-pal] .bnav{--nb:#262A5A;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+.bnav button,body.nt .bnav button{min-width:0;padding:6px 0 5px;gap:1px;border-radius:20px;color:#fff;font-size:11.5px;font-weight:800;opacity:.88;transition:background .2s,opacity .2s}
+.bnav button span,body.nt .bnav button span{display:block;width:36px;height:36px;font-size:0;filter:none;opacity:1;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.bnav button span svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff) drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff) drop-shadow(0 2px 2px rgba(0,0,0,.22))}
+.bnav button.on,body.nt .bnav button.on{background:rgba(255,255,255,.26);color:#fff;opacity:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.bnav button.on span{transform:scale(1.12) translateY(-1px)}
+.bnav button:active span{transform:scale(.92)}
+
+/* v4.5 اختيار صوت القارئ */
+.vpick{text-align:center}.vbig{font-size:54px}.vpick h2{margin:4px 0}
+.vlist{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.vrow{display:flex;direction:rtl;flex-direction:row;align-items:center;gap:10px;background:#F6F3FF;border-radius:18px;padding:8px 10px;border:3px solid transparent}.vrow.on{border-color:var(--orange);background:#FFF1E6}
+.vrow b{flex:1;text-align:right;font-size:17px}.vrow .btn{width:auto;padding:9px 16px;font-size:15px;margin:0}
+.vplay{width:46px;height:46px;border-radius:50%;background:#fff;font-size:20px;box-shadow:0 3px 8px rgba(43,35,80,.12);flex:none}
+
+/* v4.6 رأس مرتب: الاسم يمين، القمر يسار، وتحتها حبتين (اليوم والتاريخ / الفصل) مثل سهم ونبض */
+.hx{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 2px 14px}
+.hxb{flex:1;min-width:0}
+.hxb h1{margin:0;font-size:42px;font-weight:800;line-height:1.05;color:var(--ink);display:flex;align-items:center;gap:10px}
+.hxb h1 img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.14)}
+.hxb small{display:block;margin-top:6px;color:#4B5470;font-size:15px;font-weight:600}
+.hxm{position:relative;flex:none;display:flex;align-items:flex-start;gap:6px}
+.moonx{width:92px;height:92px;border-radius:50%;padding:0;background:radial-gradient(circle,rgba(255,236,170,.55),rgba(255,236,170,0) 68%);position:relative;overflow:visible}
+.moonx .mn{position:absolute;inset:8px;animation:moonpulse 6s ease-in-out infinite}
+.moonx .mn svg{width:76px;height:76px;display:block;filter:drop-shadow(0 0 12px #FFE9A8aa)}
+.moonx .spk{position:absolute;width:12px;height:12px;animation:spk 2.6s ease-in-out infinite}.moonx .spk svg{width:100%;height:100%}
+.moonx .cld{display:none}
+.moonx .sat{position:absolute;left:-8px;bottom:0;width:38px;animation:satb 5s ease-in-out infinite}.moonx .sat svg{width:38px;height:auto}
+.hxgear{order:2;margin-top:4px;width:36px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.95);color:#4B5470;box-shadow:0 4px 12px rgba(58,90,138,.16);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hxgear svg{width:18px;height:18px}
+.hpills{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.hpill{display:flex;align-items:center;justify-content:center;gap:7px;height:48px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.95);box-shadow:0 6px 16px rgba(58,90,138,.12);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);white-space:nowrap;min-width:0}
+.hpill b{font-size:16px;font-weight:800;color:var(--ink)}.hpill small{font-size:14px;font-weight:700;color:#6B7290;direction:ltr}.hpi{font-size:18px}
+.hpill .season,.hpill #season.season{all:unset;display:inline-flex;align-items:center;gap:7px;font-size:16px;font-weight:800;color:var(--ink)!important;flex-direction:row-reverse}
+.hpill .season em,.hpill #season.season em{position:static!important;transform:none!important;font-style:normal;font-size:19px;filter:none}
+.modebar{background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.95);border-radius:18px;padding:4px;margin:0 0 4px;box-shadow:0 6px 16px rgba(58,90,138,.1)}
+.modebar button{color:#5A6180;font-size:15px;padding:10px 8px;border-radius:14px}
+.modebar button.on{background:linear-gradient(180deg,var(--or2),var(--orange));color:#fff;box-shadow:0 4px 10px #F2851E44}
+.modehint{color:#6B7290;font-size:12.5px;margin:4px 0 10px}
+body.nt .hxb h1,body.nt .hpill b,body.nt .hpill .season,body.nt .hpill #season.season{color:#F4F1FF!important}
+body.nt .hxb small,body.nt .hpill small,body.nt .modehint{color:#C9C4E8}
+body.nt .hpill,body.nt .hxgear,body.nt .modebar{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);color:#D9D5F2}
+body.nt .modebar button{color:#C9C4E8}
+@media (max-width:390px){.hxb h1{font-size:36px}.hxb h1 img{width:28px;height:28px}.moonx{width:80px;height:80px}.moonx .mn svg{width:64px;height:64px}.hpill b,.hpill .season{font-size:15px}}
+
+/* v4.7 نوع الرحلة + العودة للسعودية */
+.trmode{display:flex;flex-direction:column;gap:12px;margin:14px 0 6px}
+.trmode button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 12px;border-radius:22px;background:#F6F3FF;border:3px solid transparent}
+.trmode button:active{border-color:var(--orange)}.trmode button:last-child{background:linear-gradient(160deg,#E4F6EA,#F6FFF8)}
+.trmode span{font-size:46px;line-height:1.1}.trmode b{font-size:19px}.trmode small{color:var(--soft);font-size:14px}
+.welcome h2{color:#0E7A43}.stampnew.green{border-color:#0E7A43;color:#0E7A43}
+
+/* ===== v5.0 إعادة التصميم: سماء زرقاء، قمر يقرأ، شريط بنفسجي-وردي، ملصقات، وغرفتي ===== */
+body,body[data-pal="sky"]{background:linear-gradient(180deg,#4FA3EC 0%,#7CBDF3 20%,#A9D3F7 40%,#D6EAFB 62%,#EEF2FD 82%,#F4EEFB 100%);background-attachment:fixed}
+#home{position:relative;z-index:0}
+.skyfx{position:absolute;top:calc(-1 * env(safe-area-inset-top));left:-16px;right:-16px;height:330px;z-index:-1;pointer-events:none;overflow:hidden}
+.skyfx i{position:absolute;animation:spk 2.8s ease-in-out infinite}.skyfx i svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 4px #fff8)}
+.skycl{position:absolute;left:0;right:0;bottom:24px;width:100%;height:90px}
+body.nt .skycl{opacity:.18}body.nt .skyfx i svg{filter:drop-shadow(0 0 6px #FFE27A)}
+.hx{align-items:flex-start;margin-top:4px}
+.hxm{position:relative;width:158px;height:136px;display:block;flex:none;margin-inline-end:-6px}
+.moonx{position:absolute;inset:0;width:100%!important;height:100%!important;background:none;border-radius:0}
+.moonread{width:100%;height:100%;display:block;overflow:visible}
+.moonread .mrb{animation:mrbob 5s ease-in-out infinite;transform-origin:112px 80px}
+@keyframes mrbob{50%{transform:translateY(-3px) rotate(-1.5deg)}}
+.hxgear{position:absolute;top:-2px;left:-4px;z-index:2;order:0;margin:0;width:44px;height:44px;background:#fff;border:0;box-shadow:0 6px 16px rgba(40,70,140,.2);color:#3F4C6B}.hxgear svg{width:22px;height:22px}
+.hxb{padding-top:22px}.hxb h1{font-size:46px;color:#2E2A6B}.hxb h1 img{width:44px;height:44px;border-radius:13px}.hxb small{color:#2E3A5C;font-size:16px;font-weight:700}
+.hpills{position:relative;margin-top:-6px}
+.hpill{background:#FFF6EA;border:0;box-shadow:0 8px 20px rgba(60,80,150,.16);height:54px}
+.hpill b{font-size:17px}.hpill small{color:#2E2A6B;font-size:15px;font-weight:800}
+.hpi,.hpill .season em{display:inline-flex;width:30px;height:30px}.hpi svg,.hpill .season em svg{width:30px;height:30px;filter:drop-shadow(1.2px 0 0 #fff) drop-shadow(-1.2px 0 0 #fff) drop-shadow(0 1.2px 0 #fff) drop-shadow(0 -1.2px 0 #fff) drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+.kidsbar{background:linear-gradient(135deg,#FFFFFF,#F3ECFF)!important;border:0!important;box-shadow:0 10px 24px rgba(90,70,170,.14)!important}
+.klbl{color:#3B2E8C!important}
+/* الشريط السفلي: تدرّج شعار سراج */
+.bnav,body[data-pal] .bnav{background:#A9D8F8;gap:6px;padding:7px;box-shadow:0 12px 28px rgba(40,95,190,.28)}
+body.nt .bnav,body.nt[data-pal] .bnav{background:#1C2A66;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+/* كل تبويب مربع بلون من شعار سراج */
+.bnav button{--tc:#8B5CF6;background:color-mix(in srgb,var(--tc) 22%,#fff)!important;color:#2B2A5E!important;opacity:1!important;border-radius:18px!important;box-shadow:none!important}
+#tabTonight{--tc:#8B5CF6}#tabMe{--tc:#EC6FA8}#tabExplore{--tc:#F5913A}#tabLearn{--tc:#E9B526}#tabParents{--tc:#6D7BF2}
+.bnav button.on{background:var(--tc)!important;color:#fff!important;box-shadow:0 6px 14px color-mix(in srgb,var(--tc) 45%,transparent),inset 0 0 0 2px rgba(255,255,255,.7)!important}
+body.nt .bnav button{background:color-mix(in srgb,var(--tc) 30%,#1C2A66)!important;color:#E9E6FF!important}
+body.nt .bnav button.on{background:var(--tc)!important;color:#fff!important}
+.bnav button.on,body.nt .bnav button.on{background:rgba(255,255,255,.28)}
+/* أيقونات الملصقات */
+.stkv{width:100%;height:100%;display:block;overflow:visible}
+.stk{display:inline-block;line-height:1;filter:drop-shadow(1.2px 0 0 #fff) drop-shadow(-1.2px 0 0 #fff) drop-shadow(0 1.2px 0 #fff) drop-shadow(0 -1.2px 0 #fff) drop-shadow(0 1.6px 1.4px rgba(0,0,0,.2))}
+.pgrid span,.trstats span,.achg span,.rpbtn>span{display:inline-flex;width:40px;height:40px;font-size:30px;align-items:center;justify-content:center}
+.pgrid span svg,.trstats span svg,.achg span svg,.rpbtn>span svg,.subnav i svg{filter:drop-shadow(1.4px 0 0 #fff) drop-shadow(-1.4px 0 0 #fff) drop-shadow(0 1.4px 0 #fff) drop-shadow(0 -1.4px 0 #fff) drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.subnav button{display:inline-flex;align-items:center;gap:6px}.subnav i{display:inline-block;width:24px;height:24px;flex:none}
+/* غرفتي */
+.room{padding:14px;background:linear-gradient(160deg,#fff,#F6F0FF)}
+.roomh{display:flex;align-items:center;justify-content:space-between}.roomh h3{margin:0}
+.roomst{display:inline-flex;align-items:center;gap:6px;background:#FFF3C9;border-radius:999px;padding:4px 12px 4px 8px}.roomst svg{width:24px;height:24px}.roomst b{font-size:18px;color:#8A5A00}
+.roomart{margin:10px 0;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 2px #fff,0 8px 18px rgba(90,70,170,.15)}
+.roomsvg{width:100%;height:auto;display:block}
+.roomnext{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:700;color:#3B2E8C}.roomnext i{display:block;height:10px;border-radius:9px;background:#EDE6FF;overflow:hidden}.roomnext i b{display:block;height:100%;background:linear-gradient(90deg,#FFB547,#FF7AB6);border-radius:9px}
+.roomgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.roomgrid div{display:flex;flex-direction:column;align-items:center;background:#F6F3FF;border-radius:14px;padding:6px 4px;filter:grayscale(1);opacity:.5}
+.roomgrid div.on{filter:none;opacity:1;background:#FFF6EA}
+.roomgrid svg{width:52px;height:44px}.roomgrid small{font-size:11.5px;font-weight:700;text-align:center;line-height:1.3;margin-top:2px}
+.roomtip{font-size:12.5px;margin:10px 0 0}
+@media (max-width:390px){.hxm{width:136px;height:118px}.hxb h1{font-size:38px}.hxb h1 img{width:36px;height:36px}.hxb{padding-top:16px}}
+
+/* ===== v5.1 ترتيب: شريط أبيض زجاجي مرتب، بدون إطارات الإيموجي، صفحة الرمز السري ===== */
+.stk{filter:none!important}
+.bnav,body[data-pal] .bnav{background:rgba(255,255,255,.86)!important;-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid rgba(255,255,255,.95);gap:2px;padding:6px;box-shadow:0 10px 30px rgba(40,70,140,.2)!important}
+body.nt .bnav,body.nt[data-pal] .bnav{background:rgba(28,34,80,.9)!important;border-color:rgba(255,255,255,.12);box-shadow:0 10px 30px rgba(0,0,0,.45)!important}
+.bnav button,body.nt .bnav button{background:transparent!important;color:#5B6182!important;box-shadow:none!important;border-radius:20px!important;font-weight:700}
+body.nt .bnav button{color:#C9C4E8!important}
+.bnav button.on,body.nt .bnav button.on{background:linear-gradient(180deg,#8A5CF0,#6A42D8)!important;color:#fff!important;font-weight:800;box-shadow:0 6px 16px rgba(106,66,216,.38)!important}
+.bnav button.on span svg{filter:drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff) drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff)}
+.modebar button{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.mbi{display:inline-block;width:24px;height:24px;flex:none}.mbi svg{width:24px;height:24px}
+.modebar button.on .mbi svg{filter:drop-shadow(1.2px 0 0 #fff) drop-shadow(-1.2px 0 0 #fff) drop-shadow(0 1.2px 0 #fff) drop-shadow(0 -1.2px 0 #fff)}
+/* صفحة الرمز السري */
+#pinModal{background:rgba(40,60,120,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.pincard{text-align:center;max-width:380px;margin:auto;padding:22px 20px 14px!important;border-radius:30px!important;background:linear-gradient(180deg,#FFFFFF,#F4F0FF)!important;box-shadow:0 24px 60px rgba(40,50,120,.3)!important}
+.pinic{width:64px;height:64px;margin:0 auto 4px;border-radius:20px;background:linear-gradient(135deg,#E8F3FF,#EFE8FF);display:grid;place-items:center}.pinic svg{width:40px;height:40px}
+.pincard h2{margin:4px 0 0;font-size:22px;color:#2E2A6B}.pincard .muted{margin:2px 0 6px;font-size:14px}
+.pin{gap:16px;margin:16px 0 20px}
+.pin span{width:18px!important;height:18px!important;border-radius:50%!important;background:#E4DEF7!important;transition:transform .15s,background .15s}
+.pin span.on{background:#7A4BE0!important;transform:scale(1.15)}
+.pin.shake{animation:pshake .4s}@keyframes pshake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pad{gap:12px!important;max-width:290px;margin:0 auto}
+.pad button{height:64px;border-radius:50%!important;width:64px;justify-self:center;background:#fff!important;box-shadow:0 4px 12px rgba(60,70,140,.12),inset 0 0 0 1px #EEEAF9;font-size:26px!important;font-family:Poppins,sans-serif;color:#2E2A6B!important;padding:0!important}
+.pad button:active{background:#EFE8FF!important;transform:scale(.94)}
+.pad button.del{background:transparent!important;box-shadow:none!important;color:#7A80A0!important}.pad button.del svg{width:28px;height:28px}
+.pincancel{margin-top:10px;background:none;border:0;color:#7A4BE0;font-weight:800;font-size:16px;padding:10px}
+body.nt .pincard{background:linear-gradient(180deg,#2A2F66,#1F2454)!important}body.nt .pincard h2{color:#F4F1FF}
+body.nt .pad button{background:#353B7A!important;color:#fff!important;box-shadow:none}
+
+/* v5.1.1 تنعيم: الغيوم تذوب بدون خط، حبوب ومعاينة أصغر، رأس وشرائح الإعدادات */
+.skyfx{overflow:visible;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+.skycl{bottom:40px;opacity:.75}
+.hpills{gap:8px}
+.hpill{height:44px;padding:0 10px;gap:6px}.hpill b,.hpill .season,.hpill #season.season{font-size:15px!important}.hpill small{font-size:13.5px}
+.hpi,.hpill .season em{width:24px!important;height:24px!important}.hpi svg,.hpill .season em svg{width:24px!important;height:24px!important}
+.modebar{background:#fff!important;padding:3px!important;border-radius:16px!important;max-width:100%;box-shadow:0 6px 16px rgba(58,90,138,.12)!important}
+.modebar button{padding:7px 8px!important;font-size:14px!important;border-radius:13px!important;gap:6px!important}
+.mbi,.mbi svg{width:19px!important;height:19px!important}
+.modehint{font-size:12px!important;margin:3px 0 8px!important}
+body.nt .modebar{background:rgba(255,255,255,.1)!important}
+.pghead{display:flex;align-items:center;gap:10px;margin:0;font-size:30px;font-weight:800;color:#2E2A6B}.pghead i{display:inline-block;width:34px;height:34px}.pghead i svg{width:34px;height:34px}
+body.nt .pghead{color:#F4F1FF}
+.setnav{background:transparent!important;padding:6px 2px!important;margin:0 -2px 8px!important;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);padding-inline:14px!important}
+.setnav button{padding:7px 12px!important;font-size:13px!important;border:0!important;box-shadow:0 3px 10px rgba(58,90,138,.12)}
+.subnav button{padding:8px 8px!important;font-size:14px!important;border-radius:14px!important}.subnav i{width:20px!important;height:20px!important}
+
+
+
+
+
+
+
+
+/* ===== WAMD ARC · توحيد 2026-11 (لا تعدّلها لتطبيق واحد) ===== */
+/* الشريط السفلي: نفس المقاس في كل تطبيقات ومض آرك، أنزل ما يمكن فوق خط الرجوع للرئيسية.
+   فاتح في الفاتح، داكن في الداكن، والخيار المختار بلون التطبيق */
+:root{--wb-b:max(14px,calc(env(safe-area-inset-bottom,0px) - 14px));--wb-h:68px}
+.bnav,body[data-pal] .bnav{position:fixed!important;left:50%!important;right:auto!important;top:auto!important;bottom:var(--wb-b)!important;transform:translateX(-50%)!important;width:calc(100% - 28px)!important;max-width:452px!important;height:var(--wb-h)!important;box-sizing:border-box!important;margin:0!important;padding:6px!important;gap:2px!important;border-radius:26px!important;border:1px solid rgba(20,30,50,.08)!important;background:rgba(255,255,255,.82)!important;-webkit-backdrop-filter:blur(18px) saturate(1.4)!important;backdrop-filter:blur(18px) saturate(1.4)!important;box-shadow:0 10px 30px rgba(30,40,60,.14)!important;color:#7a8291!important}
+.bnav button,body[data-pal] .bnav button{display:flex;flex:1 1 0!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;height:54px!important;min-height:0!important;min-width:0!important;margin:0!important;padding:0 2px!important;border:0!important;border-radius:20px!important;background:transparent!important;box-shadow:none!important;color:#7a8291!important;font-size:11px!important;font-weight:500!important;line-height:1.2!important;letter-spacing:0!important;white-space:nowrap!important;opacity:1!important;transform:none!important;filter:none!important}
+.bnav button svg,body[data-pal] .bnav button svg{width:22px!important;height:22px!important;flex:none!important;filter:none!important}
+.bnav button::after,body[data-pal] .bnav button::after,.bnav button::before,body[data-pal] .bnav button::before{display:none!important}
+.bnav button.on,body[data-pal] .bnav button.on{background:linear-gradient(180deg,#8A5CF0,#6A42D8)!important;color:#fff!important;font-weight:700!important;box-shadow:0 6px 14px rgba(106,66,216,.32)!important}
+body.nt .bnav,body.nt[data-pal] .bnav{background:rgba(28,34,80,.92)!important;border-color:rgba(255,255,255,.09)!important;box-shadow:0 10px 30px rgba(0,0,0,.45)!important;color:#9aa3b5!important}
+body.nt .bnav button,body.nt[data-pal] .bnav button{color:#9aa3b5!important}
+body.nt .bnav button.on,body.nt[data-pal] .bnav button.on{color:#fff!important}
+.bnav button span,body.nt .bnav button span{display:block!important;width:26px!important;height:26px!important;font-size:0!important;line-height:0!important;margin:0!important;filter:none!important;opacity:1!important;transform:none!important}
+.bnav button span svg,body[data-pal] .bnav button span svg{width:100%!important;height:100%!important}
+.bnav button.dim{opacity:.55!important}
+.bnav button.on span{transform:none!important}
+/* أعلى الشاشة عند الساعة: لون التطبيق دايماً، بدون شريط فاتح ولا محتوى يمر تحت الساعة */
+.wcap{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);z-index:35;pointer-events:none}
+:root{--wtc:#4FA3EC}body.nt{--wtc:#1E2348}
+html{background:#4FA3EC}html:has(body.nt){background:#1E2348}
+.wcap{background:linear-gradient(180deg,#4FA3EC 0%,#7CBDF3 20%,#A9D3F7 40%) 0 0/100% 100vh no-repeat}
+body.nt .wcap{background:#1E2348}
+body:has(#reader.on) .wcap{display:none}
+.setnav{top:env(safe-area-inset-top,0px)!important}
+/* عناوين مجموعات الإعدادات تنقرى على السماء الزرقاء */
+body:not(.nt) #settings .gh{color:#fff;text-shadow:0 1px 8px rgba(20,60,120,.3)}
+/* فوتر الإعدادات بنفس مقاس ومكان باقي التطبيقات، والغيمة أخف وأوطى عشان ما تقطع الشعار */
+#settings .sfoot{padding:26px 0 calc(env(safe-area-inset-bottom,0px) + 40px)!important;font-size:13px!important;gap:0!important}
+#settings .sfoot b{font-size:16px!important;font-weight:700!important;margin-bottom:4px}
+#settings .sfoot .wamdf{margin-top:14px!important;gap:3px!important}
+#settings .sfoot .wamdf span{font-family:Montserrat,Poppins,system-ui,sans-serif!important;font-weight:400;font-size:9.5px!important;letter-spacing:.26em!important;opacity:.8}
+body:has(#settings.on):before{height:16vh!important;opacity:.5}
+body:not(.nt) #settings .sfoot .wamdf{color:#33406B!important}
+/* ===== /WAMD ARC · توحيد ===== */
+</style>
+<style id="native-perf">
+*{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+:root{--glass:rgba(255,255,255,.92)}
+.bnav,body[data-pal] .bnav{background:rgba(255,255,255,.97)!important}
+</style>
+</head>
+<body>
+<div class="wcap" aria-hidden="true"></div>
+<div id="nowBar" class="nowbar" style="display:none"></div>
+
+<!-- الترحيب وإضافة التطبيق للشاشة الرئيسية -->
+<section id="welcome" class="screen">
+  <img src="icons/icon-512.png" alt="">
+  <h1>سراج</h1>
+  <p style="font-size:19px;margin:4px 0">قصص ما قبل النوم، أبطالها أطفالك ✨</p>
+  <div class="steps" id="installSteps"></div>
+  <button class="btn" id="installBtn" style="display:none">أضف سراج للشاشة الرئيسية</button>
+  <button class="btn ghost" style="color:#fff" onclick="App.skipWelcome()">متابعة في المتصفح</button>
+</section>
+
+<!-- من يستخدم هذا الجهاز؟ -->
+<section id="role" class="screen">
+  <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">سراج</div></div>
+  <p class="hello" style="font-size:24px;font-weight:800">أهلًا بك 👋<br><span style="font-size:18px;font-weight:600">من يستخدم هذا الجهاز؟</span></p>
+  <button class="choice" onclick="App.openSetup()"><span class="ic">👨‍👩‍👧</span><b>أنا وليّ الأمر</b><span>أنشئ عائلتك وأضف أطفالك، وتابع قراءتهم من جوالك</span></button>
+  <button class="choice" onclick="App.openJoin('child')"><span class="ic">🧒</span><b>جهاز طفل</b><span>اربطه بعائلتك برمز العائلة من جوال وليّ الأمر</span></button>
+  <button class="btn ghost" style="color:#fff" onclick="App.openJoin('parent')">عندي رمز عائلة وأبي أسترجعها 🔑</button>
+</section>
+
+<!-- إعداد العائلة (وليّ الأمر) -->
+<section id="setup" class="screen">
+  <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">عائلتي</div><button class="iconbtn" onclick="App.show('role')" aria-label="رجوع">→</button></div>
+  <div class="card">
+    <h2>الأطفال 🧒</h2>
+    <p class="muted">أضف أطفالك ليصيروا أبطال القصص.</p>
+    <div class="list" id="setupKids"></div>
+    <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
+  </div>
+  <div class="card">
+    <h2>وش ينادونكم العيال؟ 💛</h2>
+    <p class="muted">عشان تصير القصص قصة عائلتكم: «قال بابا…»</p>
+    <label>الأب</label><div class="chips" id="setupDad"></div>
+    <label>الأم</label><div class="chips" id="setupMom"></div>
+  </div>
+  <div class="card">
+    <h2>وقت القصة 🌙</h2>
+    <p class="muted">يوصل تذكير لجهاز الأطفال في هذا الوقت.</p>
+    <input type="hidden" id="setupBed" value="20:30">
+    <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('setupBed',-15)" aria-label="أبكر">−</button><div class="tv" id="setupBedView"></div><button type="button" class="tbtn" onclick="App.bumpTime('setupBed',15)" aria-label="أأخر">+</button></div>
+    <div class="tquick" id="setupBedQuick"></div>
+  </div>
+  <div class="card">
+    <h2>رمز وليّ الأمر 🔒</h2>
+    <p class="muted">٤ أرقام تحمي الإعدادات من الصغار.</p>
+    <input class="inp" id="setupPin" type="tel" inputmode="numeric" maxlength="4" placeholder="مثال: 2580" style="direction:ltr;text-align:center;letter-spacing:8px">
+  </div>
+  <button class="btn" onclick="App.finishSetup()">أنشئ العائلة 🌙</button>
+</section>
+
+<!-- ربط جهاز بالعائلة -->
+<section id="join" class="screen">
+  <div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">سراج</div><button class="iconbtn" onclick="App.show('role')" aria-label="رجوع">→</button></div>
+  <div class="card">
+    <h2 id="joinTitle">ربط جهاز الطفل</h2>
+    <p class="muted" id="joinHint"></p>
+    <input type="hidden" id="joinRole" value="child">
+    <input class="codein" id="joinCode" placeholder="XXXXX-XXXXX" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text" oninput="App.fmtCode()" onpaste="setTimeout(App.fmtCode,0)">
+    <button class="btn alt" id="pasteBtn" style="margin-top:10px" onclick="App.pasteCode()">📋 لصق الرمز</button>
+    <button class="btn" id="joinBtn" style="margin-top:14px" onclick="App.doJoin()">ربط</button>
+  </div>
+</section>
+
+<!-- الرئيسية -->
+<section id="home" class="screen">
+  <header class="hx">
+    <div class="hxb"><h1>سراج <img src="icons/icon-192.png" alt=""></h1><small id="hello">حكاية الليلة</small></div>
+    <div class="hxm"><button class="moonx" id="moonBtn" onclick="App.tab('space')" aria-label="القمر والكواكب"></button>
+      <button class="hxgear" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
+  </header>
+  <div class="hpills"><div class="hpill"><span class="hpi" id="hpCal">📅</span><b id="clk"></b><small id="dt"></small></div><div class="hpill"><span id="season" class="season"></span></div></div>
+  <div class="hchips"><div class="hchip" id="chStars"></div><div class="hchip" id="chStreak"></div>
+    <button class="hicon" id="dashBtn" onclick="App.tab('dash')" aria-label="المتابعة">📊</button><button class="hicon" onclick="App.askPin(App.openSettings)" aria-label="الإعدادات">⚙️</button></div>
+  <div class="modebar" id="modeBar" style="display:none"></div>
+  <p class="modehint" id="modeHint"></p>
+  <div id="paneTonight">
+    <div id="msgCard"></div>
+
+    <div class="card kidsbar"><div class="kids" id="kids"></div><span class="klbl">أبطال الليلة<small>أول من تختاره هو البطل ⭐</small></span></div>
+    <div class="card tonight" id="tonightCard"></div>
+    <div class="card bedbar" id="bedBar"></div>
+
+    <div class="nightbtns"><button class="card" onclick="Night.adhkar()"><span>🤲</span><b>أذكار النوم</b><small id="adkState">قبل النوم</small></button><button class="card" onclick="Night.sounds()"><span>🌧️</span><b>أصوات النوم</b><small>مطر · موج · صحراء</small></button></div>
+    <div id="qtiles" hidden></div>
+  </div>
+  <div id="paneSky" style="display:none"><div id="rewardCard"></div><div id="sky"></div><div class="kidfoot" id="kidFoot"></div></div>
+  <div class="subnav" id="subExplore" style="display:none"><button data-t="trips" id="subTrips" style="display:none"><i data-ic="plane"></i>رحلاتي</button><button data-t="space"><i data-ic="planet"></i>الكواكب والقمر</button><button data-t="lib"><i data-ic="books"></i>مكتبة القصص</button></div>
+  <div class="subnav" id="subLearn" style="display:none"><button data-t="eng"><i data-ic="abc"></i>English</button><button data-t="play"><i data-ic="palette"></i>ألعاب</button></div>
+  <div id="paneTrips" style="display:none"><div id="trips"></div></div>
+  <div id="paneSpace" style="display:none"><div id="space"></div></div>
+  <div id="panePlay" style="display:none"><div id="play"></div></div>
+  <div id="paneEng" style="display:none"><div id="eng"></div></div>
+  <div id="paneLib" style="display:none"><div class="lib" id="lib"></div></div>
+  <div id="paneDash" style="display:none"><div id="dash"></div></div>
+  <span id="ver" hidden></span>
+  <nav class="tabs bnav"><button id="tabTonight" class="on" onclick="App.tab('tonight')"><span><svg viewBox="0 0 48 48"><path d="M29 5a19 19 0 1 0 14 31A16 16 0 0 1 29 5z" fill="#FFD23F"/><path d="M29 5a19 19 0 0 0-9 34A19 19 0 0 1 29 5z" fill="#FFE68A" opacity=".7"/><path d="M14 25q3 3 6 0M23 30q2.5 2.5 5 0" stroke="#3B2A20" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="15" cy="31" r="2.4" fill="#FF9AA8"/><path d="M38 8l1.2 2.6 2.8.4-2 2 .5 2.8-2.5-1.4-2.5 1.4.5-2.8-2-2 2.8-.4z" fill="#FFF3B0"/></svg></span>الليلة</button><button id="tabMe" onclick="App.tab('sky')"><span><svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="16" fill="#FBD3B0"/><path d="M8 24c0-11 7-17 16-17s16 6 16 17c-3-5-8-8-13-8-4 3-9 4-14 4-2 1-4 2-5 4z" fill="#5A3A26"/><circle cx="18" cy="27" r="2.3" fill="#3B2A20"/><circle cx="30" cy="27" r="2.3" fill="#3B2A20"/><circle cx="18.8" cy="26.2" r=".8" fill="#fff"/><circle cx="30.8" cy="26.2" r=".8" fill="#fff"/><path d="M20 33q4 4 8 0" stroke="#3B2A20" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="13.5" cy="31.5" r="2.4" fill="#FF9AA8"/><circle cx="34.5" cy="31.5" r="2.4" fill="#FF9AA8"/></svg></span>أنا</button><button id="tabExplore" onclick="App.tab('explore')"><span><svg viewBox="0 0 48 48"><circle cx="22" cy="26" r="17" fill="#4DB8F0"/><path d="M10 18c4-2 7 0 8 3s4 3 4 6-3 4-3 7c-4-1-7-4-9-8-1-3-1-6 0-8zM27 11c4 0 8 2 10 6-2 1-4 0-5 2s1 4-1 5-4-1-5-3 0-4 1-5-1-3 0-5z" fill="#5CCB6E"/><path d="M33 33c2-1 4 1 3 3" fill="none"/><g transform="rotate(-25 36 13)"><path d="M28 13l16-6-6 16-3-7z" fill="#FF8A3D"/><path d="M35 16l3 7 6-16z" fill="#D9601C"/></g></svg></span>اكتشف</button><button id="tabLearn" onclick="App.tab('learn')"><span><svg viewBox="0 0 48 48"><rect x="5" y="20" width="21" height="21" rx="4" fill="#FF6B6B"/><rect x="5" y="20" width="21" height="5" rx="2.5" fill="#FF9393"/><text x="15.5" y="37.5" text-anchor="middle" font-family="Baloo Bhaijaan 2,sans-serif" font-weight="800" font-size="15" fill="#fff">أ</text><rect x="22" y="6" width="21" height="21" rx="4" fill="#5B8DEF" transform="rotate(10 32 16)"/><text x="32.5" y="23" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="800" font-size="14" fill="#fff" transform="rotate(10 32 16)">B</text><rect x="27" y="30" width="16" height="11" rx="3" fill="#FFC93C"/><circle cx="32" cy="35.5" r="2" fill="#fff"/><circle cx="38" cy="35.5" r="2" fill="#fff"/></svg></span>العب وتعلّم</button><button id="tabParents" onclick="App.tab('dash')"><span><svg viewBox="0 0 48 48"><path d="M24 6L5 22h5v19h28V22h5z" fill="#FFB547"/><path d="M24 6L5 22h5l14-12 14 12h5z" fill="#E07B39"/><rect x="31" y="9" width="5" height="9" rx="1.5" fill="#B85A2A"/><path d="M24 39c-6-4-9-7-9-11a4.5 4.5 0 0 1 9-1.5 4.5 4.5 0 0 1 9 1.5c0 4-3 7-9 11z" fill="#FF6B8A"/></svg></span>للوالدين</button></nav>
+  <div hidden><button id="tabSky"></button><button id="tabSpace"></button><button id="tabPlay"></button><button id="tabEng"></button><button id="tabLib"></button><button id="tabDash"></button><button id="tabTrips"></button><button id="dashBtn"></button></div>
+</section>
+
+<!-- قارئ القصة -->
+<section id="reader" class="screen">
+  <div class="rtop">
+    <button class="iconbtn" onclick="App.closeReader()" aria-label="إغلاق">✕</button>
+    <div class="row" style="flex:0;gap:8px">
+      <span class="viewtag" id="viewTag" style="display:none">🔍 معاينة</span>
+      <button class="iconbtn" id="favBtn" onclick="App.toggleFav()" aria-label="مفضلة">☆</button>
+      <button class="iconbtn" id="voicePickBtn" onclick="App.voicePick()" aria-label="اختيار الصوت">🗣️</button><button class="iconbtn" id="voiceBtn" onclick="App.toggleVoice()" aria-label="قراءة بصوت">🔈</button>
+    </div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="recbar" id="recBar" style="display:none"></div>
+  <div class="nav" id="nav"></div>
+</section>
+<div id="sleep" onclick="App.wake()"></div>
+
+<!-- قفل وقت النوم (أجهزة الأطفال) -->
+<div id="lock">
+  <div class="lockin">
+    <div class="lmoon">🌙</div>
+    <h1>حان وقت النوم 😴</h1>
+    <p id="lockText"></p>
+    <p class="lsub">سراج نايم الحين، ويصحى الصبح ☀️</p>
+    <div class="zzz">z<span>z</span><span>z</span></div>
+    <button class="btn ghost" onclick="App.unlockParent()">🔒 وليّ الأمر</button>
+  </div>
+</div>
+
+<!-- نافذة الألعاب -->
+<div class="modal" id="gameModal"><div class="card gamecard"><button class="iconbtn gclose" onclick="Play.closeGame()" aria-label="إغلاق">✕</button><div id="gameBody"></div></div></div>
+
+<!-- الإعدادات -->
+<section id="settings" class="screen">
+  <div class="top">
+    <h1 class="pghead"><i data-ic="gear"></i>الإعدادات</h1>
+    <button class="iconbtn" onclick="App.show('home')" aria-label="رجوع">→</button>
+  </div>
+  <div class="setnav"><button onclick="App.goSet('sFam')">👨‍👩‍👧 العائلة</button><button onclick="App.goSet('sKids')">🧒 الأطفال</button><button onclick="App.goSet('sNight')">📚 القصص والنوم</button><button onclick="App.goSet('sMsg')">💌 الرسائل والمكافأة</button><button onclick="App.goSet('sLook')">🎨 المظهر</button><button onclick="App.goSet('sNotif')">🔔 الإشعارات</button><button onclick="App.goSet('sApp')">ℹ️ عن سراج</button></div>
+  <div class="card" id="famBox">
+    <h2 id="sFam">العائلة والنسخة الاحتياطية 👨‍👩‍👧</h2>
+    <p class="muted">هذا الجهاز: <b id="devRole"></b></p>
+    <p class="muted" style="margin-bottom:0">رمز العائلة هو نسختك الاحتياطية: به تربط جهاز طفل، وبه يرجع كل شيء لو حذفت التطبيق أو غيّرت الجوال. احفظه في مكانٍ آمن.</p>
+    <button class="btn alt" id="whoRow" style="margin:6px 0 10px" onclick="App.openWho(false)">تغيير صاحب الجهاز 👤</button>
+    <div class="code" id="famCode"></div>
+    <div class="qr" id="qr"></div>
+    <p class="muted" style="text-align:center;font-size:13px">صوّر الرمز من كاميرا التابلت، أو أرسل له الرابط</p>
+    <div class="row"><button class="btn" onclick="App.shareJoin()">إرسال رابط الربط</button><button class="btn alt" onclick="App.copyCode()">نسخ الرمز</button></div>
+  </div>
+  <div class="card">
+    <h2 id="sKids">الأطفال</h2>
+    <div class="list" id="setKids"></div>
+    <button class="btn alt" onclick="App.editKid()">+ إضافة طفل</button>
+  </div>
+  <div class="card">
+    <h2>وش ينادونكم العيال؟</h2>
+    <label>الأب</label><div class="chips" id="setDad"></div>
+    <label>الأم</label><div class="chips" id="setMom"></div>
+  </div>
+  <div class="card">
+    <h2 id="sNotif">وقت القصة والإشعارات 🔔</h2>
+    <p class="muted" id="notifState"></p>
+    <button class="btn" id="notifBtn" onclick="App.enableNotif()">تفعيل الإشعارات على هذا الجهاز</button>
+    <label class="toggle"><b>تذكير وقت القصة</b><input type="checkbox" class="switch" id="remindOn"></label>
+    <input type="hidden" id="bedTime" value="20:30">
+    <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('bedTime',-15)" aria-label="أبكر">−</button><div class="tv" id="bedTimeView"></div><button type="button" class="tbtn" onclick="App.bumpTime('bedTime',15)" aria-label="أأخر">+</button></div>
+    <div class="tquick" id="bedTimeQuick"></div>
+    <p class="muted" id="remindNote" style="margin-top:8px"></p>
+    <button class="btn alt" onclick="App.setBed()">حفظ</button>
+  </div>
+  <div class="card">
+    <h2 id="sLook">المظهر 🎨</h2>
+    <p class="muted">فاتح أو داكن على هذا الجهاز.</p>
+    <div class="seg" id="themeSeg"></div>
+    <div class="pals" id="palSeg" style="display:none"></div>
+  </div>
+    <div class="card">
+    <h2 id="sMsg">💌 رسالة للعيال</h2>
+    <p class="muted">تظهر لهم فوق قصة الليلة لين يضغطون ❤️</p>
+    <textarea class="inp" id="msgText" rows="2" maxlength="140" placeholder="مثلًا: فخور فيكم اليوم يا أبطال ❤️"></textarea>
+    <label>لمين؟</label><div class="seg wrap" id="msgTo"></div>
+    <label>من؟</label><div class="seg" id="msgFrom"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" onclick="App.sendMsg()">إرسال 💌</button><button class="btn alt" onclick="App.clearMsg()">مسح الرسالة</button></div>
+  </div>
+  <div class="card">
+    <h2 id="sRw">🎁 مكافأة الأسبوع</h2>
+    <p class="muted">كل ليلة يقرون فيها قصة = نجمة. لما يوصلون العدد يكسبون المكافأة اللي تحددها.</p>
+    <label>المكافأة</label><input class="inp" id="rwText" maxlength="60" placeholder="مثلًا: طلعة للحديقة 🎡">
+    <label>كم نجمة؟</label><div class="seg" id="rwStars"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" onclick="App.saveReward()">حفظ</button><button class="btn alt" onclick="App.clearReward()">إيقاف المكافأة</button></div>
+  </div>
+  <div class="card">
+    <h2 id="sNight">الليل والنوم 🌙</h2>
+    <label>كم قصة الليلة؟</label>
+    <div class="seg" id="perNight"></div>
+    <p class="muted" style="margin-top:8px">بعد القصة الأولى يظهر لهم زر «القصة التالية» لين يوصلون العدد.</p>
+    <button class="btn alt" onclick="App.giveExtra()">✨ قصة إضافية الليلة بس</button>
+    <p class="muted" id="extraNote" style="margin:6px 0 0"></p>
+    <label class="toggle" style="margin-top:16px"><b>✂️ قصص قصيرة للصغار (٣-٥)</b><input type="checkbox" class="switch" id="shortKids" onchange="App.setShortKids()"></label>
+    <p class="muted" style="margin:0">لعمر ٣-٥: نسخة قصيرة مكتوبة لكل قصة (٣-٤ صفحات بجمل بسيطة). ٦ سنوات وفوق: القصة كاملة. إذا يقرون مع بعض يمشي على عمر الأصغر، وفي القصة زر «اعرض الكاملة».</p>
+    <label class="toggle" style="margin-top:16px"><b>قفل التطبيق وقت النوم</b><input type="checkbox" class="switch" id="lockOn"></label>
+    <input type="hidden" id="lockTime" value="21:30">
+    <div class="timepick"><button type="button" class="tbtn" onclick="App.bumpTime('lockTime',-15)" aria-label="أبكر">−</button><div class="tv" id="lockTimeView"></div><button type="button" class="tbtn" onclick="App.bumpTime('lockTime',15)" aria-label="أأخر">+</button></div>
+    <div class="tquick" id="lockTimeQuick"></div>
+    <p class="muted" style="margin-top:8px">من هذا الوقت لين ٥ الصبح، أجهزة الأطفال تعرض «حان وقت النوم» بس. والألعاب تنام من وقت القصة.</p>
+    <button class="btn alt" onclick="App.setLock()">حفظ</button>
+  </div>
+  <div class="card">
+    <h2 id="sLib">مكتبة القصص <span class="count" id="storyCount"></span></h2>
+    <p class="muted">اضغط أي قصة لمعاينتها بأسماء أطفالك.</p>
+    <input class="search" id="storySearch" placeholder="🔍 ابحث باسم القصة أو القيمة" oninput="App.filterStories()">
+    <div class="chips libchips" id="libChips"></div>
+    <div class="slist" id="allStories"></div>
+    <button class="btn alt" id="moreStories" style="margin-top:12px" onclick="App.moreStories()">عرض المزيد</button>
+  </div>
+  <div class="card">
+    <h2>رمز وليّ الأمر</h2>
+    <div class="row"><input class="inp" id="newPin" type="tel" inputmode="numeric" maxlength="4" placeholder="رمز جديد" style="direction:ltr;text-align:center;letter-spacing:8px"><button class="btn alt" onclick="App.changePin()">تغيير</button></div>
+  </div>
+  <h3 class="gh">الأجهزة</h3>
+  <div class="sgrp">
+    <button class="slink" id="pushAllBtn" onclick="App.refreshAll()"><i class="sic" style="background:linear-gradient(135deg,#F07AA8,#C9407A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="11" height="16" rx="2"/><rect x="14" y="8" width="7" height="12" rx="1.5"/><path d="M8 17h1"/></svg></i><span>تحديث كل أجهزة العيال</span><em class="chev"></em></button>
+    <button class="slink" onclick="App.unlink()" style="color:#D33"><i class="sic" style="background:linear-gradient(135deg,#FF7A7A,#D33A3A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a4 4 0 0 1 5.6 5.6L16.5 12M13 17.5l-1.2 1.2a4 4 0 0 1-5.6-5.6L7.5 12"/><path d="M4 4l16 16"/></svg></i><span>فك ربط هذا الجهاز</span><em class="chev"></em></button>
+  </div>
+  <h3 class="gh" id="sApp">سراج | SIRAJ</h3>
+  <div class="sgrp">
+    <button class="slink" onclick="Info.about()"><i class="sic" style="background:linear-gradient(135deg,#7FA6C6,#4E7AA3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></i><span>حول التطبيق</span><em class="chev"></em></button>
+    <button class="slink" onclick="App.shareApp()"><i class="sic" style="background:linear-gradient(135deg,#FEAE47,#F0761C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></i><span>مشاركة التطبيق</span><em class="chev"></em></button>
+    <button class="slink" onclick="Info.contact()"><i class="sic" style="background:linear-gradient(135deg,#4FC79A,#21875F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></i><span>تواصل معنا</span><em class="chev"></em></button>
+    <button class="slink" onclick="Info.privacy()"><i class="sic" style="background:linear-gradient(135deg,#9D7BEA,#6A45C9)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></i><span>سياسة الخصوصية</span><em class="chev"></em></button>
+  </div>
+  <h3 class="gh">التطبيق</h3>
+  <div class="sgrp">
+    <button class="slink" onclick="Info.addHome()"><i class="sic" style="background:linear-gradient(135deg,#FF9A3D,#D9620C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 9v6M9 12h6"/></svg></i><span>إضافة للشاشة الرئيسية</span><em class="chev"></em></button>
+    <button class="slink" onclick="App.hardRefresh()"><i class="sic" style="background:linear-gradient(135deg,#5AC8FA,#2C7FD6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/></svg></i><span>البحث عن تحديثات</span><small class="v"><b class="verV"></b></small><em class="chev"></em></button>
+  </div>
+  <p class="muted" id="verNote" style="display:none"></p>
+  <div class="sfoot"><b>سراج | SIRAJ — الإصدار <span id="ver2"></span></b>
+    <a class="wamdf" href="https://wamdarc.com" target="_blank" rel="noopener" aria-label="WAMD ARC"><img class="wl" src="wamdarc-light.png" alt="WAMD ARC" width="132" height="21"><img class="wd" src="wamdarc-dark.png" alt="WAMD ARC" width="132" height="21"><span dir="ltr">WAMDARC.COM</span></a></div>
+</section>
+
+<!-- نافذة: تعديل طفل -->
+<div class="modal" id="kidModal"><div class="card ked">
+  <div class="kedHead"><div class="preview" id="kidPreview"></div><div class="kedSide"><h2 id="kidTitle">طفل جديد</h2>
+    <div class="kedBtns"><button class="btn" onclick="App.saveKid()">✓ حفظ</button><button class="btn alt" onclick="App.closeModal('kidModal')">إلغاء</button></div></div></div>
+  <div class="kedBody">
+  <div id="kidBasics">
+    <label>الاسم</label><input class="inp" id="kidName" maxlength="20" placeholder="اسم الطفل">
+    <label>ولد أو بنت</label><div class="seg" id="kidG"><button data-v="m">ولد</button><button data-v="f">بنت</button></div>
+    <label>العمر</label><div class="seg" id="kidAge"><button data-v="1">٣-٥</button><button data-v="2">٦-٨</button><button data-v="3">٩-١٢</button></div>
+    <div class="pals" id="kidPal" style="display:none"></div>
+    <label>المظهر على جهازه</label><div class="seg" id="kidTheme"><button data-v="light">☀️ فاتح</button><button data-v="dark">🌙 داكن</button></div>
+  </div>
+  <div class="wtabs" id="wTabs"><button data-t="face" class="on">😊 الشكل والشعر</button><button data-t="wear">👕 اللبس</button><button data-t="shoe">👟 الأحذية</button></div>
+  <div class="wsec" data-s="face">
+  <label>لون البشرة</label><div class="swatches" id="kidSkin"></div>
+  <label>غطاء الرأس</label><div class="seg wrap" id="kidHead"></div>
+  <div id="hcRow"><label>لون الحجاب</label><div class="swatches" id="kidHC"></div></div>
+  <div id="hairRow"><label>تسريحة الشعر</label><div class="seg wrap" id="kidStyle"></div>
+  <label>لون الشعر</label><div class="swatches" id="kidHair"></div></div>
+  </div>
+  <div class="wsec" data-s="wear" style="display:none">
+  <label>اللبس</label><div class="seg wrap" id="kidOutfit"></div>
+  <div id="clubRow"><label>⚽ اختر ناديك</label><div class="seg wrap lg" id="kidLeague"></div><div class="clubs" id="kidClub"></div>
+  <label>رقم القميص</label><div class="seg wrap" id="kidNum"></div></div>
+  <div id="shirtRow"><label>لون اللبس</label><div class="swatches" id="kidShirt"></div></div>
+  <div id="pantsRow"><label>لون البنطلون</label><div class="swatches" id="kidPants"></div></div>
+  </div>
+  <div class="wsec" data-s="shoe" style="display:none">
+  <label>نوع الحذاء</label><div class="seg wrap" id="kidShoe"></div>
+  <label>لون الحذاء</label><div class="swatches" id="kidShoeC"></div>
+  </div>
+  </div>
+</div></div>
+
+<!-- نافذة: رمز وليّ الأمر -->
+<div class="modal" id="pinModal"><div class="card pincard">
+  <div class="pinic" id="pinIc"></div>
+  <h2>رمز وليّ الأمر</h2>
+  <p class="muted">للإعدادات والمتابعة</p>
+  <div class="pin" id="pinDots"></div>
+  <div class="pad" id="pinPad"></div>
+  <button class="pincancel" onclick="App.closeModal('pinModal')">إلغاء</button>
+</div></div>
+
+<!-- نافذة: رمز العائلة -->
+<div class="modal" id="codeModal"><div class="card" style="text-align:center">
+  <div style="font-size:50px">🎉</div>
+  <h2 id="fcFirst">تم إنشاء عائلتك!</h2>
+  <p class="muted">هذا رمز عائلتك. احفظه، وبه تربط تابلت الأطفال.</p>
+  <div class="code" id="fcCode"></div>
+  <p class="muted" style="font-size:14px">في التابلت: افتح سراج ← «جهاز طفل» ← أدخل الرمز.</p>
+  <div class="row"><button class="btn" onclick="App.shareJoin()">إرسال رابط الربط</button><button class="btn alt" onclick="App.copyCode()">نسخ</button></div>
+  <button class="btn ghost" onclick="App.closeModal('codeModal')">تم</button>
+</div></div>
+
+<!-- نافذة: جهاز مين؟ -->
+<div class="modal" id="whoModal"><div class="card" style="text-align:center;max-height:92vh;overflow:auto">
+  <div style="font-size:46px">👋</div>
+  <h2>هذا الجهاز لمين؟</h2>
+  <p class="muted">اختر صاحب الجهاز. ولو الجهاز مشترك، اختر أكثر من واحد.</p>
+  <div class="kids" id="whoKids" style="margin:10px 0 14px"></div>
+  <button class="chip" id="whoAll" onclick="App.whoAll()" style="margin-bottom:14px">👨‍👩‍👧 جهاز مشترك للكل</button>
+  <button class="btn" id="whoOk" onclick="App.whoDone()">تم</button>
+</div></div>
+
+<!-- نافذة: الإشعارات -->
+<div class="modal" id="notifModal"><div class="card" style="text-align:center">
+  <div style="font-size:50px">🔔</div>
+  <h2>نفعّل الإشعارات؟</h2>
+  <p class="muted">نذكّركم بوقت القصة كل ليلة، ونوصل لك خبر إذا خلص الأطفال قصتهم.</p>
+  <button class="btn" onclick="App.enableNotif()">تفعيل</button>
+  <button class="btn ghost" onclick="App.closeModal('notifModal')">لاحقًا</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<script src="native-shim.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="config.js?v=5.1.2"></script>
+<script src="sync.js?v=5.1.2"></script>
+<script src="art.js?v=5.1.2"></script>
+<script src="stories.js?v=5.1.2"></script>
+<script src="stories-2.js?v=5.1.2"></script>
+<script src="stories-3.js?v=5.1.2"></script>
+<script src="stories-4.js?v=5.1.2"></script>
+<script src="stories-5.js?v=5.1.2"></script>
+<script src="stories-6.js?v=5.1.2"></script>
+<script src="stories-7.js?v=5.1.2"></script>
+<script src="extra.js?v=5.1.2"></script>
+<script src="young.js?v=5.1.2"></script>
+<script src="play.js?v=5.1.2"></script>
+<script src="english-2.js?v=5.1.2"></script>
+<script src="english.js?v=5.1.2"></script>
+<script src="english-3.js?v=5.1.2"></script>
+<script src="space.js?v=5.1.2"></script>
+<script src="night.js?v=5.1.2"></script>
+<script src="honors.js?v=5.1.2"></script>
+<script src="stickers.js?v=5.1.2"></script>
+<script src="room.js?v=5.1.2"></script>
+<script src="trips-data.js?v=5.1.2"></script>
+<script src="trips.js?v=5.1.2"></script>
+<script src="about.js?v=5.1.2"></script>
+<script src="app.js?v=5.1.2"></script>
+<script src="wamd-cfg.js?v=5.1.2" data-app="siraj" defer></script>
+<!-- WAMD-TC --><script>/* WAMD ARC: لون شريط الساعة (theme-color) = لون أعلى التطبيق، ويتبع الفاتح والداكن */
+(function(){var busy=0;function c(){return (getComputedStyle(document.body||document.documentElement).getPropertyValue('--wtc')||'').trim()}
+function f(){var v=c();if(!v||busy)return;busy=1;document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){if(m.getAttribute('content')!==v)m.setAttribute('content',v)});busy=0}
+f();var o=new MutationObserver(f);o.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']});if(document.body)o.observe(document.body,{attributes:true,attributeFilter:['class','data-pal']});
+document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){o.observe(m,{attributes:true,attributeFilter:['content']})});
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){setTimeout(f,0)})}catch(e){}})();</script><!-- /WAMD-TC -->
+</body>
+</html>

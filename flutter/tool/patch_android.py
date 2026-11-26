@@ -49,7 +49,15 @@ if 'siraj-test.keystore' not in t:
 
     buildTypes {'''
     t = t.replace('    buildTypes {', block, 1)
-    t = t.replace('signingConfig = signingConfigs.getByName("debug")', 'signingConfig = signingConfigs.getByName("siraj")')
+    t = t.replace('signingConfig = signingConfigs.getByName("debug")', 'signingConfig = if (System.getenv("SIRAJ_PLAY") == "1") signingConfigs.getByName("upload") else signingConfigs.getByName("siraj")')
+if 'create("upload")' not in t:
+    t = t.replace('        create("siraj") {', '''        create("upload") {
+            storeFile = file("upload.jks")
+            storePassword = System.getenv("SIRAJ_KEYSTORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("SIRAJ_KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("SIRAJ_KEY_PASSWORD") ?: ""
+        }
+        create("siraj") {''', 1)
 # مكتبة الإشعارات تحتاج core library desugaring
 if 'isCoreLibraryDesugaringEnabled' not in t:
     t = re.sub(r'compileOptions\s*\{', 'compileOptions {\n        isCoreLibraryDesugaringEnabled = true', t, count=1)

@@ -17,6 +17,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # مفتاح رفع Google Play (يضيفه باسل في Settings → Secrets → Actions)
+      SIRAJ_KEYSTORE_BASE64: ${{ secrets.SIRAJ_KEYSTORE_BASE64 }}
+      SIRAJ_KEYSTORE_PASSWORD: ${{ secrets.SIRAJ_KEYSTORE_PASSWORD }}
+      SIRAJ_KEY_ALIAS: ${{ secrets.SIRAJ_KEY_ALIAS }}
+      SIRAJ_KEY_PASSWORD: ${{ secrets.SIRAJ_KEY_PASSWORD }}
     defaults:
       run:
         working-directory: flutter
@@ -66,3 +72,24 @@ jobs:
             gh release create android-test --target "${GITHUB_SHA}" --prerelease --title "سراج | Siraj — نسخة تجريبية للأندرويد" --notes "آخر نسخة تجريبية."
           gh release upload android-test siraj-test.apk --clobber
           gh release edit android-test --notes "آخر نسخة تجريبية (Flutter) — رقم البناء ${BN}"
+
+      # ---- نسخة متجر Google Play (AAB موقّع بمفتاح الرفع) — تنبني بس لو المفاتيح موجودة ----
+      - name: بناء نسخة Google Play (AAB)
+        if: env.SIRAJ_KEYSTORE_BASE64 != ''
+        run: |
+          echo "$SIRAJ_KEYSTORE_BASE64" | base64 -d > android/app/upload.jks
+          export SIRAJ_PLAY=1
+          flutter build appbundle --release --build-number=$BN --build-name=2.3.0 --dart-define=STORE=play || (sleep 45; flutter build appbundle --release --build-number=$BN --build-name=2.3.0 --dart-define=STORE=play)
+          cp build/app/outputs/bundle/release/app-release.aab siraj-play-$BN.aab
+          rm -f android/app/upload.jks
+
+      - name: نشر ملف المتجر
+        if: env.SIRAJ_KEYSTORE_BASE64 != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view play-store >/dev/null 2>&1 || \
+            gh release create play-store --target "${GITHUB_SHA}" --prerelease --title "سراج | Siraj — ملف Google Play" --notes "ملف AAB للرفع على Google Play Console."
+          for f in $(gh release view play-store --json assets -q '.assets[].name'); do gh release delete-asset play-store "$f" -y; done
+          gh release upload play-store siraj-play-$BN.aab --clobber
+          gh release edit play-store --notes "ملف Google Play — رقم البناء ${BN} — الإصدار 2.3.0"

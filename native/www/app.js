@@ -1,0 +1,1301 @@
+/* سراج | SIRAJ — منطق التطبيق */
+const KEY = 'siraj';
+const DAD = ['بابا', 'يبه', 'أبوي', 'بابي'];
+const MOM = ['ماما', 'يمه', 'أمي', 'مامي'];
+
+const App = (() => {
+  const $ = (id) => document.getElementById(id);
+  let S = load();
+  let sel = [];               // أبطال الليلة (أول واحد = البطل)
+  let R = null;               // حالة القارئ
+  let editing = null;         // الطفل اللي نعدّله
+  let pinBuf = '', pinCb = null;
+  let installEvt = null, pendingReload = false, remote = [], sleepTimer = null;
+
+  /* ---------- التخزين ---------- */
+  function freshFam() { return { kids: [], pin: '', dad: 'بابا', mom: 'ماما', bedtime: '20:30', remind: true, perNight: 1, shortKids: true, lockOn: true, lock: '21:30', extra: null }; }
+  function fresh() { return { v: 2, role: '', code: '', dev: uid(), rev: 0, dirty: false, progDirty: false, fam: freshFam(), log: [], fav: [], voice: true, voiceV: 1, sel: [], notif: false, devKids: [], beat: 0, act: [], unlockUntil: 0 }; }
+  function load() {
+    let s; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    if (!s) return fresh();
+    if (!s.v || s.v === 1) {               // ترحيل من النسخة 1.0
+      const n = fresh();
+      n.fam.kids = s.kids || []; n.fam.pin = s.pin || ''; n.fav = s.fav || []; n.voice = !!s.voice; n.sel = s.sel || [];
+      n.log = Object.entries(s.read || {}).map(([sid, d]) => ({ s: sid, d, k: [], t: Date.parse(d) || Date.now() }));
+      n.role = n.fam.kids.length ? 'parent' : '';
+      return n;
+    }
+    s.fam = Object.assign(freshFam(), s.fam || {});
+    if (!s.voiceV) { s.voice = true; s.voiceV = 1; } // من 1.8: السماعة شغالة افتراضيًا
+    return s;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} writeSWData(); }
+  function famChanged() { S.dirty = true; save(); syncNow(); }
+
+  /* بيانات صغيرة يقراها sw.js لكتابة نص الإشعار (الأسماء ما تطلع للسيرفر) */
+  function writeSWData() {
+    if (!('caches' in window)) return;
+    const kids = {}; S.fam.kids.forEach((k) => (kids[k.id] = { n: k.name, g: k.g }));
+    caches.open('siraj-data').then((c) => c.put(location.origin + '/__family', new Response(JSON.stringify({ kids, sel: S.sel })))).catch(() => {});
+  }
+
+  /* ---------- أدوات ---------- */
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600); }
+  function dateKey(d = new Date()) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function dayOfYear(d = new Date()) { return Math.floor((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(d.getFullYear(), 0, 0)) / 864e5); }
+  function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  const kidById = (id) => S.fam.kids.find((k) => k.id === id);
+  const names = (arr) => arr.map((k) => k.name).join(' و');
+  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const joinLink = () => CONFIG.SITE + '/#join=' + S.code;
+
+  /* ---------- قصة اليوم: مربوطة بالتاريخ والعائلة، والمناسبات تتقدّم ---------- */
+  function hijri(d) {
+    try {
+      const p = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { month: 'numeric', day: 'numeric' }).formatToParts(d);
+      return { m: +p.find((x) => x.type === 'month').value, d: +p.find((x) => x.type === 'day').value };
+    } catch (e) { return null; }
+  }
+  function occasion(d) {
+    const h = hijri(d);
+    return STORIES.find((s) => s.occ && ((s.occ.cal === 'g' && s.occ.m === d.getMonth() + 1 && s.occ.d.includes(d.getDate())) ||
+      (s.occ.cal === 'h' && h && s.occ.m === h.m && s.occ.d.includes(h.d))));
+  }
+  /* قصص الأنبياء: كل اثنين وجمعة بالترتيب من آدم إلى محمد ﷺ */
+  const isPro = (s) => s && s.cat === 'pro';
+  const isSah = (s) => s && s.cat === 'sahaba';
+  const isQan = (s) => s && s.cat === 'qanimal';
+  const isNarr = (s) => isPro(s) || isSah(s) || isQan(s);
+  const laterPart = (s) => s && s.ser && s.part > 1;
+  const isProDay = (d) => d.getDay() === 1 || d.getDay() === 5;
+  function proOfDay(d) {
+    const pros = STORIES.filter(isPro); if (!pros.length) return null;
+    const a = new Date(2026, 0, 1); let n = 0;
+    for (let x = new Date(a); x <= d; x.setDate(x.getDate() + 1)) if (isProDay(x)) n++;
+    return pros[(Math.max(n, 1) - 1) % pros.length];
+  }
+  function storyOfDay(d) { return d ? storyOfDate(d) : (tonightList()[0] || storyOfDate(new Date())); }
+  /* القصص بالدور: ترتيب ثابت لكل عائلة، ومتى ما فتحوا التطبيق ياخذون اللي عليها الدور، فما تضيع ولا قصة */
+  function storyQueue() {
+    const r = rng(hash((S.code || 'x') + '#queue'));
+    const reg = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s)).map((s) => [r(), s]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+    const pro = [], sah = STORIES.filter(isSah), out = [], qan = STORIES.filter(isQan);
+    STORIES.filter(isPro).forEach((x, j) => { pro.push(x); if (j % 4 === 3 && qan.length) pro.push(qan.shift()); }); pro.push(...qan);
+    let i = 0, p = 0, c = 0, turn = 0;
+    while (i < reg.length || p < pro.length || c < sah.length) {
+      for (let k = 0; k < 2 && i < reg.length; k++) out.push(reg[i++]);
+      if (turn % 2 === 0 ? p < pro.length : c >= sah.length) { if (p < pro.length) out.push(pro[p++]); } else if (c < sah.length) out.push(sah[c++]);
+      turn++;
+    }
+    return out;
+  }
+  function storyOfDate(d = new Date()) {
+    const occ = occasion(d); if (occ) return occ;
+    if (isProDay(d)) { const p = proOfDay(d); if (p) return p; }
+    if (d.getDay() === 3) { const sh = STORIES.filter(isSah); if (sh.length) { let n = 0; for (let x = new Date(2026, 0, 1); x <= d; x.setDate(x.getDate() + 1)) if (x.getDay() === 3) n++; return sh[(n - 1) % sh.length]; } }
+    // السلاسل: إذا قروا جزء قبل اليوم، الجزء اللي بعده يصير قصة اليوم
+    try {
+      const today = dateKey(d), logs = allLogs().filter((e) => e.d < today);
+      const last = logs.find((e) => { const s = STORIES.find((x) => x.id === e.s); return s && s.ser; });
+      if (last) {
+        const s = STORIES.find((x) => x.id === last.s), nx = STORIES.find((x) => x.ser === s.ser && x.part === s.part + 1);
+        if (nx && !logs.some((e) => e.s === nx.id)) return nx;
+      }
+    } catch (e) {}
+    const pool = STORIES.filter((s) => !s.occ && !isNarr(s) && !laterPart(s));
+    const seed = S.code || S.fam.kids.map((k) => k.name.trim()).sort().join('|');
+    const order = pool.map((_, i) => i);
+    const r = rng(hash(seed + '#' + d.getFullYear()));
+    for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    return pool[order[(dayOfYear(d) - 1) % order.length]];
+  }
+
+  /* ---------- التصنيفات: تظهر تحت اسم كل قصة ---------- */
+  const CATS = [
+    ['pro', '🕌', 'قصص الأنبياء', null],
+    ['sahaba', '🌟', 'قصص الصحابة', null],
+    ['saudi', '🇸🇦', 'سعوديتي', null],
+    ['qanimal', '🐪', 'حيوانات في القرآن', null],
+    ['choose', '🧭', 'اختر الطريق', null],
+    ['series', '📚', 'سلاسل', null],
+    ['occ', '🎉', 'المناسبات', null],
+    ['truth', '🤝', 'الصدق والأمانة', /الصدق|الأمانة|الوفاء|الوعد/],
+    ['share', '🎁', 'المشاركة والعطاء', /المشاركة|العطاء|التعاون|الكرم|ضيف|مساعدة|نصرة|التطوعي|الصدقة|العاملين|الإيثار/],
+    ['mercy', '💗', 'الرحمة واللطف', /الرحمة|الرفق|اللطف|التسامح|المريض|الاعتذار/],
+    ['brave', '🦁', 'الشجاعة والثقة', /الشجاعة|الثقة|المحاولة|الطموح|تقبّل/],
+    ['patience', '🌱', 'الصبر', /الصبر|ضبط|الهدوء|التركيز|الطمأنينة/],
+    ['faith', '🤲', 'الإيمان والعبادة', /الصلاة|العبادة|الشكر|الامتنان|رمضان|العيد/],
+    ['know', '📚', 'العلم والمعرفة', /العلم|القراءة|تعلّم|التأمّل|التعليم|الخيال|الاستماع|التعلّم/],
+    ['family', '🏠', 'العائلة', /الوالدين|العائلة|الكبار|الحب/],
+    ['habits', '✨', 'العادات الجميلة', /النظافة|الترتيب|النوم|الأكل|الاستعداد|السلامة|الأمان|آداب|الاستئذان|السلام|إماطة|الأجهزة|الوقت|المسؤولية|المال|الادّخار|البيئة|النِّعَم|القناعة|البيت|الطعام|الدور/],
+    ['manners', '🌟', 'أخلاق جميلة', null]
+  ];
+  function catOf(s) {
+    if (isPro(s)) return CATS[0];
+    if (isSah(s)) return CATS[1];
+    if (s.cat === 'saudi' || s.cat === 'qanimal') return CATS.find((c) => c[0] === s.cat);
+    if (s.cat2 === 'choose') return CATS.find((c) => c[0] === 'choose');
+    if (s.ser) return CATS.find((c) => c[0] === 'series');
+    if (s.occ) return CATS.find((c) => c[0] === 'occ');
+    return CATS.find((c) => c[3] && c[3].test(s.value)) || CATS[CATS.length - 1];
+  }
+  function catChip(s, withVal) {
+    const c = catOf(s);
+    return `<div class="cats"><span class="cat c-${c[0]}">${c[1]} ${c[2]}</span>${withVal && s.value !== c[2] ? `<span class="val">${esc(s.value)}</span>` : ''}</div>`;
+  }
+  /* في قصص الأنبياء: ما نرسم الأطفال إلا في صفحة البداية وهم يسمعون */
+  const artHs = (st, hs, pg) => (isNarr(st) ? (pg && pg.k ? hs : []) : hs);
+
+  /* ---------- محرّك القوالب ---------- */
+  function fill(str, heroes) {
+    const [hero, ...rest] = heroes;
+    const g = hero.g === 'f' ? 1 : 0;
+    const cg = rest.length > 1 ? 2 : rest.length === 1 ? (rest[0].g === 'f' ? 1 : 0) : 0;
+    let s = str.replace(/\[\[([\s\S]*?)\]\]/g, (_, inner) => (rest.length ? inner : ''));
+    s = s.replace(/\{\{([^{}]*)\}\}/g, (_, x) => { const o = x.split('|'); return o[cg] ?? o[o.length - 1]; });
+    s = s.replace(/\{([^{}|]*)\|([^{}|]*)\}/g, (_, a, b) => (g ? b : a));
+    return s.replace(/\{n\}/g, hero.name).replace(/\{fr\}/g, names(rest))
+      .replace(/\{dad\}/g, S.fam.dad || 'بابا').replace(/\{mom\}/g, S.fam.mom || 'ماما');
+  }
+
+  /* ---------- طول القصة حسب العمر ----------
+     ٣-٥ سنوات: نسخة قصيرة مكتوبة لكل قصة (st.y = [[رقم الصفحة الأصلية، نص قصير]…] من young.js)
+     قصص الأنبياء والصحابة: الصغار يبدؤون من القصة مباشرة بدون صفحة المقدمة
+     ٦-١٢: القصة كاملة. وإذا يقرون مع بعض يمشي على عمر الأصغر. */
+  function storyLevel(hs) {
+    const ag = (hs || []).map((k) => k.age).filter((a) => a > 0);
+    if (S.fam.shortKids === false || !ag.length) return 3;
+    return Math.min(...ag);
+  }
+  function youngPages(st) {
+    if (st.y && st.y.length) return st.y.map(([i, t]) => Object.assign({}, st.pages[i], { t, ch: undefined, end: undefined }));
+    if (isNarr(st)) return st.pages.filter((p) => !p.k);
+    return null;
+  }
+  const canShort = (st) => !st.pages.some((p) => p.ch) && !!youngPages(st);
+  const readerPages = () => (R.short ? youngPages(R.st) : R.st.pages);
+  function toggleFull() { R.short = !R.short; R.i = 0; R.total = readerPages().length + 2; renderPage(); toast(R.short ? 'النسخة القصيرة ✂️' : 'النسخة الكاملة 📖'); }
+  function setShortKids() { S.fam.shortKids = $('shortKids').checked; famChanged(); toast(S.fam.shortKids ? 'القصص تقصر للصغار (٣-٥) ✂️' : 'كل القصص كاملة 📖'); }
+  function shortChip() {
+    if (R.lvl > 1 || !canShort(R.st)) return '';
+    return `<div class="shortchip"><button onclick="App.toggleFull()">${R.short ? '✂️ نسخة قصيرة للصغار · <u>اعرض الكاملة</u>' : '📖 النسخة الكاملة · <u>رجّع القصيرة</u>'}</button></div>`;
+  }
+
+  /* ---------- التنقل ---------- */
+  function show(id) {
+    document.querySelectorAll('.screen').forEach((s) => s.classList.remove('on'));
+    $(id).classList.add('on');
+    window.scrollTo(0, 0);
+    if (id === 'home') { renderHome(); if (!S.tourDone && S.role === 'child') setTimeout(() => tour(0), 600); }
+    if (id === 'settings') renderSettings();
+  }
+
+  /* ---------- الترحيب والتثبيت ---------- */
+  function renderWelcome() {
+    $('installSteps').innerHTML = isIOS()
+      ? '<b>أضفه للشاشة الرئيسية ليعمل كتطبيق:</b><br>١. اضغط زر المشاركة <b>⬆️</b><br>٢. اختر <b>«إضافة إلى الشاشة الرئيسية»</b><br>٣. افتح سراج من أيقونته 🌙'
+      : '<b>أضفه للشاشة الرئيسية ليعمل كتطبيق:</b><br>١. اضغط قائمة المتصفح <b>⋮</b><br>٢. اختر <b>«تثبيت التطبيق»</b> أو «إضافة إلى الشاشة الرئيسية»<br>٣. افتح سراج من أيقونته 🌙';
+  }
+  function skipWelcome() { try { sessionStorage.setItem('siraj-skip', '1'); } catch (e) {} start(); }
+
+  /* ---------- البداية: وليّ أمر أو جهاز طفل ---------- */
+  function start() {
+    let pj = ''; try { pj = localStorage.getItem('siraj-join') || ''; } catch (e) {}
+    if (pj && !S.code) { openJoin('child', pj); return; }
+    if (!S.role) return show('role');
+    if (S.role === 'parent' && (!S.fam.kids.length || !S.fam.pin)) return openSetup();
+    show('home');
+  }
+  function openSetup() {
+    S.role = 'parent'; save();
+    renderKidList($('setupKids'), false);
+    buildCallChips('setupDad', 'dad', DAD); buildCallChips('setupMom', 'mom', MOM);
+    $('setupPin').value = S.fam.pin || ''; setTime('setupBed', S.fam.bedtime || '20:30');
+    show('setup');
+  }
+  function buildCallChips(id, key, opts) {
+    const el = $(id), cur = S.fam[key];
+    const custom = !opts.includes(cur);
+    el.innerHTML = opts.map((o) => `<button class="chip ${o === cur ? 'on' : ''}" data-v="${o}">${o}</button>`).join('') +
+      `<input class="chipin ${custom ? 'on' : ''}" maxlength="12" placeholder="غير ذلك" value="${custom ? esc(cur) : ''}">`;
+    el.querySelectorAll('.chip').forEach((b) => (b.onclick = () => { S.fam[key] = b.dataset.v; save(); buildCallChips(id, key, opts); if (S.code) S.dirty = true; }));
+    el.querySelector('.chipin').oninput = (e) => { const v = e.target.value.trim(); if (v) { S.fam[key] = v; save(); if (S.code) S.dirty = true; el.querySelectorAll('.chip').forEach((b) => b.classList.remove('on')); } };
+  }
+  async function finishSetup() {
+    const pin = $('setupPin').value.replace(/\D/g, '');
+    if (!S.fam.kids.length) return toast('أضف طفلًا واحدًا على الأقل');
+    if (pin.length !== 4) return toast('الرمز لازم يكون ٤ أرقام');
+    S.fam.pin = pin; S.fam.bedtime = $('setupBed').value || '20:30';
+    if (!S.code) S.code = Sync.newCode();
+    S.dirty = true; save();
+    show('home');
+    await syncNow();
+    showFamilyCode(true);
+    askNotif();
+  }
+
+  /* ---------- ربط جهاز (طفل، أو استرجاع جهاز وليّ الأمر) ---------- */
+  function openJoin(role, code) {
+    $('joinRole').value = role;
+    $('joinTitle').textContent = role === 'child' ? 'ربط جهاز الطفل 🧒' : 'استرجاع العائلة 🔑';
+    $('joinHint').textContent = role === 'child'
+      ? 'أدخل رمز العائلة اللي يظهر في جوال وليّ الأمر (الإعدادات ← العائلة)، أو افتح رابط الربط اللي أرسله لك.'
+      : 'أدخل رمز عائلتك، ويرجع كل شيء: الأطفال والإعدادات وتقدّم القراءة.';
+    $('joinCode').value = code || '';
+    show('join');
+  }
+  function fmtCode() {
+    const el = $('joinCode'), v = Sync.pretty(el.value);
+    if (el.value !== v) el.value = v;
+  }
+  async function pasteCode() {
+    try { const t = await navigator.clipboard.readText(); $('joinCode').value = t; fmtCode(); if (Sync.norm(t)) toast('تم اللصق ✓'); else toast('ما لقيت رمز صحيح في المنسوخ'); }
+    catch (e) { $('joinCode').focus(); toast('اضغط مطوّل على الخانة واختر «لصق»'); }
+  }
+  async function doJoin() {
+    const code = Sync.norm($('joinCode').value);
+    if (!code) return toast('الرمز ١٠ حروف وأرقام، مثل K7QPM-4XR2D');
+    if (!Sync.online()) return toast('الربط يحتاج إنترنت');
+    $('joinBtn').disabled = true; $('joinBtn').textContent = 'جاري الربط…';
+    try {
+      const r = await Sync.pullFamily(code);
+      if (!r) { toast('ما لقينا عائلة بهذا الرمز'); return; }
+      const role = $('joinRole').value;
+      S.code = code; S.fam = Object.assign(freshFam(), r.fam); S.rev = r.rev; S.dirty = false; S.role = role; S.sel = [];
+      try { localStorage.removeItem('siraj-join'); } catch (e) {}
+      remote = await Sync.pullProgress(code).catch(() => []);
+      if (role === 'parent') { const mine = remote.filter((x) => x.dev !== S.dev); mine.forEach((p) => (S.fav = [...new Set([...S.fav, ...(p.fav || [])])])); }
+      S.devKids = []; S.progDirty = true;
+      save(); toast(role === 'child' ? 'تم ربط الجهاز بالعائلة ✓' : 'تم استرجاع العائلة ✓');
+      show('home');
+      if (role === 'child' && S.fam.kids.length > 1) openWho(true);
+      else { if (role === 'child') setDevKids(S.fam.kids.map((k) => k.id)); askNotif(); }
+      syncNow();
+    } catch (e) { toast('تعذّر الربط، تأكد من الإنترنت'); }
+    finally { $('joinBtn').disabled = false; $('joinBtn').textContent = 'ربط'; }
+  }
+
+  /* دمج العائلة: لو جهازين عدّلوا بنفس الوقت، كل شخصية تاخذ آخر تعديل لها (ما يضيع شكل أحد) */
+  function mergeFam(local, remoteFam) {
+    const base = S.role === 'parent' ? JSON.parse(JSON.stringify(local)) : Object.assign(freshFam(), JSON.parse(JSON.stringify(remoteFam)));
+    const other = S.role === 'parent' ? remoteFam : local;
+    (base.kids || []).forEach((k) => { const o = (other.kids || []).find((x) => x.id === k.id); if (o && (o.avAt || 0) > (k.avAt || 0)) { k.av = o.av; k.avAt = o.avAt; } });
+    ['dad', 'mom'].forEach((w) => { const a = (other.pavAt || {})[w] || 0, b = (base.pavAt || {})[w] || 0; if (a > b) { base.pav = { ...(base.pav || {}), [w]: other.pav[w] }; base.pavAt = { ...(base.pavAt || {}), [w]: a }; } });
+    if (S.role !== 'parent') (local.kids || []).forEach((k) => { const b = base.kids.find((x) => x.id === k.id); if (b && (S.devKids || []).includes(k.id) && (k.avAt || 0) > (b.avAt || 0)) { b.av = k.av; b.avAt = k.avAt; } });
+    return base;
+  }
+
+  /* ---------- المزامنة ---------- */
+  let syncing = false;
+  async function syncNow() {
+    if (!S.code || !Sync.online() || syncing) return;
+    syncing = true;
+    try {
+      const r = await Sync.pullFamily(S.code);
+      let changed = false;
+      if (S.dirty) {
+        if (r && r.rev > S.rev) { S.fam = mergeFam(S.fam, r.fam); changed = true; }
+        const rev = Math.max(S.rev, r ? r.rev : 0) + 1;
+        const res = await Sync.pushFamily(S.code, S.fam, rev);
+        if (res.ok) { S.rev = rev; S.dirty = false; }
+      } else if (r && r.rev > S.rev) {
+        S.fam = Object.assign(freshFam(), r.fam); S.rev = r.rev; changed = true;
+      }
+      if (S.progDirty || Date.now() - (S.beat || 0) > 6 * 3600000) {
+        const notifOn = !!S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+        await Sync.pushProgress(S.code, S.dev, { role: S.role, log: S.log.slice(-500), fav: S.fav, act: (S.act || []).slice(-300), trips: (S.trips || []).slice(-60), kids: S.devKids || [], plat: platform(), ver: CONFIG.VERSION, notif: notifOn, seen: Date.now() });
+        S.progDirty = false; S.beat = Date.now();
+      }
+      save();
+      registerSub();
+      loadRemote();
+      if (changed && $('home').classList.contains('on')) { renderHome(); refreshPane(); }
+      if (changed) checkLock();
+      if (S.fam.forceAt && S.fam.forceAt > (S.forceSeen || 0)) { S.forceSeen = S.fam.forceAt; save(); hardRefresh(true); }
+    } catch (e) {}
+    syncing = false;
+  }
+  let remoteAt = 0;
+  async function loadRemote(force) {
+    if (!S.code || !Sync.online()) return remote;
+    if (!force && Date.now() - remoteAt < 20000) return remote;
+    try {
+      const before = JSON.stringify(remote.map((p) => [p.dev, p.updated]));
+      remote = await Sync.pullProgress(S.code); remoteAt = Date.now();
+      if (JSON.stringify(remote.map((p) => [p.dev, p.updated])) !== before) refreshPane();
+    } catch (e) {}
+    return remote;
+  }
+  // يعيد رسم الصفحة المفتوحة لما توصل بيانات جديدة من الأجهزة الثانية
+  function refreshPane() {
+    if (!$('home').classList.contains('on')) return;
+    const on = (id) => $(id).style.display !== 'none';
+    if (on('paneSky')) Play.renderSky();
+    else if (on('panePlay')) Play.renderPlay();
+    else if (on('paneLib')) renderLib();
+    else if (on('paneTrips') && typeof Trips !== 'undefined') Trips.render();
+    else if (on('paneTonight')) renderHome();
+  }
+  function allActs() {
+    const seen = new Set(), out = [];
+    const add = (a) => { const k = a.t + a.a; if (!seen.has(k)) { seen.add(k); out.push(a); } };
+    (S.act || []).forEach(add); remote.filter((p) => p.dev !== S.dev).forEach((p) => (p.act || []).forEach(add));
+    return out;
+  }
+  function allLogs() {
+    const seen = new Set(), out = [];
+    const add = (e, dev, role) => { const key = e.t + e.s; if (seen.has(key)) return; seen.add(key); out.push({ ...e, dev, role }); };
+    S.log.forEach((e) => add(e, S.dev, S.role));
+    remote.filter((p) => p.dev !== S.dev).forEach((p) => (p.log || []).forEach((e) => add(e, p.dev, p.role)));
+    return out.sort((a, b) => b.t - a.t);
+  }
+
+  /* ---------- الأطفال ---------- */
+  function renderKidList(el, withDelete) {
+    el.innerHTML = S.fam.kids.length ? S.fam.kids.map((k) => `
+      <div class="li">${ART.avatarSVG(k.av, k.g, 44)}<span class="nm">${esc(k.name)}</span>
+      <button class="small" onclick="App.editKid('${k.id}')">تعديل</button>${withDelete ? `<button class="small del" onclick="App.delKid('${k.id}')">حذف</button>` : ''}
+      </div>`).join('') : '<p class="muted" style="text-align:center">لا يوجد أطفال بعد</p>';
+  }
+  let selfEdit = false;
+  let wTab = 'face', wLeague = null, parentEdit = null;
+  /* شخصيات بابا وماما */
+  function pAv(who) {
+    S.fam.pav = S.fam.pav || {};
+    return S.fam.pav[who] || (who === 'dad' ? { ...ART.DEFAULTS.m, outfit: 'thobe', head: 'shmagh' } : { ...ART.DEFAULTS.f, head: 'hijab', hc: 3, outfit: 'dress', shirt: 8 });
+  }
+  function family() {
+    return [{ id: 'dad', name: S.fam.dad || 'بابا', g: 'm', av: pAv('dad'), parent: 1 }, { id: 'mom', name: S.fam.mom || 'ماما', g: 'f', av: pAv('mom'), parent: 1 }, ...S.fam.kids];
+  }
+  function familyStrip(mode) {
+    const me = S.role === 'child' ? (S.devKids || []) : [];
+    return `<div class="card famstrip"><h3>👨‍👩‍👧‍👦 عائلتي</h3><div class="fams">${family().map((m) => {
+      const n = m.parent ? '' : kidNights(m).month;
+      const can = mode === 'parent' || me.includes(m.id);
+      const act = mode === 'parent' ? (m.parent ? `App.editParent('${m.id}')` : `App.editKid('${m.id}')`) : can ? `App.editKid('${m.id}', true)` : '';
+      return `<button class="fm ${can ? 'can' : ''} ${me.includes(m.id) ? 'me' : ''}" ${act ? `onclick="${act}"` : 'disabled'}>${ART.avatarSVG(m.av, m.g, 64)}<b>${esc(m.name)}</b>${m.parent ? '<small>' + (m.id === 'dad' ? '👨' : '👩') + '</small>' : `<small>⭐ ${AR(n)}</small>`}${can ? '<i>✏️</i>' : ''}</button>`;
+    }).join('')}</div>${mode === 'parent' ? '<p class="muted" style="margin:6px 0 0;font-size:12.5px">اضغط أي شخصية تعدّلها. النجوم = ليالي القراءة هالشهر.</p>' : '<p class="muted" style="margin:6px 0 0;font-size:12.5px">تقدر تغيّر شكلك أنت ✏️</p>'}</div>`;
+  }
+  function editParent(who) {
+    parentEdit = who; wTab = 'face'; wLeague = null; selfEdit = true;
+    editing = { id: 'p-' + who, name: who === 'dad' ? S.fam.dad : S.fam.mom, g: who === 'dad' ? 'm' : 'f', age: 0, av: JSON.parse(JSON.stringify(pAv(who))) };
+    $('kidTitle').textContent = 'شخصية ' + (editing.name || (who === 'dad' ? 'بابا' : 'ماما')) + ' ✨';
+    $('kidBasics').style.display = 'none'; $('kidName').value = editing.name || '';
+    buildKidForm(); $('kidModal').classList.add('on');
+  }
+  function editKid(id, self) {
+    wTab = 'face'; wLeague = null; parentEdit = null;
+    const k = kidById(id);
+    selfEdit = !!(self && k);
+    editing = k ? JSON.parse(JSON.stringify(k)) : { id: uid(), name: '', g: 'm', age: 2, av: { ...ART.DEFAULTS.m } };
+    if (editing.av.head == null) editing.av.head = editing.av.hijab ? 'hijab' : '';
+    $('kidTitle').textContent = selfEdit ? 'غيّر شكلك يا ' + k.name + ' ✨' : k ? 'تعديل ' + k.name : 'طفل جديد';
+    $('kidBasics').style.display = selfEdit ? 'none' : '';
+    $('kidName').value = editing.name;
+    buildKidForm(); $('kidModal').classList.add('on');
+  }
+  function buildKidForm() {
+    const e = editing, a = e.av, G = e.g === 'f' ? 'f' : 'm';
+    const seg = (id, val, set) => { $(id).querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b.dataset.v == val); b.onclick = () => { set(b.dataset.v); buildKidForm(); }; }); };
+    const opts = (id, list) => { $(id).innerHTML = list.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join(''); };
+    seg('kidG', e.g, (v) => { if (v !== e.g) { e.g = v; e.av = { ...ART.DEFAULTS[v === 'f' ? 'f' : 'm'] }; } });
+    seg('kidAge', e.age, (v) => (e.age = +v));
+    e.app = e.app || {};
+    $('kidPal').innerHTML = PALS.map(([v, t, g]) => `<button type="button" class="${(e.app.pal || 'sky') === v ? 'on' : ''}" data-p="${v}"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
+    $('kidPal').querySelectorAll('button').forEach((b) => (b.onclick = () => { e.app.pal = b.dataset.p; buildKidForm(); }));
+    seg('kidTheme', e.app.theme === 'dark' ? 'dark' : 'light', (v) => (e.app.theme = v));
+    opts('kidHead', ART.HEADS[G]); seg('kidHead', ART.headOf(a, G === 'f'), (v) => { a.head = v; a.hijab = v === 'hijab' ? 1 : 0; });
+    opts('kidStyle', ART.STYLES[G].map((t, i) => [i, t])); seg('kidStyle', a.style || 0, (v) => (a.style = +v));
+    opts('kidOutfit', ART.OUTFITS[G]); seg('kidOutfit', a.outfit || 'tee', (v) => (a.outfit = v));
+    const sw = (id, arr, key) => { $(id).innerHTML = arr.map((c, i) => `<button class="sw ${(a[key] || 0) === i ? 'on' : ''}" style="background:${c}" data-i="${i}" aria-label="لون"></button>`).join(''); $(id).querySelectorAll('.sw').forEach((b) => (b.onclick = () => { a[key] = +b.dataset.i; buildKidForm(); })); };
+    sw('kidSkin', ART.SKIN, 'skin'); sw('kidHair', ART.HAIR, 'hair'); sw('kidShirt', ART.SHIRT, 'shirt'); sw('kidHC', ART.HEADC, 'hc'); sw('kidPants', ART.PANTS, 'pants');
+    const head = ART.headOf(a, G === 'f');
+    $('hcRow').style.display = head === 'hijab' ? '' : 'none';
+    $('hairRow').style.display = head ? 'none' : '';
+    $('shirtRow').style.display = ['thobe', 'jersey', 'space', 'bisht'].includes(a.outfit) ? 'none' : '';
+    $('pantsRow').style.display = ['thobe', 'dress', 'sport', 'jersey', 'pj', 'space', 'bisht', 'party'].includes(a.outfit) ? 'none' : '';
+    // الأندية والأحذية
+    wLeague = wLeague || ((ART.CLUBS.find((c) => c[0] === a.club) || ART.CLUBS[0])[2]);
+    $('clubRow').style.display = a.outfit === 'jersey' ? '' : 'none';
+    $('kidLeague').innerHTML = ART.LEAGUES.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join('');
+    seg('kidLeague', wLeague, (v) => (wLeague = v));
+    $('kidClub').innerHTML = ART.CLUBS.filter((c) => c[2] === wLeague).map((c) => `<button type="button" class="${(a.club || 'hilal') === c[0] ? 'on' : ''}" data-c="${c[0]}"><svg viewBox="26 68 48 50">${ART.avatar({ ...a, outfit: 'jersey', club: c[0] }, e.g).replace(/<g>/, '<g>')}</svg>${c[1]}</button>`).join('');
+    $('kidClub').querySelectorAll('button').forEach((b) => (b.onclick = () => { a.club = b.dataset.c; buildKidForm(); }));
+    $('kidNum').innerHTML = [7, 9, 10, 11, 17, 19, 20].map((n) => `<button data-v="${n}">${n}</button>`).join('');
+    seg('kidNum', a.num || 10, (v) => (a.num = +v));
+    opts('kidShoe', ART.SHOES); seg('kidShoe', a.shoe || 'sneaker', (v) => (a.shoe = v));
+    sw('kidShoeC', ART.SHOEC, 'shoeC');
+    $('wTabs').querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b.dataset.t === wTab); b.onclick = () => { wTab = b.dataset.t; buildKidForm(); }; });
+    document.querySelectorAll('#kidModal .wsec').forEach((x) => (x.style.display = x.dataset.s === wTab ? '' : 'none'));
+    $('kidPreview').innerHTML = ART.avatarSVG(a, e.g, 110);
+  }
+  function saveKid() {
+    if (parentEdit) {
+      S.fam.pav = S.fam.pav || {}; S.fam.pav[parentEdit] = editing.av; S.fam.pavAt = { ...(S.fam.pavAt || {}), [parentEdit]: Date.now() }; parentEdit = null;
+      closeModal('kidModal'); famChanged(); toast('تم حفظ الشخصية ✨'); if ($('paneDash').style.display !== 'none') renderDash(); renderHome();
+      return;
+    }
+    if (selfEdit) {
+      const k = kidById(editing.id); if (k) { k.av = editing.av; k.avAt = Date.now(); }
+      closeModal('kidModal'); famChanged(); toast('شكلك الجديد يجنن ✨');
+      renderHome(); if ($('paneSky').style.display !== 'none') Play.renderSky();
+      return;
+    }
+    const name = $('kidName').value.trim();
+    if (!name) return toast('اكتب اسم الطفل');
+    editing.name = name;
+    const i = S.fam.kids.findIndex((x) => x.id === editing.id);
+    if (i >= 0) S.fam.kids[i] = editing; else S.fam.kids.push(editing);
+    closeModal('kidModal');
+    if (S.code) famChanged(); else save();
+    renderKidList($('setupKids'), false);
+    if ($('settings').classList.contains('on')) renderSettings();
+  }
+  function delKid(id) {
+    const k = kidById(id);
+    if (!k || !confirm('حذف ' + k.name + '؟')) return;
+    S.fam.kids = S.fam.kids.filter((x) => x.id !== id); S.sel = (S.sel || []).filter((x) => x !== id);
+    famChanged(); renderSettings();
+  }
+  function closeModal(id) { $(id).classList.remove('on'); }
+
+  /* ---------- الرئيسية ---------- */
+  function heroes() { return sel.map(kidById).filter(Boolean); }
+  function myKids() {
+    const mine = S.role === 'child' ? (S.devKids || []).map(kidById).filter(Boolean) : [];
+    return mine.length ? mine : S.fam.kids;
+  }
+  function renderHome() {
+    const shown = myKids();
+    sel = (S.sel || []).filter((id) => shown.some((k) => k.id === id));
+    if (!sel.length && shown.length) sel = [shown[0].id];
+    const h = new Date().getHours();
+    const greet = h >= 17 || h < 4 ? 'مساء الخير' : 'أهلًا';
+    const own = S.role === 'child' && (S.devKids || []).length && shown.length < S.fam.kids.length;
+    $('hello').textContent = own ? `${greet} يا ${names(shown)} 🌙` : greet + '، جاهزين للحكاية؟ 🌙';
+    $('kids').innerHTML = shown.map((k) => {
+      const i = sel.indexOf(k.id);
+      return `<button class="kid ${i >= 0 ? 'sel' : ''} ${i === 0 ? 'hero' : ''}" onclick="App.pick('${k.id}')"><span class="badge">البطل ⭐</span>${ART.avatarSVG(k.av, k.g, 60)}<div class="nm">${esc(k.name)}</div></button>`;
+    }).join('');
+    const hs = heroes(), n = readTonight(), allow = allowedTonight(), nxt = nextTonight();
+    const st = nxt || tonightList()[0], done = !nxt;
+    const lbl = ['قصة الليلة', 'القصة الثانية الليلة', 'القصة الثالثة الليلة', 'القصة الرابعة الليلة'][n] || 'قصة إضافية';
+    $('tonightCard').innerHTML = hs.length ? `${ART.page(st.scene, done ? '🌙' : st.occ ? '🎉' : isPro(st) ? '📖' : '✨', artHs(st, hs))}
+      <div class="info">${done ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">خلّصتوا قصص الليلة 🌙 (${n}/${allow})</span>` : (st.occ ? '<span class="tag" style="background:#E5FBEA;color:#1E8E4A">قصة المناسبة 🎉</span> ' : '') + (allow > 1 ? `<span class="tag" style="background:#EFEAFF;color:#5B4BDB">${lbl} · ${n + 1}/${allow}</span>` : '')}
+      <p class="title">${esc(fill(st.title, hs))}</p>${S.resume && S.resume.id === st.id && Date.now() - S.resume.at < 12 * 36e5 ? `<span class="resume">📖 بتكمّل من الصفحة ${AR(S.resume.i + 1)}</span>` : ''}<p class="tmeta">${(() => { const sh = storyLevel(hs) === 1 && canShort(st), n = sh ? youngPages(st).length : st.pages.length; return AR(n) + ' صفحات · ' + AR(Math.max(sh ? 1 : 2, Math.round(n * (sh ? .5 : .7)))) + ' دقائق · ' + (sh ? 'نسخة قصيرة للصغار ✂️' : 'صور متحركة ✨'); })()}</p>${catChip(st, true)}${allow > 1 ? tonightRows(hs, n, allow) : ''}
+      ${done ? `<p class="muted" style="margin:10px 0 0">موعدنا الجاية مع قصة جديدة ✨ تقدرون تعيدون أي قصة من «اكتشف ← مكتبة القصص».</p><div class="donebtns"><button class="btn" onclick="Night.adhkar()">🤲 أذكار النوم</button><button class="btn alt" onclick="Night.sounds()">🌧️ أصوات النوم</button></div><button class="btn ghost" style="margin-top:6px" onclick="App.openStory('${st.id}')">اقرأها مرة ثانية 🔁</button>`
+        : `<button class="btn" style="margin-top:14px" onclick="App.openStory('${st.id}')">ابدأ ${lbl} ✨</button>`}</div>`
+      : '<div class="info"><p class="muted">اختر بطلًا واحدًا على الأقل</p></div>';
+    $('tabLearn').classList.toggle('dim', isNight());
+    renderTop(hs.length ? hs : shown.slice(0, 1));
+    $('ver').textContent = 'v' + CONFIG.VERSION;
+    $('tabParents').style.display = S.role === 'parent' ? '' : 'none';
+    const mb = $('modeBar'), kidsMode = S.parentMode === 'kids';
+    mb.style.display = S.role === 'parent' ? '' : 'none';
+    const ic = (n) => (typeof Stk !== 'undefined' ? '<i class="mbi">' + Stk.icon(n) + '</i>' : '');
+    mb.innerHTML = `<button class="${kidsMode ? '' : 'on'}" onclick="App.setMode('view')">${ic('search')}معاينة</button><button class="${kidsMode ? 'on' : ''}" onclick="App.setMode('kids')">${ic('book')}أقرأ مع العيال</button>`;
+    $('modeHint').textContent = S.role !== 'parent' ? '' : kidsMode ? 'القصص والألعاب تنحسب للأبطال المختارين ⭐' : 'تتصفح بس، وما ينحسب شي على العيال';
+    renderLib();
+  }
+  /* v3.0 الرأس: الساعة والتاريخ الميلادي والقمر، وشرائح النجوم، وشريط وقت النوم، والبلاطات */
+  function tickClock() {
+    const d = new Date(); if (!$('clk')) return;
+    $('clk').textContent = d.toLocaleDateString('ar-SA-u-ca-gregory', { weekday: 'long' });
+    $('dt').textContent = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+    const se = season(d); $('season').innerHTML = se[0] + '<em>' + (typeof Stk !== 'undefined' ? Stk.icon(se[1]) : se[2]) + '</em>';
+    if ($('hpCal') && typeof Stk !== 'undefined') $('hpCal').innerHTML = Stk.icon('cal', d.getDate()); $('season').className = 'season ' + se[1];
+    const ap = appPrefs(); document.body.dataset.pal = ap.pal;
+    const th = ap.theme;
+    document.body.classList.toggle('nt', th === 'dark' || (th === 'auto' && isNight()));
+  }
+  /* الفصول الفلكية (نصف الكرة الشمالي) */
+  function season(d) {
+    const v = (d.getMonth() + 1) * 100 + d.getDate();
+    return v >= 320 && v < 621 ? ['فصل الربيع', 'spring', '🌸'] : v >= 621 && v < 923 ? ['فصل الصيف', 'summer', '☀️'] : v >= 923 && v < 1221 ? ['فصل الخريف', 'autumn', '🍂'] : ['فصل الشتاء', 'winter', '❄️'];
+  }
+  /* القمر الكبير بالرأس: نجوم تلمع وسحاب وزحل صغير */
+  function moonDeco() {
+    const star = '<svg viewBox="0 0 20 20"><path d="M10 0 C11 7 13 9 20 10 C13 11 11 13 10 20 C9 13 7 11 0 10 C7 9 9 7 10 0Z" fill="#FFE27A"/></svg>';
+    const spk = [[4, 4, 0, 16], [74, -2, -.8, 18], [82, 40, -1.6, 12], [62, 76, -2.2, 11], [-2, 52, -1.1, 11]]
+      .map(([l, t, dl, w]) => `<i class="spk" style="left:${l}%;top:${t}%;width:${w}px;height:${w}px;animation-delay:${dl}s">${star}</i>`).join('');
+    const cld = '<svg class="cld" viewBox="0 0 150 44" preserveAspectRatio="none"><g fill="#fff" opacity=".9"><ellipse cx="30" cy="32" rx="30" ry="12"/><ellipse cx="58" cy="26" rx="24" ry="14"/><ellipse cx="92" cy="32" rx="30" ry="11"/><ellipse cx="124" cy="34" rx="24" ry="9"/></g></svg>';
+    if (typeof Stk !== 'undefined') return Stk.moonReader();
+    return `<i class="mn">${Space.moonSVG(Space.moonAge(), 108, true)}</i>${cld}${spk}<i class="sat">${Space.planetSVG(5, 58)}</i>`;
+  }
+  /* المظهر: جهاز الطفل ياخذ اللون اللي اختاره وليّ الأمر للطفل، وجهاز وليّ الأمر له اختياره */
+  function devKid() { return S.role === 'child' && (S.devKids || []).length ? kidById(S.devKids[0]) : null; }
+  function appPrefs() { const k = devKid(), a = (k && k.app) || {}; const th = k ? a.theme : S.theme; return { pal: 'sky', theme: th === 'dark' ? 'dark' : 'light' }; }
+  function setPref(key, v) { const k = devKid(); if (k) { k.app = { ...(k.app || {}), [key]: v }; famChanged(); } else { S[key] = v; save(); } tickClock(); renderSettings(); }
+  let msgTo = null, msgFrom = null, rwStars = null;
+  function msgSegs() {
+    const fam = S.fam;
+    $('msgTo').innerHTML = [['all', 'الكل'], ...fam.kids.map((k) => [k.id, k.name])].map(([v, t]) => `<button class="${(msgTo === 'all' ? v === 'all' : Array.isArray(msgTo) && msgTo.includes(v)) ? 'on' : ''}" onclick="App.msgPick('${v}')">${esc(t)}</button>`).join('');
+    $('msgFrom').innerHTML = [fam.dad || 'بابا', fam.mom || 'ماما'].map((v) => `<button class="${msgFrom === v ? 'on' : ''}" onclick="App.msgFromPick('${esc(v)}')">${esc(v)}</button>`).join('');
+    $('rwStars').innerHTML = [3, 4, 5, 6, 7].map((n) => `<button class="${rwStars === n ? 'on' : ''}" onclick="App.rwPick(${n})">${AR(n)} ⭐</button>`).join('');
+  }
+  function msgPick(v) { if (v === 'all') msgTo = 'all'; else { let a = Array.isArray(msgTo) ? msgTo.slice() : []; a = a.includes(v) ? a.filter((x) => x !== v) : [...a, v]; msgTo = a.length ? a : 'all'; } msgSegs(); }
+  function msgFromPick(v) { msgFrom = v; msgSegs(); }
+  function rwPick(n) { rwStars = n; msgSegs(); }
+  function sendMsg() { const t = $('msgText').value.trim(); if (!t) return toast('اكتب الرسالة'); S.fam.msg = { t, at: Date.now(), to: msgTo || 'all', from: msgFrom || S.fam.dad || 'بابا' }; famChanged(); toast('وصلت الرسالة للعيال 💌'); }
+  function clearMsg() { delete S.fam.msg; $('msgText').value = ''; famChanged(); toast('انمسحت الرسالة'); renderSettings(); }
+  function saveReward() { const t = $('rwText').value.trim(); if (!t) return toast('اكتب المكافأة'); S.fam.reward = { text: t, stars: rwStars || 5 }; famChanged(); toast('تم حفظ المكافأة 🎁'); }
+  function clearReward() { delete S.fam.reward; famChanged(); toast('توقفت المكافأة'); renderSettings(); }
+  function setTheme(t) { setPref('theme', t); }
+  function setPal(p) { setPref('pal', p); }
+  const PALS = [['sky', 'سماوي', '#7FBFEF,#EEF6FD'], ['pink', 'وردي', '#F3A6C8,#FFF3F8'], ['green', 'أخضر', '#86D2AE,#F1FBF6'], ['sand', 'رملي', '#93AECF,#EFE5D6']];
+  function kidNights(k) {
+    const d = new Date(), mk = dateKey(d).slice(0, 7);
+    const days = new Set(allLogs().filter((e) => (e.k || []).includes(k.id)).map((e) => e.d));
+    const month = [...days].filter((x) => x.startsWith(mk)).length;
+    let streak = 0; const c = new Date(); if (!days.has(dateKey(c))) c.setDate(c.getDate() - 1);
+    while (days.has(dateKey(c))) { streak++; c.setDate(c.getDate() - 1); }
+    return { month, streak };
+  }
+  function renderTop(ks) {
+    tickClock();
+    if (typeof Space !== 'undefined' || typeof Stk !== 'undefined') $('moonBtn').innerHTML = moonDeco();
+    if (typeof Stk !== 'undefined' && !$('skyfx')) { $('home').insertAdjacentHTML('afterbegin', Stk.skyfx()); $('home').firstElementChild.id = 'skyfx'; }
+    const k = ks[0], x = k ? kidNights(k) : { month: 0, streak: 0 };
+    $('chStars').innerHTML = `⭐ <em>${AR(x.month)}</em> ${x.month === 1 ? 'نجمة' : 'نجوم'} هالشهر`;
+    $('chStreak').innerHTML = `🔥 <em>${AR(x.streak)}</em> ${x.streak === 1 ? 'ليلة' : 'ليالٍ'} متتالية`;
+    const bt = S.fam.bedtime || '20:30', [bh, bm] = bt.split(':').map(Number), now = new Date(), b = new Date(); b.setHours(bh, bm, 0, 0);
+    const left = Math.round((b - now) / 6e4), from = 16 * 60, tot = bh * 60 + bm - from, el = now.getHours() * 60 + now.getMinutes() - from;
+    const pct = Math.max(4, Math.min(100, tot > 0 ? el / tot * 100 : 100));
+    const t12 = b.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' });
+    $('bedBar').innerHTML = isNight() ? `🌙 وقت النوم الحين <div class="bar"><i style="width:100%"></i></div><em>تصبحون على خير 😴</em>`
+      : `🌙 وقت النوم <b>${t12}</b><div class="bar"><i style="width:${pct}%"></i></div><em>${left > 0 && left < 720 ? 'باقي ' + (left >= 60 ? AR(Math.floor(left / 60)) + ' س ' : '') + AR(left % 60) + ' د' : ''}</em>`;
+    const ph = typeof Space !== 'undefined' ? Space.phaseName() : '';
+    $('qtiles').innerHTML = [['App.tab(\'sky\')', '⭐', 'سمائي', AR(x.month) + ' نجوم'], ['App.tab(\'space\')', '🪐', 'الكواكب', ph ? 'القمر: ' + ph : 'جديد'], ['Night.adhkar()', '🤲', 'أذكار النوم', S.adkDay === dateKey(new Date()) ? 'تمّت ✓' : 'قبل النوم'],
+      ['Night.sounds()', '🌧️', 'أصوات النوم', 'مطر وموج'], ['App.tab(\'play\')', '🎨', 'ألعاب', 'لوّن ورتّب'], ['App.tab(\'eng\')', '🔤', 'English', 'تعلّم والعب']]
+      .map(([t, i, n, sm]) => `<button onclick="${t}"><span>${i}</span>${n}<small>${sm}</small></button>`).join('');
+    if ($('adkState')) $('adkState').textContent = S.adkDay === dateKey(new Date()) ? 'تمّت ✓' : 'قبل النوم';
+    if (typeof Night !== 'undefined') $('msgCard').innerHTML = Night.msgCard(ks);
+  }
+  function tonightRows(hs, n, allow) {
+    const L = tonightList().slice(0, allow);
+    return `<div class="tl"><b>قصص الليلة</b>${L.map((s, i) => { const c = catOf(s);
+      return `<button class="tlr ${i < n ? 'done' : i === n ? 'now' : ''}" onclick="App.openStory('${s.id}')"><i>${i < n ? '✓' : AR(i + 1)}</i><span>${esc(fill(s.title, hs))}</span><em class="cat c-${c[0]}">${c[1]} ${c[2]}</em></button>`; }).join('')}</div>`;
+  }
+  function pick(id) {
+    const i = sel.indexOf(id);
+    if (i >= 0) sel.splice(i, 1); else sel.push(id);
+    S.sel = sel.slice(); save(); renderHome();
+  }
+  /* جولة أول مرة (أجهزة العيال) */
+  const TOUR = [['🌙', 'الليلة', 'هنا قصة الليلة، وأذكار النوم، وأصوات المطر والموج.'], ['⭐', 'أنا', 'شخصيتك ونجومك وهداياك وشاراتك وعائلتك.'], ['🧭', 'اكتشف', 'سافر حول العالم ✈️، واكتشف الكواكب والقمر، ومكتبة القصص.'], ['🎨', 'العب وتعلّم', 'إنجليزي وألعاب تلوين وتركيب وأسئلة.']];
+  function tour(i) {
+    if (i >= TOUR.length) { S.tourDone = 1; save(); Play.closeGame(); return; }
+    const [e, t, d] = TOUR[i];
+    $('gameBody').innerHTML = `<div class="tour"><div class="big">${e}</div><h2>${t}</h2><p class="muted" style="font-size:16px">${d}</p><div class="dots">${TOUR.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+      <button class="btn" onclick="App.tour(${i + 1})">${i < TOUR.length - 1 ? 'التالي ←' : 'يلا نبدأ! 🚀'}</button></div>`;
+    $('gameModal').classList.add('on');
+  }
+  function goSet(id) { setTimeout(() => { const el = $(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80); }
+  const GROUP = { tonight: 'Tonight', sky: 'Me', trips: 'Explore', space: 'Explore', lib: 'Explore', eng: 'Learn', play: 'Learn', dash: 'Parents' };
+  function tab(t) {
+    if (t === 'explore') t = S.lastExplore || (typeof Trips !== 'undefined' ? 'trips' : 'space');
+    if (t === 'learn') t = S.lastLearn || 'eng';
+    if (t === 'dash' && S.role !== 'parent') t = 'tonight';
+    if (GROUP[t] === 'Explore') S.lastExplore = t; if (GROUP[t] === 'Learn') S.lastLearn = t;
+    ['tonight', 'sky', 'trips', 'space', 'play', 'eng', 'lib', 'dash'].forEach((x) => {
+      const p = $('pane' + x[0].toUpperCase() + x.slice(1)); if (p) p.style.display = x === t ? '' : 'none';
+    });
+    ['Tonight', 'Me', 'Explore', 'Learn', 'Parents'].forEach((g) => $('tab' + g).classList.toggle('on', GROUP[t] === g));
+    $('subExplore').style.display = GROUP[t] === 'Explore' ? '' : 'none'; $('subLearn').style.display = GROUP[t] === 'Learn' ? '' : 'none';
+    document.querySelectorAll('.subnav button').forEach((b) => { b.classList.toggle('on', b.dataset.t === t); b.onclick = () => tab(b.dataset.t); });
+    if ($('subTrips')) $('subTrips').style.display = typeof Trips !== 'undefined' ? '' : 'none';
+    if (t === 'trips' && typeof Trips !== 'undefined') Trips.render();
+    if (t === 'lib') renderLib();
+    if (t === 'sky' && typeof Night !== 'undefined') $('rewardCard').innerHTML = Night.rewardCard(S.role === 'parent' ? S.fam.kids : heroes().length ? heroes() : myKids());
+    if (t === 'dash') renderDash();
+    if (t === 'sky') Play.renderSky();
+    if (t === 'play') Play.renderPlay();
+    if (t === 'eng') EN.render();
+    if (t === 'space') Space.render();
+    if (t === 'sky' || t === 'dash') syncNow();
+    if ($('dashBtn')) $('dashBtn').classList.toggle('on', t === 'dash');
+    window.scrollTo(0, 0);
+    if (t !== 'dash') loadRemote(true);
+  }
+  function renderLib() {
+    const hs = heroes().length ? heroes() : S.fam.kids.slice(0, 1);
+    const seen = new Set(), items = [];
+    S.fav.forEach((id) => { if (!seen.has(id)) { seen.add(id); items.push(id); } });
+    allLogs().forEach((e) => { if (!seen.has(e.s)) { seen.add(e.s); items.push(e.s); } });
+    const list = items.map((id) => STORIES.find((s) => s.id === id)).filter(Boolean);
+    $('lib').innerHTML = list.length && hs.length ? list.map((s) => `<button class="item" onclick="App.openStory('${s.id}')">${ART.page(s.scene, S.fav.includes(s.id) ? '⭐' : '', artHs(s, hs))}<div>${esc(fill(s.title, hs))}</div>${catChip(s)}</button>`).join('')
+      : '<p class="empty" style="grid-column:1/-1">القصص اللي تقرونها تنحفظ هنا، وتقدرون ترجعون لها متى ما حبيتوا 📚</p>';
+  }
+
+  /* ---------- جهاز مين؟ ---------- */
+  let whoSel = [], whoFirst = false;
+  function openWho(first) {
+    whoFirst = !!first;
+    whoSel = (S.devKids || []).filter(kidById);
+    drawWho(); $('whoModal').classList.add('on');
+  }
+  function drawWho() {
+    $('whoKids').innerHTML = S.fam.kids.map((k) => `<button class="kid ${whoSel.includes(k.id) ? 'sel' : ''}" onclick="App.whoPick('${k.id}')">${ART.avatarSVG(k.av, k.g, 70)}<div class="nm">${esc(k.name)}</div></button>`).join('');
+    $('whoAll').classList.toggle('on', whoSel.length === S.fam.kids.length);
+    $('whoOk').disabled = !whoSel.length;
+    $('whoOk').textContent = whoSel.length ? 'هذا جهاز ' + names(whoSel.map(kidById)) + ' ✓' : 'اختر طفلًا واحدًا على الأقل';
+  }
+  function whoPick(id) { const i = whoSel.indexOf(id); if (i >= 0) whoSel.splice(i, 1); else whoSel.push(id); drawWho(); }
+  function whoAll() { whoSel = whoSel.length === S.fam.kids.length ? [] : S.fam.kids.map((k) => k.id); drawWho(); }
+  function whoDone() {
+    if (!whoSel.length) return;
+    setDevKids(whoSel.slice()); closeModal('whoModal');
+    toast('أهلًا ' + names(whoSel.map(kidById)) + ' 🌙');
+    if ($('settings').classList.contains('on')) renderSettings(); else renderHome();
+    if (whoFirst) askNotif();
+  }
+  function setDevKids(ids) { S.devKids = ids; S.sel = ids.slice(0, 1); S.progDirty = true; save(); syncNow(); }
+  function platform() {
+    const u = navigator.userAgent;
+    if (/iPad/.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'آيباد';
+    if (/iPhone/.test(u)) return 'آيفون';
+    if (/Android/.test(u)) return /Mobile/.test(u) ? 'جوال أندرويد' : 'تابلت أندرويد';
+    return 'متصفح';
+  }
+  function devices() {
+    const hidden = S.fam.hiddenDevs || [];
+    return remote.filter((p) => p.dev !== S.dev && !hidden.includes(p.dev)).map((p) => ({ ...p, last: p.seen || p.updated || 0 })).sort((a, b) => b.last - a.last);
+  }
+  function hideDev(dev) {
+    if (!confirm('إزالة هذا الجهاز من القائمة؟ (لو رجع ينفتح، يرجع يظهر)')) return;
+    S.fam.hiddenDevs = [...new Set([...(S.fam.hiddenDevs || []), dev])]; famChanged(); renderDash();
+  }
+
+  /* ---------- لوحة المتابعة ---------- */
+  function streak(days) {
+    let n = 0, d = new Date();
+    if (!days.has(dateKey(d))) d.setDate(d.getDate() - 1);
+    while (days.has(dateKey(d))) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  function ago(t) {
+    const m = Math.round((Date.now() - t) / 60000);
+    if (m < 2) return 'الآن'; if (m < 60) return 'قبل ' + m + ' دقيقة';
+    const h = Math.round(m / 60); if (h < 24) return 'قبل ' + h + ' ساعة';
+    const d = Math.round(h / 24); return d === 1 ? 'أمس' : 'قبل ' + d + ' أيام';
+  }
+  async function renderDash() {
+    const el = $('dash');
+    const draw = () => {
+      const logs = allLogs();
+      const week = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return dateKey(d); });
+      const dayNames = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+      const cards = S.fam.kids.map((k) => {
+        const mine = logs.filter((e) => (e.k || []).includes(k.id));
+        const days = new Set(mine.map((e) => e.d));
+        const last = mine[0];
+        const lastSt = last && STORIES.find((s) => s.id === last.s);
+        return `<div class="card dk">
+          <div class="row" style="align-items:center;gap:12px;flex:none">${ART.avatarSVG(k.av, k.g, 54)}<div style="flex:1"><h2 style="margin:0">${esc(k.name)}</h2>
+          <span class="muted" style="margin:0">${last ? 'آخر قصة ' + ago(last.t) : 'ما قرأ{|ت} بعد'.replace('{|ت}', k.g === 'f' ? 'ت' : '')}</span></div></div>
+          <div class="stats"><div><b>${new Set(mine.map((e) => e.s)).size}</b><span>قصة</span></div><div><b>${streak(days)} 🔥</b><span>أيام متتالية</span></div><div><b>${mine.length}</b><span>مرة قراءة</span></div></div>
+          <div class="week">${week.map((d) => `<i class="${days.has(d) ? 'on' : ''}" title="${d}">${dayNames[new Date(d + 'T12:00').getDay()]}</i>`).join('')}</div>
+          ${lastSt ? `<p class="muted" style="margin:8px 0 0">آخر قصة: «${esc(fill(lastSt.title, [k]))}»</p>` : ''}
+          ${(() => {
+            const sk = Play.skyInfo(k), A = allActs().filter((a) => (a.k || []).includes(k.id));
+            const cnt = (t) => A.filter((a) => a.a === t).length;
+            const best = A.filter((a) => a.a === 'quiz').reduce((m, a) => Math.max(m, a.sc || 0), 0);
+            return `<p class="muted" style="margin:8px 0 0">⭐ ${sk.n} نجمة · ✨ ${sk.done} كوكبة${A.length ? ` · 🎨 ${cnt('color')} · 🧩 ${cnt('puzzle')} · ❓ ${cnt('quiz')}${best ? ' (أفضل ' + best + '/3)' : ''}` : ''}</p>`;
+          })()}
+          ${(() => {
+            const d = devices().filter((x) => x.role === 'child' && (x.kids || []).includes(k.id));
+            return d.length ? `<div class="devbadge on">📱 سراج مثبّت على ${esc(d[0].plat || 'جهاز')}${d.length > 1 ? ' و' + (d.length - 1) + ' غيره' : ''} · آخر فتح ${ago(d[0].last)}</div>`
+              : `<button class="devbadge" onclick="App.showFamilyCode(false)">⚪ ما فيه جهاز مربوط ل${k.g === 'f' ? 'ها' : 'ه'}، اربط جهاز${k.g === 'f' ? 'ها' : 'ه'} ←</button>`;
+          })()}
+        </div>`;
+      }).join('');
+      const devs = devices();
+      const devCard = `<div class="card"><h2>الأجهزة المربوطة 📱</h2>${devs.length ? '<div class="list">' + devs.map((d) => {
+          const ks = (d.kids || []).map(kidById).filter(Boolean);
+          const who = d.role === 'parent' ? 'وليّ أمر' : ks.length ? names(ks) : 'جهاز طفل (ما اختار اسمه بعد)';
+          const fresh = Date.now() - d.last < 3 * 864e5;
+          return `<div class="li"><span class="dot ${fresh ? 'on' : ''}"></span><span class="nm" style="font-size:16px">${esc(who)}<br><span class="muted" style="font-size:13px">${esc(d.plat || 'جهاز')} · آخر فتح ${ago(d.last)}${d.ver ? ' · v' + esc(d.ver) : ''}${d.notif ? ' · 🔔' : ''}</span></span><button class="small del" onclick="App.hideDev('${d.dev}')">إزالة</button></div>`;
+        }).join('') + '</div>' : '<p class="muted">ما فيه أجهزة مربوطة غير هذا الجوال.</p>'}
+        <button class="btn alt" style="margin-top:10px" onclick="App.showFamilyCode(false)">+ ربط جهاز جديد</button></div>`;
+      const recent = logs.slice(0, 12).map((e) => {
+        const st = STORIES.find((s) => s.id === e.s); const ks = (e.k || []).map(kidById).filter(Boolean);
+        if (!st) return '';
+        const who = ks.length ? names(ks) : '—';
+        const t = new Date(e.t);
+        return `<div class="li"><span class="nm" style="font-size:16px">${esc(ks.length ? fill(st.title, ks) : st.title.replace(/\{n\}/g, '…'))}<br><span class="muted" style="font-size:13px">${esc(who)} · ${t.toLocaleDateString('ar-SA-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'short' })} ${t.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' })} · ${e.role === 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}</span></span></div>`;
+      }).join('');
+      el.innerHTML = `<div class="pgrid"><button class="card" onclick="App.askPin(App.openSettings)"><span>${typeof Stk !== 'undefined' ? Stk.icon('gear') : ''}</span>الإعدادات</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sMsg')})"><span>${typeof Stk !== 'undefined' ? Stk.icon('letter') : ''}</span>رسالة للعيال</button><button class="card" onclick="App.askPin(()=>{App.openSettings();App.goSet('sRw')})"><span>${typeof Stk !== 'undefined' ? Stk.icon('gift') : ''}</span>المكافأة</button><button class="card" onclick="App.refreshAll()"><span>${typeof Stk !== 'undefined' ? Stk.icon('refresh') : ''}</span>حدّث أجهزتهم</button></div>` + (typeof Trips !== 'undefined' ? `<button class="card rpbtn" onclick="App.tab('trips')"><span>${typeof Stk !== 'undefined' ? Stk.icon('plane') : ''}</span><div><b>رحلات العيال</b><small>${AR(Trips.allTrips().length)} رحلة حول العالم · شوف وين سافروا</small></div><em>←</em></button>` : '') + familyStrip('parent') + (typeof Honors !== 'undefined' ? Honors.reportBtn() + Honors.board() : '') + (S.code ? '' : '<div class="card"><p class="muted">اربط جهاز الطفل بعائلتك عشان تشوف قراءته هنا.</p></div>') + cards + devCard +
+        `<div class="card"><h2>آخر النشاط</h2><div class="list">${recent || '<p class="muted">ما فيه نشاط بعد</p>'}</div></div>` +
+        ((S.log.length || (S.act || []).length) ? `<div class="card"><h2>قراءات هذا الجوال</h2><p class="muted">قصص وألعاب انحسبت من جوالك (${S.log.length} قصة · ${(S.act || []).length} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.</p><button class="btn alt" onclick="App.clearMine()">مسح قراءات هذا الجوال</button></div>` : '');
+    };
+    draw();
+    await loadRemote(); draw();
+  }
+
+
+  /* ---------- الليل: عدد قصص الليلة، ووقت الألعاب، وقفل وقت النوم ---------- */
+  const mins = (hm) => { const [h, m] = String(hm || '0:0').split(':').map(Number); return h * 60 + m; };
+  const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+  const MORNING = 5 * 60;
+  function inWindow(fromHM) { const n = nowMin(), f = mins(fromHM); return f > MORNING ? (n >= f || n < MORNING) : (n >= f && n < MORNING); }
+  function isNight() { return inWindow(S.fam.bedtime || '20:30'); }
+  function isLocked() {
+    if (S.role !== 'child' || !S.fam.lockOn || !S.code) return false;
+    if ((S.unlockUntil || 0) > Date.now()) return false;
+    return inWindow(S.fam.lock || '21:30');
+  }
+  function nightKey() { const d = new Date(); if (nowMin() < MORNING) d.setDate(d.getDate() - 1); return dateKey(d); }
+  function allowedTonight() { const x = S.fam.extra; return (S.fam.perNight || 1) + (x && x.d === nightKey() ? x.n : 0); }
+  function tonightList() {
+    const hs = heroes(), ids = hs.length ? hs.map((h) => h.id) : null;
+    const today = new Set([dateKey(), nightKey()]);
+    const logs = allLogs().filter((e) => !ids || (e.k || []).some((k) => ids.includes(k)));
+    const before = logs.filter((e) => !today.has(e.d)).sort((a, b) => b.t - a.t); // اللي انقرت قبل الليلة بس، عشان ما تتغير القائمة أثناء الليل
+    const readB = new Set(before.map((e) => e.s)), list = [];
+    const occ = occasion(new Date()); if (occ) list.push(occ);
+    // السلاسل: إذا آخر قصة كانت جزء من سلسلة، الجزء اللي بعده أول
+    const lastSer = before.find((e) => { const s = STORIES.find((x) => x.id === e.s); return s && s.ser; });
+    if (lastSer) { const s = STORIES.find((x) => x.id === lastSer.s), nx = STORIES.find((x) => x.ser === s.ser && x.part === s.part + 1); if (nx && !readB.has(nx.id)) list.push(nx); }
+    const q = storyQueue();
+    let fresh = q.filter((s) => !readB.has(s.id) && !list.includes(s));
+    if (fresh.length < 6) fresh = fresh.concat(q.filter((s) => !fresh.includes(s) && !list.includes(s))); // خلصت كلها؟ نبدأ الدورة من جديد
+    return [...list, ...fresh].slice(0, 6);
+  }
+  function readTonight() {
+    const day = new Set([dateKey(), nightKey()]);
+    const ids = new Set(allLogs().filter((e) => day.has(e.d) && (e.k || []).some((k) => heroes().some((h) => h.id === k))).map((e) => e.s));
+    return tonightList().filter((s) => ids.has(s.id)).length;
+  }
+  function nextTonight() { const n = readTonight(); return n < allowedTonight() ? tonightList()[n] : null; }
+  const SLEEP_MSGS = ['النوم بدري يخليك تصحى نشيط مثل العصفور 🐦', 'جسمك يكبر ويقوى وأنت نايم 🌱', 'غمّض عيونك واقرأ أذكار النوم 🤲', 'أحلام سعيدة، وموعدنا بكرة مع قصة جديدة ✨', 'حتى القمر يسهر عشان يحرس نومك 🌙', 'اللي ينام بدري يلعب أكثر بكرة ⚽'];
+  function checkLock() {
+    const on = isLocked(), el = $('lock');
+    if (!el) return;
+    if (on) {
+      const n = names(myKids());
+      const msg = SLEEP_MSGS[Math.floor(Date.now() / 3e5) % SLEEP_MSGS.length];
+      $('lockText').innerHTML = `${n ? 'يا ' + esc(n) + '، ' : ''}${esc(msg)}`;
+      if (!el.classList.contains('on')) { stopSpeak(); Play.stopPlay(); }
+      el.classList.add('on');
+    } else el.classList.remove('on');
+  }
+  function unlockParent() { askPin(() => { S.unlockUntil = Date.now() + 30 * 6e4; save(); checkLock(); toast('مفتوح لمدة ٣٠ دقيقة'); }); }
+  function giveExtra() {
+    const k = nightKey(), x = S.fam.extra && S.fam.extra.d === k ? S.fam.extra.n : 0;
+    S.fam.extra = { d: k, n: x + 1 }; famChanged();
+    toast('صار لهم الليلة ' + allowedTonight() + ' قصص ✨'); if ($('settings').classList.contains('on')) renderSettings();
+  }
+  function setPerNight(n) { S.fam.perNight = n; famChanged(); renderSettings(); }
+  function setLock() { S.fam.lockOn = $('lockOn').checked; S.fam.lock = $('lockTime').value || '21:30'; famChanged(); toast('تم الحفظ ✓'); checkLock(); }
+
+  /* ---------- القارئ ---------- */
+  function openStory(id, opt) {
+    const hs = heroes();
+    if (!hs.length) return toast('اختر بطل القصة أولًا');
+    const st = STORIES.find((s) => s.id === id);
+    R = { st, hs, i: 0, total: st.pages.length + 2, logged: false, rec: !!(opt && opt.rec), hist: [], lvl: storyLevel(hs) };
+    const rs = S.resume; if (rs && rs.id === id && Date.now() - rs.at < 12 * 36e5 && rs.i > 0) { R.i = rs.i; R.hist = rs.hist || []; }
+    R.short = R.lvl === 1 && canShort(st); R.total = readerPages().length + 2;
+    show('reader');
+    if (S.voice && !kidVoice() && voiceOpts().length) { renderPage(true); voicePick(() => renderPage()); } else renderPage();
+  }
+  function recKey() { return R.st.id + ':' + R.i; }
+  function recChanged() { if (R) renderRecBar(); }
+  async function renderRecBar() {
+    const bar = $('recBar'); if (!bar || !R) return;
+    const recBtn = $('recBtn'); if (recBtn) recBtn.classList.toggle('on', R.rec);
+    if (!R.rec || R.i > R.st.pages.length) { bar.innerHTML = ''; bar.style.display = 'none'; return; }
+    bar.style.display = '';
+    const r = await Play.getRec(recKey()), live = Play.recording();
+    const by = r && kidById(r.by);
+    bar.innerHTML = live ? `<button class="btn rec live" onclick="App.recStop()">⏹ إيقاف التسجيل</button>`
+      : `<button class="btn rec" onclick="App.recStart()">🎙️ ${r ? 'أعد التسجيل' : 'سجّل هذي الصفحة'}</button>${r ? `<button class="btn alt" onclick="App.recPlay()">▶ اسمع</button>` : ''}`;
+    if (r && !live) bar.insertAdjacentHTML('beforeend', `<span class="recby">🎙️ ${by ? 'بصوت ' + esc(by.name) : 'مسجّل'}</span>`);
+  }
+  function recStart() { Play.stopPlay(); stopSpeak(); Play.startRec(recKey(), (R.hs[0] || {}).id); }
+  function recStop() { Play.stopRec(); }
+  function recPlay() { Play.playRec(recKey()); }
+  function toggleRec() {
+    if (!Play.canRec()) return toast('هذا الجهاز ما يدعم التسجيل');
+    R.rec = !R.rec; if (!R.rec) Play.stopRec();
+    toast(R.rec ? 'وضع التسجيل: اقرأ كل صفحة بصوتك 🎙️' : 'انتهى وضع التسجيل'); renderRecBar();
+  }
+  function renderPage(quiet) {
+    const { st, hs, i, total } = R, PG = readerPages();
+    // «كمّل من وين وقفت»: نحفظ مكانه في القصة
+    try { if (i > 0 && i < st.pages.length) S.resume = { id: st.id, i, hist: R.hist, at: Date.now() }; else if (i >= st.pages.length && S.resume && S.resume.id === st.id) S.resume = null; save(); } catch (e) {}
+    clearTimeout(sleepTimer); $('sleep').classList.remove('on');
+    $('favBtn').textContent = S.fav.includes(st.id) ? '⭐' : '☆';
+    $('viewTag').style.display = counts() ? 'none' : '';
+    $('voiceBtn').textContent = S.voice ? '🔊' : '🔈';
+    const dots = `<div class="dots">${Array.from({ length: total - 1 }, (_, k) => `<i class="${k === Math.min(i, total - 2) ? 'on' : ''}"></i>`).join('')}</div>`;
+    let html = '', nav = '', say = '';
+    if (i < PG.length) {
+      const p = PG[i], txt = fill(p.t, hs);
+      html = (i === 0 ? `<h2 style="text-align:center;color:var(--yellow);margin:0 0 6px">${esc(fill(st.title, hs))}</h2><div style="text-align:center;margin-bottom:8px">${catChip(st)}</div>${shortChip()}` : '') + ART.page(p.s, p.p, artHs(st, hs, p), i === 0 ? 'enter' : i === PG.length - 1 ? 'jump' : '') + dots + `<p class="ptext anim" id="ptext" data-t="${esc(txt)}">${txt.split(/\s+/).map((w) => `<span class="w">${esc(w)}</span>`).join(' ')}</p>`;
+      say = (i === 0 ? fill(st.title, hs) + '. ' : '') + txt;
+      nav = p.ch ? `<div class="choices"><p>🧭 أنت تقرّر:</p>${p.ch.map(([l, to]) => `<button class="btn" onclick="App.choose(${to})">${esc(fill(l, hs))}</button>`).join('')}</div>`
+        : `${i > 0 ? '<button class="btn alt" onclick="App.step(-1)">→ السابق</button>' : ''}<button class="btn" onclick="App.step(1)">التالي ←</button>`;
+    } else if (i === PG.length) {
+      const q = fill(st.q, hs);
+      html = ART.page('night', '💭', hs) + dots + `<p class="ptext" style="text-align:center;color:var(--yellow);margin-bottom:8px">سؤال قبل النوم</p><div class="q anim">${esc(q)}</div>${st.src ? `<p class="src">📚 المصدر: ${esc(st.src)}</p>` : ''}`;
+      say = 'سؤال قبل النوم. ' + q;
+      nav = '<button class="btn alt" onclick="App.step(-1)">→ السابق</button><button class="btn" onclick="App.step(1)">النهاية 🌙</button>';
+      if (!R.rec) logStory();
+    } else {
+      const n = names(hs), one = hs.length === 1, f = one && hs[0].g === 'f';
+      const nxt = R.rec ? null : nextTonight(), cel = Play.celebrate(hs);
+      if (nxt && nxt.id !== st.id) {
+        html = `${cel}<div class="goodnight"><div class="moon">⭐</div><h1>أحسنتم!</h1><p class="ptext">${esc(n)}، الليلة لكم قصة ثانية ✨<br>«${esc(fill(nxt.title, hs))}»</p></div>`;
+        say = 'أحسنتم! الليلة لكم قصة ثانية.';
+        nav = `<button class="btn alt" onclick="App.closeReader()">خلاص، ننام 😴</button><button class="btn" onclick="App.openStory('${nxt.id}')">القصة التالية ✨</button>`;
+      } else {
+        html = `${cel}<div class="goodnight"><div class="moon">🌙</div><h1>${one ? (f ? 'تصبحين على خير' : 'تصبح على خير') : 'تصبحون على خير'}</h1>
+        <p class="ptext">نومًا هنيئًا يا ${esc(n)} ✨<br>وموعدنا مع حكايةٍ جديدة غدًا</p><p class="muted" style="color:#ffffff88">الشاشة بتخفت لحالها… 😴</p></div>`;
+        say = (one ? (f ? 'تصبحين على خير يا ' : 'تصبح على خير يا ') : 'تصبحون على خير يا ') + n + '. نومًا هنيئًا.';
+        nav = '<button class="btn alt" onclick="App.closeReader()">إغلاق</button>';
+        sleepTimer = setTimeout(() => $('sleep').classList.add('on'), 6000);
+      }
+    }
+    $('stage').innerHTML = html; $('nav').innerHTML = nav;
+    if (quiet !== true) speak(say, false, $('ptext'));
+  }
+  // في جوال وليّ الأمر: «معاينة» ما تنحسب، و«أقرأ مع العيال» تنحسب
+  function counts() { return S.role !== 'parent' || S.parentMode === 'kids'; }
+  function setMode(m) {
+    S.parentMode = m; save(); renderHome();
+    toast(m === 'kids' ? 'تنحسب القصص والألعاب للعيال 📖' : 'وضع المعاينة: ما ينحسب شي 🔍');
+    if ($('paneSky').style.display !== 'none') Play.renderSky();
+    if ($('panePlay').style.display !== 'none') Play.renderPlay();
+  }
+  function clearMine() {
+    if (!confirm('مسح القصص والألعاب اللي انحسبت من هذا الجوال؟ (قراءات التابلت تبقى)')) return;
+    S.log = []; S.act = []; S.progDirty = true; save(); syncNow(); toast('تم المسح ✓'); renderDash();
+  }
+  function logStory() {
+    if (R.logged) return; R.logged = true;
+    if (!counts()) return;
+    const e = { s: R.st.id, d: dateKey(), k: R.hs.map((k) => k.id), t: Date.now() };
+    S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500);
+    S.progDirty = true; save();
+    if (S.code && Sync.online()) { syncNow(); Sync.event(S.code, S.dev, e.k, e.s).catch(() => {}); }
+  }
+  function step(d) {
+    const p = R.st.pages[R.i];
+    if (d > 0 && R.st.pages.some((x) => x.ch)) { R.hist.push(R.i); R.i = p && p.end ? R.st.pages.length : R.i + 1; }
+    else if (d < 0 && R.hist && R.hist.length) R.i = R.hist.pop();
+    else R.i = R.i + d;
+    R.i = Math.max(0, Math.min(R.total - 1, R.i)); window.scrollTo(0, 0); renderPage();
+  }
+  function choose(to) { R.hist.push(R.i); R.i = to; window.scrollTo(0, 0); renderPage(); }
+  function closeReader() {
+    stopSpeak(); Play.stopPlay(); Play.stopRec(); clearTimeout(sleepTimer); $('sleep').classList.remove('on'); R = null;
+    if (pendingReload) { try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {} location.reload(); return; }
+    show('home');
+  }
+  function wake() { $('sleep').classList.remove('on'); }
+  function toggleFav() {
+    const id = R.st.id, i = S.fav.indexOf(id);
+    if (i >= 0) S.fav.splice(i, 1); else { S.fav.push(id); toast('أضيفت للمفضلة ⭐'); }
+    S.progDirty = true; save(); $('favBtn').textContent = S.fav.includes(id) ? '⭐' : '☆';
+  }
+
+  /* ---------- القراءة بالصوت (أصوات الجهاز نفسه) ---------- */
+  function arVoices() {
+    if (!('speechSynthesis' in window)) return [];
+    const v = speechSynthesis.getVoices().filter((x) => /^ar/i.test(x.lang)), seen = new Set();
+    return v.sort((a, b) => (/^ar[-_]SA/i.test(b.lang) ? 1 : 0) - (/^ar[-_]SA/i.test(a.lang) ? 1 : 0)).filter((x) => !seen.has(x.name) && seen.add(x.name));
+  }
+  function arVoice() { return arVoices()[0] || null; }
+  /* الطفل يختار صوت القارئ من أصوات جهازه هو، ويتحفظ له */
+  const MAL = /majed|maged|tarik|naayf|hamed|fahed|shakir|\bmale/i;
+  const FEM = /laila|layla|hoda|salma|zariyah|amira|mariam|maryam|nora|noura|sara|female|woman|ليلى|سلمى|نورة/i;
+  function voiceOpts() {
+    const vs = arVoices().slice(0, 4); if (!vs.length) return [];
+    vs.sort((a, b) => (FEM.test(b.name) ? 1 : 0) - (FEM.test(a.name) ? 1 : 0));
+    const ic = ['🌸', '⭐', '🎈', '🦋'], nth = ['الأول', 'الثاني', 'الثالث', 'الرابع'];
+    const o = vs.map((v, i) => ({ n: v.name, p: 1, r: .85, t: FEM.test(v.name) ? 'صوت امرأة' : MAL.test(v.name) ? 'صوت رجل' : 'الصوت ' + nth[i], e: FEM.test(v.name) ? '👩' : MAL.test(v.name) ? '👨' : ic[i] }));
+    const seenT = {}; o.forEach((x) => { seenT[x.t] = (seenT[x.t] || 0) + 1; if (seenT[x.t] > 1) x.t += ' ' + ['', '', '٢', '٣', '٤'][seenT[x.t]]; });
+    o.push({ n: vs[0].name, p: 1.35, r: .85, t: 'صوت ناعم', e: '🧁' }, { n: vs[0].name, p: 1.12, r: .7, t: 'صوت هادي للنوم', e: '🌙' });
+    return o;
+  }
+  const kidVoice = () => { const k = (R && R.hs[0]) || heroes()[0]; return k && (S.kv || {})[k.id]; };
+  function voicePick(then) {
+    const o = voiceOpts(), k = (R && R.hs[0]) || heroes()[0], cur = kidVoice();
+    if (!o.length) { if (then) then(); return; }
+    voicePick.then = then;
+    $('gameBody').innerHTML = `<div class="vpick"><div class="vbig">🗣️</div><h2>بأي صوت تبي القصة${k ? ' يا ' + esc(k.name) : ''}؟</h2><p class="muted">اضغط ▶️ وتسمع الصوت، وبعدين اختار اللي يعجبك</p>
+      <div class="vlist">${o.map((x, i) => `<div class="vrow ${cur && cur.n === x.n && cur.p === x.p && cur.r === x.r ? 'on' : ''}"><button class="vplay" onclick="App.voiceTry(${i})" aria-label="جرّب">▶️</button><b>${x.e} ${x.t}</b><button class="btn" onclick="App.voiceSet(${i})">اختار</button></div>`).join('')}</div>
+      <p class="muted" style="font-size:12.5px">تقدر تغيّره بعدين من زر 🗣️ فوق القصة</p></div>`;
+    $('gameModal').classList.add('on');
+  }
+  function voiceTry(i) {
+    const x = voiceOpts()[i], k = (R && R.hs[0]) || heroes()[0]; if (!x) return;
+    speak((k ? 'هلا ' + k.name + '! ' : 'هلا! ') + 'أنا بقرأ لك قصة الليلة.', true, null, x);
+  }
+  function voiceSet(i) {
+    const x = voiceOpts()[i], k = (R && R.hs[0]) || heroes()[0]; if (!x) return;
+    if (k) { S.kv = { ...(S.kv || {}), [k.id]: { n: x.n, p: x.p, r: x.r } }; save(); }
+    stopSpeak(); Play.closeGame(); toast('تم ✓ ' + x.t);
+    const t = voicePick.then; voicePick.then = null; if (t) t(); else if (R) renderPage();
+  }
+  /* شريط «يشتغل الآن» مثل الواتساب: يطلع فوق في كل مكان، فيه الوقت وزر إيقاف */
+  const Now = (() => {
+    let cur = null, t = null;
+    const bar = () => $('nowBar');
+    const fmt = (ms) => { const s = Math.max(0, Math.round(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+    function draw() {
+      if (!cur) { bar().style.display = 'none'; document.body.classList.remove('hasnow'); return; }
+      const el = Date.now() - cur.at, rem = cur.endAt ? cur.endAt - Date.now() : 0;
+      bar().innerHTML = `<span class="nb-ic">${cur.icon}</span><span class="nb-t">${esc(cur.label)}</span><span class="nb-s">${cur.endAt ? '⏳ ' + fmt(rem) : fmt(el)}</span><button onclick="App.now.stop()" aria-label="إيقاف">✕</button>`;
+      bar().style.display = 'flex'; document.body.classList.add('hasnow');
+    }
+    return {
+      set(label, icon, stop, endAt) { cur = { label, icon, stop, at: Date.now(), endAt }; clearInterval(t); t = setInterval(draw, 1000); draw(); },
+      end(endAt) { if (cur) { cur.endAt = endAt; draw(); } },
+      clear() { cur = null; clearInterval(t); draw(); },
+      stop() { const c = cur; cur = null; clearInterval(t); draw(); if (c && c.stop) try { c.stop(); } catch (e) {} },
+      on: () => !!cur
+    };
+  })();
+  function stopAllSound() { stopSpeak(); try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} if (typeof Night !== 'undefined') Night.stop(true); Now.clear(); }
+  // أي صوت يوقف لو الطفل طلع من التطبيق أو قفله
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopAllSound(); });
+  window.addEventListener('pagehide', stopAllSound);
+
+  /* القراءة بصوت + تلوين الكلمة اللي تنقرأ (إذا الجهاز يدعم، وإلا تقدير بالوقت) */
+  let kTimer = null;
+  function speak(text, force, wordsEl, pref) {
+    stopSpeak();
+    if ((!S.voice && !force) || !('speechSynthesis' in window)) return;
+    const u = new SpeechSynthesisUtterance(text.replace(/[«»]/g, ' '));
+    const kp = pref || kidVoice(), v = (kp && arVoices().find((x) => x.name === kp.n)) || arVoice(); if (v) u.voice = v;
+    u.lang = v ? v.lang : 'ar-SA'; u.rate = kp && v && v.name === kp.n ? kp.r : .85; u.pitch = kp && v && v.name === kp.n ? kp.p : 1.05;
+    if (wordsEl) {
+      const ws = [...wordsEl.querySelectorAll('.w')], base = text.indexOf(wordsEl.dataset.t || ''), starts = [];
+      let pos = 0; ws.forEach((w) => { const i = text.indexOf(w.textContent, base + pos); starts.push(i); pos = i - base + w.textContent.length; });
+      let got = false;
+      const mark = (k) => ws.forEach((w, j) => w.classList.toggle('on', j === k));
+      u.onboundary = (e) => { if (e.name && e.name !== 'word') return; got = true; clearInterval(kTimer); let k = -1; starts.forEach((s0, j) => { if (s0 <= e.charIndex) k = j; }); mark(k); };
+      u.onstart = () => { setTimeout(() => { if (got) return; let k = 0; const per = 430 / u.rate; clearInterval(kTimer); kTimer = setInterval(() => { mark(k++); if (k > ws.length) clearInterval(kTimer); }, per); }, base > 0 ? 1400 : 300); };
+      u.onend = () => { clearInterval(kTimer); mark(-1); };
+    }
+    u.addEventListener('start', () => Now.set('يقرأ بصوت…', '🔊', stopSpeak));
+    u.addEventListener('end', () => { if (!speechSynthesis.pending) Now.clear(); });
+    speechSynthesis.speak(u);
+  }
+  function stopSpeak() { clearInterval(kTimer); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (Now.on() && /يقرأ/.test(($('nowBar') || {}).textContent || '')) Now.clear(); }
+  function toggleVoice() {
+    S.voice = !S.voice; save(); $('voiceBtn').textContent = S.voice ? '🔊' : '🔈';
+    if (S.voice) { if (!arVoice() && 'speechSynthesis' in window) toast('ما فيه صوت عربي على هذا الجهاز، نزّله من إعدادات تحويل النص إلى كلام'); renderPage(); } else stopSpeak();
+  }
+
+  /* ---------- رمز وليّ الأمر ---------- */
+  function askPin(cb) {
+    pinBuf = ''; pinCb = cb; drawPin();
+    if ($('pinIc') && typeof Stk !== 'undefined') $('pinIc').innerHTML = Stk.icon('lock');
+    $('pinPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map((x) => `<button data-k="${x}" class="${x === '⌫' ? 'del' : ''}" ${x === '' ? 'style="visibility:hidden"' : ''}>${x === '⌫' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-5 6M12 9l5 6"/></svg>' : x}</button>`).join('');
+    $('pinPad').querySelectorAll('button').forEach((b) => (b.onclick = () => {
+      const k = b.dataset.k;
+      if (k === '⌫') pinBuf = pinBuf.slice(0, -1); else if (k !== '' && pinBuf.length < 4) pinBuf += k;
+      drawPin();
+      if (pinBuf.length === 4) setTimeout(() => {
+        if (pinBuf === S.fam.pin) { closeModal('pinModal'); pinCb && pinCb(); } else { toast('الرمز غير صحيح'); $('pinDots').classList.remove('shake'); void $('pinDots').offsetWidth; $('pinDots').classList.add('shake'); pinBuf = ''; drawPin(); }
+      }, 150);
+    }));
+    $('pinModal').classList.add('on');
+  }
+  function drawPin() { $('pinDots').innerHTML = [0, 1, 2, 3].map((i) => `<span class="${i < pinBuf.length ? 'on' : ''}"></span>`).join(''); }
+  function changePin() {
+    const p = $('newPin').value.replace(/\D/g, '');
+    if (p.length !== 4) return toast('الرمز لازم يكون ٤ أرقام');
+    S.fam.pin = p; $('newPin').value = ''; famChanged(); toast('تم تغيير الرمز ✓');
+  }
+
+
+  /* ---------- اختيار وقت القصة ---------- */
+  const AR = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+  function setTime(id, v) {
+    let [h, m] = (v || '20:30').split(':').map(Number);
+    $(id).value = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    const h12 = h % 12 || 12, part = h < 4 ? 'بعد منتصف الليل' : h < 12 ? 'صباحًا' : h < 15 ? 'ظهرًا' : h < 18 ? 'عصرًا' : 'مساءً';
+    $(id + 'View').innerHTML = `<b>${AR(h12)}:${AR(String(m).padStart(2, '0'))}</b><span>${part} 🌙</span>`;
+    $(id + 'Quick').innerHTML = ['19:30', '20:00', '20:30', '21:00'].map((t) => {
+      const [a, b] = t.split(':').map(Number);
+      return `<button type="button" class="${t === $(id).value ? 'on' : ''}" onclick="App.setTime('${id}','${t}')">${AR(a % 12 || 12)}:${AR(String(b).padStart(2, '0'))}</button>`;
+    }).join('');
+  }
+  function bumpTime(id, d) {
+    let [h, m] = $(id).value.split(':').map(Number);
+    let t = (h * 60 + m + d + 1440) % 1440;
+    setTime(id, Math.floor(t / 60) + ':' + (t % 60));
+  }
+
+  /* ---------- الإعدادات ---------- */
+  function openSettings() { show('settings'); }
+  function renderSettings() {
+    $('famCode').textContent = S.code || '—';
+    const dk = (S.devKids || []).map(kidById).filter(Boolean);
+    $('devRole').textContent = S.role === 'child' ? 'جهاز ' + (dk.length ? names(dk) : 'طفل') + ' 🧒' : 'جوال وليّ الأمر 👨‍👩‍👧';
+    $('whoRow').style.display = S.role === 'child' && S.fam.kids.length > 1 ? '' : 'none';
+    $('famBox').style.display = S.code ? '' : 'none';
+    renderQR();
+    renderKidList($('setKids'), true);
+    buildCallChips('setDad', 'dad', DAD); buildCallChips('setMom', 'mom', MOM);
+    setTime('bedTime', S.fam.bedtime || '20:30');
+    $('remindOn').checked = !!S.fam.remind;
+    $('notifState').textContent = !CONFIG.VAPID ? 'التذكير يطلع من جهاز الطفل نفسه 🔔'
+      : S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'مفعّلة على هذا الجهاز ✓' : 'غير مفعّلة على هذا الجهاز';
+    $('notifBtn').style.display = !CONFIG.VAPID || (S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted') ? 'none' : '';
+    $('remindNote').textContent = S.role === 'child' ? 'التذكير يوصل لهذا الجهاز في الوقت المحدد.' : 'التذكير يطلع على أجهزة الأطفال اللي عليها تطبيق سِراج في وقت القصة.';
+    $('perNight').innerHTML = [1, 2, 3].map((v) => `<button class="${(S.fam.perNight || 1) === v ? 'on' : ''}" onclick="App.setPerNight(${v})">${AR(v)}</button>`).join('');
+    $('shortKids').checked = S.fam.shortKids !== false;
+    $('lockOn').checked = !!S.fam.lockOn; setTime('lockTime', S.fam.lock || '21:30');
+    const ex = S.fam.extra && S.fam.extra.d === nightKey() ? S.fam.extra.n : 0;
+    $('extraNote').textContent = ex ? 'الليلة: ' + AR(allowedTonight()) + ' قصص (منها ' + AR(ex) + ' إضافية)' : '';
+    $('storyCount').textContent = STORIES.length;
+    const fam = S.fam, m = fam.msg || {}, r = fam.reward || {};
+    $('msgText').value = m.t || ''; $('rwText').value = r.text || '';
+    msgTo = m.to || 'all'; msgFrom = m.from || fam.dad || 'بابا'; rwStars = r.stars || 5;
+    msgSegs();
+    $('themeSeg').innerHTML = [['light', '☀️ فاتح'], ['dark', '🌙 داكن']].map(([v, t]) => `<button class="${appPrefs().theme === v ? 'on' : ''}" onclick="App.setTheme('${v}')">${t}</button>`).join('');
+    $('palSeg').innerHTML = PALS.map(([v, t, g]) => `<button class="${appPrefs().pal === v ? 'on' : ''}" onclick="App.setPal('${v}')"><i style="background:linear-gradient(180deg,${g})"></i>${t}</button>`).join('');
+    $('pushAllBtn').style.display = S.role === 'parent' && S.code ? '' : 'none';
+    $('verNote').textContent = 'الإصدار الحالي: ' + CONFIG.VERSION;
+    libShown = 8; filterStories();
+    $('ver2').textContent = CONFIG.VERSION; if (typeof Info !== 'undefined') Info.fill();
+  }
+  /* مكتبة القصص في الإعدادات: فلاتر + بحث + بطاقات بصور، ٨ في كل دفعة */
+  const LIB_FILTERS = [['الكل', ''], ...CATS.map((c) => [c[1] + ' ' + c[2], c[0]])];
+  let libFilter = '', libShown = 8;
+  function setLibFilter(f) { libFilter = f; libShown = 8; filterStories(); }
+  function moreStories() { libShown += 8; filterStories(); }
+  function filterStories() {
+    $('libChips').innerHTML = LIB_FILTERS.map(([t, f]) => `<button class="chip ${f === libFilter ? 'on' : ''}" onclick="App.setLibFilter('${f}')">${t}</button>`).join('');
+    const q = ($('storySearch').value || '').trim();
+    const hero = S.fam.kids.length ? [S.fam.kids[0]] : [{ name: 'البطل', g: 'm', av: {} }];
+    const all = STORIES.filter((s) => !s.hidden && (!q || s.title.includes(q) || s.value.includes(q) || catOf(s)[2].includes(q)) &&
+      (!libFilter || catOf(s)[0] === libFilter));
+    const read = new Set(allLogs().map((e) => e.s));
+    $('allStories').innerHTML = all.slice(0, libShown).map((s) => `<button class="sitem" onclick="App.preview('${s.id}')">
+        ${ART.page(s.scene, s.occ ? '🎉' : isPro(s) ? '📖' : '', [])}
+        <div class="st">${esc(fill(s.title, hero))}</div>
+        <div class="sv">${catChip(s)}${read.has(s.id) ? '<span class="rd">✓ قُرئت</span>' : ''}</div>
+      </button>`).join('') || '<p class="muted" style="grid-column:1/-1;text-align:center">ما لقينا قصة بهذا الاسم</p>';
+    $('moreStories').style.display = all.length > libShown ? '' : 'none';
+    $('moreStories').textContent = 'عرض المزيد (' + (all.length - libShown) + ')';
+  }
+  function preview(id) { if (!heroes().length && S.fam.kids.length) sel = [S.fam.kids[0].id]; openStory(id); }
+  function setBed() {
+    S.fam.bedtime = $('bedTime').value || '20:30'; S.fam.remind = $('remindOn').checked;
+    famChanged(); toast('تم الحفظ ✓');
+  }
+  function renderQR() {
+    const box = $('qr'); if (!S.code) { box.innerHTML = ''; return; }
+    const draw = () => { try { const q = qrcode(0, 'M'); q.addData(joinLink()); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); } catch (e) { box.innerHTML = ''; } };
+    if (window.qrcode) return draw();
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'; s.onload = draw; s.onerror = () => (box.innerHTML = '');
+    document.head.appendChild(s);
+  }
+  function showFamilyCode(first) {
+    $('fcCode').textContent = S.code;
+    $('fcFirst').textContent = first ? 'تم إنشاء عائلتك!' : 'رمز عائلتك جاهز 🔑';
+    $('codeModal').classList.add('on');
+  }
+  async function shareJoin() {
+    const text = 'اربط جهاز الأطفال بعائلتنا في سراج 🌙\nرمز العائلة: ' + S.code + '\n' + joinLink();
+    try { if (navigator.share) await navigator.share({ title: 'ربط سراج', text }); else { await navigator.clipboard.writeText(text); toast('تم النسخ ✓'); } } catch (e) {}
+  }
+  async function copyCode() { try { await navigator.clipboard.writeText(S.code); toast('تم نسخ الرمز ✓'); } catch (e) { toast(S.code); } }
+  async function shareApp() {
+    const text = 'سراج 🌙 قصص ما قبل النوم، أبطالها أطفالك. قصص هادفة بأسمائهم وبالصور، وتشتغل بدون إنترنت.';
+    try { if (navigator.share) await navigator.share({ title: 'سراج | SIRAJ', text, url: CONFIG.SITE }); else { await navigator.clipboard.writeText(text + '\n' + CONFIG.SITE); toast('تم نسخ الرابط ✓'); } } catch (e) {}
+  }
+  function unlink() {
+    if (!confirm('فك ربط هذا الجهاز ومسح بياناته منه؟ (بيانات العائلة تبقى محفوظة في الرمز)')) return;
+    disableNotif(true);
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = fresh(); save(); location.reload();
+  }
+
+  /* ---------- الإشعارات ---------- */
+  function vapidKey() { const s = CONFIG.VAPID.replace(/-/g, '+').replace(/_/g, '/'); const r = atob(s + '==='.slice((s.length + 3) % 4)); return Uint8Array.from(r, (c) => c.charCodeAt(0)); }
+  function askNotif() {
+    if (!CONFIG.VAPID || S.notif || !('Notification' in window) || Notification.permission === 'denied') return;
+    setTimeout(() => $('notifModal').classList.add('on'), 600);
+  }
+  async function enableNotif() {
+    closeModal('notifModal');
+    if (!CONFIG.VAPID) return toast('الإشعارات تحتاج إعداد السيرفر أولًا');
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window))
+      return toast(isIOS() && !standalone() ? 'أضف سراج للشاشة الرئيسية أولًا، ثم فعّل الإشعارات' : 'هذا الجهاز لا يدعم الإشعارات');
+    try {
+      const p = await Notification.requestPermission();
+      if (p !== 'granted') return toast('لم يتم السماح بالإشعارات');
+      const sub = await currentSub(true);
+      S.notif = true; save();
+      await Sync.sub(S.code, S.dev, S.role, S.fam.remind ? S.fam.bedtime : '', sub);
+      toast('تم تفعيل الإشعارات ✓');
+      if ($('settings').classList.contains('on')) renderSettings();
+    } catch (e) { toast('تعذّر تفعيل الإشعارات'); }
+  }
+  /* اشتراك الإشعارات الحالي؛ لو تغيّر مفتاح الخادم (VAPID) نلغي القديم ونشترك من جديد تلقائيًا */
+  async function currentSub(create) {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      const k = sub.options && sub.options.applicationServerKey;
+      const want = vapidKey();
+      const same = k && new Uint8Array(k).length === want.length && new Uint8Array(k).every((b, i) => b === want[i]);
+      if (k && !same) { await sub.unsubscribe().catch(() => {}); sub = null; }
+    }
+    if (!sub && (create || (typeof Notification !== 'undefined' && Notification.permission === 'granted')))
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidKey() });
+    return sub;
+  }
+  async function registerSub() {
+    if (!S.notif || !CONFIG.VAPID || !('serviceWorker' in navigator)) return;
+    try {
+      const sub = await currentSub(false);
+      if (sub) await Sync.sub(S.code, S.dev, S.role, S.fam.remind ? S.fam.bedtime : '', sub);
+    } catch (e) {}
+  }
+  async function disableNotif(silent) {
+    try { const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) { await Sync.sub(S.code, S.dev, S.role, '', sub, true).catch(() => {}); await sub.unsubscribe(); } } catch (e) {}
+    S.notif = false; save(); if (!silent) { toast('تم إيقاف الإشعارات'); renderSettings(); }
+  }
+
+  /* ---------- التحديث التلقائي ---------- */
+  /* نقارن رقم الإصدار المنشور بالإصدار اللي شغال؛ لو فيه جديد نحدّث فورًا (أو بعد ما تخلص القصة) */
+  let swReg = null, lastCheck = 0, updating = false;
+  async function checkVersion() {
+    if (updating || navigator.onLine === false) return;
+    lastCheck = Date.now();
+    try {
+      if (swReg && swReg.update) swReg.update().catch(() => {});
+      const txt = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store' })).text();
+      const m = txt.match(/VERSION:\s*'([^']+)'/);
+      if (m && m[1] !== CONFIG.VERSION) {
+        // حماية من الدوران: لو حاولنا نفس النسخة قبل أقل من ١٠ دقائق وما تغيّر شي، ما نعيد التحميل مرة ثانية
+        let tried = null; try { tried = JSON.parse(sessionStorage.getItem('siraj-upd-try') || 'null'); } catch (e) {}
+        if (tried && tried.v === m[1] && Date.now() - tried.t < 10 * 60000) return;
+        try { sessionStorage.setItem('siraj-upd-try', JSON.stringify({ v: m[1], t: Date.now() })); } catch (e) {}
+        applyUpdate();
+      }
+    } catch (e) {}
+  }
+  /* المتصفح يحتفظ بنسخ الملفات حتى ١٠ دقائق (GitHub Pages)، فنجبره يجيب الجديد قبل إعادة التحميل */
+  async function freshFiles() {
+    const list = ['./', 'index.html', 'sw.js', ...Array.from(document.scripts).map((x) => x.getAttribute('src')).filter((x) => x && !/^https?:/.test(x))];
+    await Promise.all(list.map((f) => fetch(f, { cache: 'reload' }).catch(() => {})));
+  }
+  function applyUpdate() {
+    if (R) { pendingReload = true; return; }             // لا نقاطع قصة شغالة
+    updating = true;
+    try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
+    const go = () => freshFiles().then(() => location.replace(location.pathname + '?r=' + Date.now()));
+    if (swReg && swReg.waiting) { swReg.waiting.postMessage('skip'); setTimeout(go, 1500); } else setTimeout(go, 300);
+  }
+  /* ---------- تحديث فوري (زر وليّ الأمر) ---------- */
+  async function hardRefresh(silent) {
+    if (navigator.onLine === false) return toast('التحديث يحتاج إنترنت');
+    if (R) { pendingReload = true; return; }
+    if (!silent) {
+      // الضغط اليدوي: نتأكد أول هل فيه نسخة أحدث، وإذا ما فيه نقول له إنه على آخر نسخة بدل ما نرجعه للرئيسية
+      toast('جاري التحقق من التحديثات… 🔄');
+      let latest = null;
+      try { const ac = typeof AbortController !== 'undefined' ? new AbortController() : null; const to = setTimeout(() => ac && ac.abort(), 8000); const t = await (await fetch('config.js?v=' + Date.now(), { cache: 'no-store', signal: ac ? ac.signal : undefined })).text(); clearTimeout(to); const m = t.match(/VERSION:\s*'([^']+)'/); latest = m && m[1]; } catch (e) {}
+      if (!latest) return toast('ما قدرت أتحقق، جرّب بعد شوي');
+      if (latest === CONFIG.VERSION) {
+        try { syncNow(); } catch (e) {}
+        const n = $('verNote'); if (n) n.textContent = 'الإصدار الحالي: ' + CONFIG.VERSION + ' ✓ آخر نسخة';
+        return toast('عندك آخر نسخة ✓ الإصدار ' + CONFIG.VERSION);
+      }
+      toast('فيه نسخة جديدة ' + latest + '، جاري التحديث… ✨');
+    }
+    try { await Promise.race([syncNow(), new Promise((r) => setTimeout(r, 3000))]); } catch (e) {}
+    try { const ks = await caches.keys(); await Promise.all(ks.filter((k) => k.startsWith('siraj-v')).map((k) => caches.delete(k))); } catch (e) {}
+    try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
+    try { await freshFiles(); } catch (e) {}
+    try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
+    location.replace(location.pathname + '?r=' + Date.now());
+  }
+  function refreshAll() {
+    S.fam.forceAt = Date.now(); S.forceSeen = S.fam.forceAt; famChanged();
+    toast('أرسلت أمر التحديث لأجهزة العيال 📲 يوصلهم خلال دقائق');
+  }
+  function setupSW() {
+    if (!('serviceWorker' in navigator)) return;
+    const had = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+      swReg = reg;
+      const wake = () => { checkVersion(); syncNow(); };
+      setInterval(wake, 3 * 60000);                        // كل ٣ دقائق
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+      ['focus', 'pageshow', 'online'].forEach((ev) => addEventListener(ev, wake));
+      document.addEventListener('pointerdown', () => { if (Date.now() - lastCheck > 15 * 60000) checkVersion(); }, { passive: true });
+      checkVersion();
+    }).catch(() => {});
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!had || refreshing) return;
+      if (R) { pendingReload = true; return; }          // لا نقاطع قصة شغالة
+      refreshing = true;
+      try { sessionStorage.setItem('siraj-updated', '1'); } catch (e) {}
+      location.reload();
+    });
+  }
+
+  /* ---------- البدء ---------- */
+  function init() {
+    const m = location.hash.match(/join=([A-Za-z0-9-]{10,12})/);
+    if (m) { const c = Sync.norm(m[1]); if (c && c !== S.code) { try { localStorage.setItem('siraj-join', c); } catch (e) {} } history.replaceState(null, '', location.pathname); }
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); installEvt = e;
+      $('installBtn').style.display = 'block';
+      $('installBtn').onclick = async () => { installEvt.prompt(); await installEvt.userChoice; installEvt = null; };
+    });
+    if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
+    let skipped = false, updated = false;
+    try { skipped = sessionStorage.getItem('siraj-skip') === '1'; updated = sessionStorage.getItem('siraj-updated') === '1'; sessionStorage.removeItem('siraj-updated'); } catch (e) {}
+    if (!standalone() && !skipped && !S.role) { renderWelcome(); show('welcome'); } else start();
+    // عائلة من النسخة 1.0 ما عندها رمز: ننشئ لها رمزًا ونرفعها، ونعرض الرمز مرة وحدة
+    let newCode = false;
+    if (S.role === 'parent' && S.fam.kids.length && S.fam.pin && !S.code) { S.code = Sync.newCode(); S.dirty = true; newCode = true; }
+    if (updated) setTimeout(() => toast('تم التحديث ✨ الإصدار ' + CONFIG.VERSION), 500);
+    setupSW(); save();
+    try { indexedDB.deleteDatabase('siraj-rec'); } catch (e) {} // تسجيلات تجريبية من 1.7
+    try {
+      const openReport = () => { if (S.role === 'parent' && typeof Honors !== 'undefined') { tab('dash'); setTimeout(() => Honors.report(), 400); } };
+      if (/[?&]report=1/.test(location.search)) { history.replaceState(null, '', location.pathname); setTimeout(openReport, 800); }
+      if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.open === 'report') openReport(); });
+    } catch (e) {}
+    checkLock(); setInterval(checkLock, 30000); setInterval(tickClock, 20000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) checkLock(); });
+    syncNow().then(() => {
+      if (newCode && $('home').classList.contains('on')) { showFamilyCode(false); askNotif(); }
+      if (S.role === 'child' && S.code && !(S.devKids || []).filter(kidById).length && $('home').classList.contains('on')) {
+        if (S.fam.kids.length > 1) openWho(false); else if (S.fam.kids.length) setDevKids([S.fam.kids[0].id]);
+      }
+    });
+  }
+
+  function ctx() {
+    return { familyStrip, speak, counts, allActs, S: () => S, save, famChanged, syncNow, fill, kidById, heroes, myKids, toast, esc, allLogs, storyOfDay, isNight, openStory, remote: () => remote,
+      renderHomeKids: () => { if ($('home').classList.contains('on')) renderHome(); } };
+  }
+
+  return {
+    ctx, family, setMode, clearMine, hardRefresh, refreshAll, fmtCode, pasteCode, recChanged, recStart, recStop, recPlay, toggleRec, unlockParent, giveExtra, setPerNight, setLock, toggleFull, setShortKids, isNight, isLocked,
+    init, show, skipWelcome, openSetup, finishSetup, openJoin, doJoin, editKid, saveKid, delKid, closeModal, pick, tab,
+    openStory, step, closeReader, wake, toggleFav, toggleVoice, voicePick: () => voicePick(), voiceTry, voiceSet, askPin, openSettings, changePin, openWho, whoPick, whoAll, whoDone, hideDev, setTime, bumpTime, preview, filterStories, setLibFilter, moreStories, setBed,
+    tour, goSet, now: Now, stopAllSound, choose, editParent, setTheme, setPal, msgPick, msgFromPick, rwPick, sendMsg, clearMsg, saveReward, clearReward, renderHome, showFamilyCode, shareJoin, copyCode, shareApp, unlink, enableNotif, disableNotif, fill, storyOfDay, _state: () => S
+  };
+})();
+
+App.init();
