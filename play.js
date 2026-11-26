@@ -1,10 +1,10 @@
-/* سِراج | SIRAJ — سماء سِراج، والألعاب (تلوين، أحجية، أسئلة)، والتسجيل بالصوت
+/* سراج | SIRAJ — سماء سراج، والألعاب (تلوين، أحجية، أسئلة)، والتسجيل بالصوت
    يستخدم App.ctx() وقت التشغيل */
 const Play = (() => {
   const $ = (id) => document.getElementById(id);
   const C = () => App.ctx();
 
-  /* ================= سماء سِراج ================= */
+  /* ================= سماء سراج ================= */
   const CONST = ['كوكبة الصدق', 'كوكبة الشجاعة', 'كوكبة الرحمة', 'كوكبة المشاركة', 'كوكبة الصبر', 'كوكبة العلم', 'كوكبة البرّ', 'كوكبة الأمانة',
     'كوكبة اللطف', 'كوكبة التعاون', 'كوكبة الشكر', 'كوكبة الأحلام'];
   // أشكال الكوكبات (٧ نجوم لكل وحدة) على لوحة 300×200
@@ -95,7 +95,8 @@ const Play = (() => {
   }
   function renderSky() {
     const c = C(), kids = c.myKids();
-    $('sky').innerHTML = kids.map((k) => {
+    const ach = c.S().role === 'child' && typeof Honors !== 'undefined' ? kids.map((k) => Honors.achCard(k)).join('') : '';
+    $('sky').innerHTML = (typeof Room !== 'undefined' ? Room.render() : '') + ach + (c.S().role === 'child' ? c.familyStrip('kid') : c.familyStrip('parent')) + (typeof Honors !== 'undefined' ? Honors.board() : '') + kids.map((k) => {
       const info = skyInfo(k), name = CONST[info.done % CONST.length], ev = kidEvents(k); ev.kid = k.id;
       const f = k.g === 'f', left = 7 - info.cur;
       const chips = Array.from({ length: info.done }, (_, i) => `<span class="cchip">✨ ${CONST[i % CONST.length]}</span>`).join('');
@@ -121,8 +122,8 @@ const Play = (() => {
   const ST_NAMES = { '🐱': 'قطة', '🐶': 'كلب', '🐰': 'أرنب', '🐻': 'دبدوب', '🐼': 'باندا', '🐨': 'كوالا', '🐸': 'ضفدع', '🐥': 'صوص', '🐢': 'سلحفاة', '🐠': 'سمكة', '🦋': 'فراشة', '🐞': 'دعسوقة', '🌻': 'زهرة شمس', '🌈': 'قوس قزح', '🍉': 'بطيخ', '🍓': 'فراولة', '🍩': 'دونات', '🎈': 'بالون', '⚽': 'كورة', '🪁': 'طيارة ورق', '🧸': 'دبدوب قطني', '🚗': 'سيارة', '🎨': 'ألوان', '📚': 'كتب',
     '🦊': 'ثعلب', '🦒': 'زرافة', '🐬': 'دلفين', '🦜': 'ببغاء', '🐙': 'أخطبوط', '🚀': 'صاروخ', '🏰': 'قلعة', '🎡': 'دولاب الهوا', '🌋': 'بركان', '🦄': 'حصان وحيد القرن', '🐉': 'تنين', '👑': 'تاج ذهبي' };
   const RARITY = { c: ['ملصق', ''], r: ['ملصق نادر', '🟣'], l: ['ملصق أسطوري', '🌟'] };
-  const ACT_NAME = { color: 'لوّنت المشهد 🎨', puzzle: 'رتّبت الأحجية 🧩', quiz: 'جاوبت أسئلة القصة ❓', en: 'لعبت English 🔤', space: 'اكتشفت الفضاء 🪐' };
-  const WEEKDAY = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const ACT_NAME = { color: 'لوّنت المشهد 🎨', puzzle: 'رتّبت الأحجية 🧩', quiz: 'جاوبت أسئلة القصة ❓', en: 'لعبت English 🔤', space: 'اكتشفت الفضاء 🪐', adhkar: 'قال أذكار النوم 🤲', trip: 'لعبت رحلة حول العالم ✈️', flags: 'لعبت لعبة الأعلام 🚩' };
+  const WEEKDAY = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
   const gx = (k, m, f) => (k.g === 'f' ? f : m);
   const pickMsg = (arr) => arr[Math.floor(Math.random() * arr.length)];
   function cheer(k, value) {
