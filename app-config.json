@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 112,
+    "latestBuild": 114,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
-    "title": "سمائي وألعاب القصة ✨",
-    "message": "جديد: غرفتي، الكوكبات، ألبوم الملصقات، الهدايا، لوحة الشرف، تقرير الأسبوع، وألعاب القصة (تلوين، أحجية، أسئلة).",
+    "title": "سراج اكتمل 🎉",
+    "message": "جديد: الإنجليزي كامل بكل مستوياته (أصوات الحروف، تتبّع الحرف، قراءة، قواعد، محادثات، إملاء، نطق) ومخطط الرحلات حول العالم بألبوم وجواز سفر.",
     "live": {
       "version": "5.1.2-6",
       "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-6/siraj-live-5.1.2-6.zip",
@@ -15,5 +15,9 @@
     "ads": false,
     "accounts": false,
     "analytics": false
+  },
+  "play": {
+    "minBuild": 0,
+    "latestBuild": 0
   }
 }
