@@ -111,6 +111,29 @@
     /* الضغط على الإشعار يفتح التطبيق، وهذا يكفي */
   }
 
+  /* ٥٫٥) لون شريط الحالة فوق = نفس لون التطبيق (بدل الشريط الأبيض)
+     على أندرويد 15+ التطبيق أصلًا يمتد تحت الشريط، وهنا نغطي الأجهزة الأقدم.
+     يتبع <meta name="theme-color">، ولو تغيّر اللون بالتطبيق يتغيّر الشريط معه. */
+  var SB = P.StatusBar;
+  if (SB) {
+    var lastBar = '';
+    var syncBar = function () {
+      var m = document.querySelector('meta[name="theme-color"]');
+      var c = (m && m.getAttribute('content')) || '#4FA3EC';
+      if (!/^#[0-9a-f]{6}$/i.test(c) || c === lastBar) return;
+      lastBar = c;
+      var n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+      var lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      SB.setBackgroundColor({ color: c }).catch(function () {});
+      SB.setStyle({ style: lum > 0.7 ? 'LIGHT' : 'DARK' }).catch(function () {});   /* DARK = أيقونات بيضاء */
+    };
+    var startBar = function () {
+      syncBar();
+      try { new MutationObserver(syncBar).observe(document.head, { subtree: true, childList: true, attributes: true, attributeFilter: ['content'] }); } catch (e) {}
+    };
+    if (document.head) startBar(); else document.addEventListener('DOMContentLoaded', startBar);
+  }
+
   /* ٦) التحكم عن بُعد + إجبار التحديث
      يقرأ ملف إعدادات صغير من الموقع. ما يرسل أي معرّف للجهاز (مناسب لسياسة تطبيقات الأطفال).
      لو الملف مو موجود أو ما فيه نت: يستخدم آخر نسخة محفوظة، وإلا الإعدادات الافتراضية. */
