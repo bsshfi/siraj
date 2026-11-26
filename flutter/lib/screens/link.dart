@@ -87,6 +87,7 @@ class _JoinScreenState extends State<JoinScreen> {
                     style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: 3, fontFamily: 'monospace'),
                     decoration: InputDecoration(
                       hintText: 'K7QPM-4XR2D',
+                      hintStyle: const TextStyle(color: Color(0xFFC3CAD8), fontWeight: FontWeight.w600),
                       filled: true,
                       fillColor: const Color(0xFFF4F7FC),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),

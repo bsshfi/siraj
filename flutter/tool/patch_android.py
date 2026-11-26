@@ -11,6 +11,8 @@ s = re.sub(r'android:label="[^"]*"', 'android:label="سراج | Siraj"', s, coun
 if 'TTS_SERVICE' not in s:
     q = '<intent><action android:name="android.intent.action.TTS_SERVICE"/></intent>'
     s = s.replace('<queries>', '<queries>\n        ' + q, 1) if '<queries>' in s else s.replace('</manifest>', '    <queries>' + q + '</queries>\n</manifest>')
+if 'android.permission.INTERNET' not in s:
+    s = s.replace('<application', '<uses-permission android:name="android.permission.INTERNET"/>\n    <application', 1)
 open(man, 'w', encoding='utf-8').write(s)
 
 shutil.copy(os.path.join(os.path.dirname(__file__), 'siraj-test.keystore'), os.path.join(A, 'app', 'siraj-test.keystore'))

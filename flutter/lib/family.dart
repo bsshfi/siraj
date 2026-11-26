@@ -85,7 +85,15 @@ class Family extends ChangeNotifier {
     final c = Sync.norm(input);
     if (c.isEmpty) return 'الرمز ١٠ حروف وأرقام، مثل K7QPM-4XR2D';
     try {
-      final r = await Sync.pullFamily(c);
+      final (Map<String, dynamic>, int)? r;
+      try {
+        r = await Sync.pullFamily(c);
+      } on FormatException {
+        return 'الرمز صحيح الشكل بس ما قدرنا نفتح بيانات العائلة';
+      } catch (e) {
+        if (e.toString().contains('SecretBox') || e.toString().contains('MAC')) return 'الرمز ما يطابق بيانات العائلة، تأكد منه';
+        return 'تعذّر الاتصال، تأكد من الإنترنت';
+      }
       if (r == null) return 'ما لقينا عائلة بهذا الرمز';
       code = c;
       fam = r.$1;
@@ -98,8 +106,8 @@ class Family extends ChangeNotifier {
       notifyListeners();
       syncNow();
       return null;
-    } catch (_) {
-      return 'تعذّر الربط، تأكد من الإنترنت';
+    } catch (e) {
+      return 'تعذّر الربط ($e)';
     }
   }
 
