@@ -83,6 +83,10 @@ class _JoinScreenState extends State<JoinScreen> {
                     controller: _code,
                     textAlign: TextAlign.center,
                     textCapitalization: TextCapitalization.characters,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    keyboardType: TextInputType.visiblePassword,
+                    inputFormatters: [_CodeFormatter()],
                     onSubmitted: (_) => _join(),
                     style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: 3, fontFamily: 'monospace'),
                     decoration: InputDecoration(
@@ -116,6 +120,24 @@ class _JoinScreenState extends State<JoinScreen> {
         ),
       ),
     );
+  }
+}
+
+/// يكتب الرمز بشكل XXXXX-XXXXX: حروف كبيرة، والشرطة تنضاف لحالها بعد خامس حرف
+class _CodeFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    var raw = newValue.text;
+    const ar = '٠١٢٣٤٥٦٧٨٩';
+    for (var i = 0; i < 10; i++) {
+      raw = raw.replaceAll(ar[i], '$i');
+    }
+    raw = raw.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+    // لو مسح الشرطة بالرجوع، نمسح الحرف اللي قبلها
+    if (oldValue.text.endsWith('-') && newValue.text.length < oldValue.text.length && raw.length == 5) raw = raw.substring(0, 4);
+    if (raw.length > 10) raw = raw.substring(0, 10);
+    final out = raw.length >= 5 ? '${raw.substring(0, 5)}-${raw.substring(5)}' : raw;
+    return TextEditingValue(text: out, selection: TextSelection.collapsed(offset: out.length));
   }
 }
 
@@ -177,6 +199,26 @@ class _WhoScreenState extends State<WhoScreen> {
                     ),
                   ),
               ],
+            ),
+            const SizedBox(height: 12),
+            SoftCard(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              onTap: () async {
+                HapticFeedback.selectionClick();
+                await Family.I.setDevKids(kids.map((k) => k.id).toList());
+                if (context.mounted) Navigator.pop(context, true);
+              },
+              child: const Row(children: [
+                Text('👨‍👩‍👧', style: TextStyle(fontSize: 30)),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('أنا ولي الأمر / جهاز للكل', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+                    Text('كل الأطفال يقدرون يكونون أبطال الحكاية', style: TextStyle(fontSize: 13.5, color: C.soft, fontWeight: FontWeight.w600)),
+                  ]),
+                ),
+                Icon(Icons.arrow_forward_ios_rounded, size: 18, color: C.soft),
+              ]),
             ),
             const SizedBox(height: 18),
             BigButton(
