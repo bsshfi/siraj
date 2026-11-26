@@ -54,7 +54,7 @@ jobs:
       - name: بناء APK
         run: |
           BN=$((100 + GITHUB_RUN_NUMBER))
-          flutter build apk --release --build-number=$BN --build-name=2.1.0 || (sleep 45; flutter build apk --release --build-number=$BN --build-name=2.0.0)
+          flutter build apk --release --build-number=$BN --build-name=2.1.0 || (sleep 45; flutter build apk --release --build-number=$BN --build-name=2.1.0)
           cp build/app/outputs/flutter-apk/app-release.apk siraj-test.apk
           echo "BN=$BN" >> "$GITHUB_ENV"
 
