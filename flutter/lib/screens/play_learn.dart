@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../data.dart';
 import '../family.dart';
 import '../learn.dart';
+import '../nav.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/common.dart';
@@ -18,7 +19,25 @@ class PlayLearnScreen extends StatefulWidget {
 }
 
 class _PlayLearnScreenState extends State<PlayLearnScreen> {
-  int _sec = 0, _cat = 0;
+  int _cat = 0;
+  int get _sec => Nav.learn.value;
+
+  @override
+  void initState() {
+    super.initState();
+    Nav.learn.addListener(_r);
+  }
+
+  @override
+  void dispose() {
+    Nav.learn.removeListener(_r);
+    super.dispose();
+  }
+
+  void _r() {
+    if (mounted) setState(() {});
+  }
+
   bool _logged = false;
 
   void _say(String t) {
@@ -36,7 +55,7 @@ class _PlayLearnScreenState extends State<PlayLearnScreen> {
       title: 'العب وتعلّم',
       subtitle: _sec == 0 ? 'ألعاب تفكير وذكاء 🎮' : 'Let\'s learn English! 🔤',
       children: [
-        Pills(items: const ['🎮 ألعاب', '🔤 حروف', '🧠 كلمات', '💬 جمل'], index: _sec, onTap: (i) => setState(() => _sec = i)),
+        Pills(items: const ['🎮 ألعاب', '🔤 حروف', '🧠 كلمات', '💬 جمل'], index: _sec, onTap: (i) => Nav.learn.value = i),
         const SizedBox(height: 14),
         if (_sec == 0) ..._games(context),
         if (_sec == 1) _letters(),

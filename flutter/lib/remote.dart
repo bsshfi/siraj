@@ -15,24 +15,33 @@ class Remote {
   static Map<String, dynamic> flags = {'ads': false, 'accounts': false, 'analytics': false};
   static bool _shown = false;
 
-  static Future<void> check(BuildContext context) async {
+  static Future<void> check(BuildContext context, {bool manual = false}) async {
+    void say(String m) {
+      if (manual && context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m, style: const TextStyle(fontFamily: 'Baloo', fontSize: 16))));
+    }
+
+    say('جاري التحقق من التحديثات… 🔄');
     try {
       final r = await http.get(Uri.parse('$url?t=${DateTime.now().millisecondsSinceEpoch}')).timeout(const Duration(seconds: 8));
-      if (r.statusCode != 200) return;
+      if (r.statusCode != 200) return say('ما قدرت أتحقق، جرّب بعد شوي');
       final cfg = Map<String, dynamic>.from(jsonDecode(utf8.decode(r.bodyBytes)) as Map);
       if (cfg['flags'] is Map) flags = {...flags, ...Map<String, dynamic>.from(cfg['flags'] as Map)};
       final a = Map<String, dynamic>.from((cfg['android'] as Map?) ?? {});
       final build = int.tryParse((await PackageInfo.fromPlatform()).buildNumber) ?? 0;
       final minB = (a['minBuild'] as num?)?.toInt() ?? 0, latest = (a['latestBuild'] as num?)?.toInt() ?? 0;
-      if (_shown || !context.mounted) return;
+      if ((_shown && !manual) || !context.mounted) return;
       if (minB > build) {
         _shown = true;
         _show(context, a, force: true);
       } else if (latest > build) {
         _shown = true;
         _show(context, a, force: false);
+      } else {
+        say('عندك آخر نسخة ✓');
       }
-    } catch (_) {}
+    } catch (_) {
+      say('ما قدرت أتحقق، تأكد من الإنترنت');
+    }
   }
 
   static void _show(BuildContext context, Map<String, dynamic> a, {required bool force}) {

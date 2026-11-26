@@ -21,7 +21,8 @@ class SkyBackground extends StatelessWidget {
 
 /// ربط الجهاز برمز العائلة
 class JoinScreen extends StatefulWidget {
-  const JoinScreen({super.key});
+  final String as; // child: جهاز طفل، parent: استرجاع العائلة
+  const JoinScreen({super.key, this.as = 'child'});
   @override
   State<JoinScreen> createState() => _JoinScreenState();
 }
@@ -44,7 +45,7 @@ class _JoinScreenState extends State<JoinScreen> {
   Future<void> _join() async {
     if (_busy) return;
     setState(() => _busy = true);
-    final err = await Family.I.join(_code.text);
+    final err = await Family.I.join(_code.text, as: widget.as);
     if (!mounted) return;
     setState(() => _busy = false);
     if (err != null) {
@@ -53,7 +54,7 @@ class _JoinScreenState extends State<JoinScreen> {
     }
     HapticFeedback.mediumImpact();
     final kids = Family.I.kids;
-    if (kids.length > 1) {
+    if (widget.as == 'child' && kids.length > 1) {
       await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WhoScreen(first: true)));
     }
     if (mounted) Navigator.of(context).pop(true);
@@ -70,9 +71,14 @@ class _JoinScreenState extends State<JoinScreen> {
               child: IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded)),
             ),
             const SizedBox(height: 8),
-            const Text('🔑', textAlign: TextAlign.center, style: TextStyle(fontSize: 54)),
-            const Text('ربط العائلة', textAlign: TextAlign.center, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
-            const Text('اكتب رمز عائلتك، ويطلع أطفالك بأسمائهم وأشكالهم', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Color(0xFF34406E), fontWeight: FontWeight.w600)),
+            Text(widget.as == 'child' ? '🧒' : '🔑', textAlign: TextAlign.center, style: const TextStyle(fontSize: 54)),
+            Text(widget.as == 'child' ? 'ربط جهاز الطفل' : 'استرجاع العائلة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF26305A))),
+            Text(
+                widget.as == 'child'
+                    ? 'أدخل رمز العائلة اللي يظهر في جوال وليّ الأمر (الإعدادات ← العائلة)'
+                    : 'أدخل رمز عائلتك، ويرجع كل شيء: الأطفال والإعدادات وتقدّم القراءة',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16, color: Color(0xFF34406E), fontWeight: FontWeight.w600, height: 1.5)),
             const SizedBox(height: 20),
             SoftCard(
               padding: const EdgeInsets.all(18),

@@ -1,21 +1,19 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../avatars.dart';
 import '../data.dart';
 import '../family.dart';
 import '../learn.dart';
 import '../theme.dart';
-import '../tts.dart';
+import '../tonight_logic.dart';
 import '../widgets/common.dart';
+import '../widgets/pin.dart';
 import 'link.dart';
+import 'settings.dart';
 import 'setup.dart';
 
-/// تبويب "للوالدين": بوابة للكبار (سياسة العائلات في Google Play) ثم لوحة المتابعة والإعدادات
+/// تبويب "للوالدين" (جوال وليّ الأمر): لوحة المتابعة — نفس renderDash في الويب
 class ParentsScreen extends StatefulWidget {
   const ParentsScreen({super.key});
   @override
@@ -23,26 +21,17 @@ class ParentsScreen extends StatefulWidget {
 }
 
 class _ParentsScreenState extends State<ParentsScreen> {
-  static DateTime? _openUntil;
-  late int _a, _b;
-  late List<int> _opts;
-  String _ver = '';
-
-  bool get _open => _openUntil != null && DateTime.now().isBefore(_openUntil!);
+  final f = Family.I;
 
   @override
   void initState() {
     super.initState();
-    _newGate();
-    Family.I.addListener(_r);
-    PackageInfo.fromPlatform().then((p) {
-      if (mounted) setState(() => _ver = '${p.version} (${p.buildNumber})');
-    });
+    f.addListener(_r);
   }
 
   @override
   void dispose() {
-    Family.I.removeListener(_r);
+    f.removeListener(_r);
     super.dispose();
   }
 
@@ -50,82 +39,46 @@ class _ParentsScreenState extends State<ParentsScreen> {
     if (mounted) setState(() {});
   }
 
-  void _newGate() {
-    final r = math.Random();
-    _a = 6 + r.nextInt(4);
-    _b = 6 + r.nextInt(4);
-    final ans = _a * _b;
-    final s = <int>{ans};
-    while (s.length < 4) {
-      s.add(ans + (r.nextInt(17) - 8));
-    }
-    _opts = s.toList()..shuffle(r);
-  }
-
-  void _answer(int v) {
-    if (v == _a * _b) {
-      HapticFeedback.mediumImpact();
-      setState(() => _openUntil = DateTime.now().add(const Duration(minutes: 10)));
-      Family.I.syncNow();
-    } else {
-      HapticFeedback.heavyImpact();
-      setState(_newGate);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_open) return _gate();
-    return _dash(context);
-  }
-
-  Widget _gate() => TabPage(
-        title: 'للوالدين',
-        subtitle: 'هالقسم للكبار فقط 🔒',
-        children: [
-          SoftCard(
-            padding: const EdgeInsets.all(22),
-            child: Column(children: [
-              const Text('👨‍👩‍👧', style: TextStyle(fontSize: 54)),
-              const Text('جاوب عشان تدخل', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 10),
-              Directionality(
-                textDirection: TextDirection.ltr,
-                child: Text('${Learn.ar(_a)} × ${Learn.ar(_b)} = ؟', style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: C.purple)),
-              ),
-              const SizedBox(height: 16),
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 2.4,
-                children: [
-                  for (final o in _opts)
-                    Material(
-                      color: const Color(0xFFF4F7FC),
-                      borderRadius: BorderRadius.circular(18),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(18),
-                        onTap: () => _answer(o),
-                        child: Center(child: Text(Learn.ar(o), style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800))),
-                      ),
-                    ),
-                ],
-              ),
-            ]),
-          ),
-        ],
-      );
-
   String _ago(num t) {
-    final d = DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(t.toInt()));
-    if (d.inMinutes < 1) return 'الحين';
-    if (d.inMinutes < 60) return 'قبل ${Learn.ar(d.inMinutes)} د';
-    if (d.inHours < 24) return 'قبل ${Learn.ar(d.inHours)} س';
-    if (d.inDays == 1) return 'أمس';
-    return 'قبل ${Learn.ar(d.inDays)} ${d.inDays < 11 ? 'أيام' : 'يوم'}';
+    final m = ((DateTime.now().millisecondsSinceEpoch - t) / 60000).round();
+    if (m < 2) return 'الآن';
+    if (m < 60) return 'قبل ${Learn.ar(m)} دقيقة';
+    final h = (m / 60).round();
+    if (h < 24) return 'قبل ${Learn.ar(h)} ساعة';
+    final d = (h / 24).round();
+    return d == 1 ? 'أمس' : 'قبل ${Learn.ar(d)} أيام';
+  }
+
+  Future<void> _settings({String? jump}) async {
+    if (!await askPin(context)) return;
+    if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingsScreen(jump: jump)));
+  }
+
+  void _code() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('🔑', style: TextStyle(fontSize: 46)),
+          const Text('رمز عائلتك', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 10),
+          Text(f.code, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: 2, fontFamily: 'monospace', color: C.purple)),
+          const SizedBox(height: 8),
+          const Text('في التابلت: افتح سراج ← «جهاز طفل» ← أدخل الرمز.', textAlign: TextAlign.center, style: TextStyle(color: C.soft)),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: f.code));
+              Navigator.pop(ctx);
+              toast(context, 'تم نسخ الرمز ✓');
+            },
+            style: FilledButton.styleFrom(backgroundColor: C.orange),
+            child: const Text('نسخ الرمز', style: TextStyle(fontWeight: FontWeight.w800)),
+          ),
+        ]),
+      ),
+    );
   }
 
   static const _actName = {
@@ -133,20 +86,45 @@ class _ParentsScreenState extends State<ParentsScreen> {
     'quiz': 'جاوب أسئلة القصص ❓', 'color': 'لوّن المشهد 🎨', 'puzzle': 'رتّب الأحجية 🧩',
   };
 
-  Widget _dash(BuildContext context) {
-    final f = Family.I;
-    final kids = f.linked && f.kids.isNotEmpty ? f.kids : [Profile.hero ?? const Kid('بطلنا', 'm')];
+  @override
+  Widget build(BuildContext context) {
+    if (f.kids.isEmpty) {
+      return TabPage(title: 'للوالدين', subtitle: 'ما فيه عائلة على هالجهاز', children: [
+        SoftCard(
+          padding: const EdgeInsets.all(20),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const Text('👨‍👩‍👧', textAlign: TextAlign.center, style: TextStyle(fontSize: 50)),
+            const Text('أنشئ عائلتك أو اربط الجهاز', textAlign: TextAlign.center, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 14),
+            BigButton(label: 'أنا وليّ الأمر — أنشئ عائلتي', onTap: () async {
+              await f.startParent();
+              if (context.mounted) await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ParentSetupScreen()));
+            }),
+            const SizedBox(height: 8),
+            OutlinedButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JoinScreen(as: 'parent'))), child: const Text('عندي رمز عائلة 🔑', style: TextStyle(fontWeight: FontWeight.w800))),
+          ]),
+        ),
+      ]);
+    }
     final byId = {for (final s in Library.stories) s.id: s};
-    final names = {for (final k in kids) k.id: k.name};
-    final weekAgo = DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch;
-    final feed = [
-      ...f.allLogs.map((e) => (e, true)),
-      ...f.allActs.map((e) => (e, false)),
-    ]..sort((a, b) => ((b.$1['t'] as num?) ?? 0).compareTo((a.$1['t'] as num?) ?? 0));
+    final logs = f.allLogs, acts = f.allActs;
+    final now = DateTime.now();
+    final week = List.generate(7, (i) => Family.dateKey(now.subtract(Duration(days: 6 - i))));
+    const dn = ['إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت', 'أحد'];
+    final devs = f.devices;
+    String names(List ids) => ids.map((id) => f.kidById(id.toString())?.name).whereType<String>().join(' و');
+
+    Widget quick(String e, String t, VoidCallback onTap) => Expanded(
+          child: SoftCard(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            onTap: onTap,
+            child: Column(children: [Text(e, style: const TextStyle(fontSize: 30)), Text(t, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5))]),
+          ),
+        );
 
     return TabPage(
       title: 'للوالدين',
-      subtitle: f.linked ? 'العائلة مربوطة ✅' : 'هالجهاز مو مربوط بعائلة',
+      subtitle: 'متابعة العائلة 📊',
       trailing: IconButton.filledTonal(
         onPressed: () {
           HapticFeedback.lightImpact();
@@ -156,136 +134,142 @@ class _ParentsScreenState extends State<ParentsScreen> {
         icon: f.syncing ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5)) : const Icon(Icons.sync_rounded, color: C.ink),
       ),
       children: [
-        if (!f.linked)
-          SoftCard(
-            padding: const EdgeInsets.all(18),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('اربط الجهاز بعائلتك 🔑', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-              const Text('عشان تطلع أسماء أطفالك وأشكالهم، وتوصلك قراءاتهم من كل الأجهزة.', style: TextStyle(fontSize: 15, color: C.soft, height: 1.5, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 12),
-              BigButton(label: 'ربط برمز العائلة', icon: Icons.key_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JoinScreen()))),
-            ]),
-          ),
+        Row(children: [
+          quick('⚙️', 'الإعدادات', _settings),
+          const SizedBox(width: 8),
+          quick('💌', 'رسالة للعيال', () => _settings(jump: 'msg')),
+          const SizedBox(width: 8),
+          quick('🎁', 'مكافأة الأسبوع', () => _settings(jump: 'reward')),
+          if (f.linked) ...[const SizedBox(width: 8), quick('🔑', 'رمز العائلة', _code)],
+        ]),
         const SectionTitle('الأطفال 👧👦'),
-        for (final k in kids) _kidCard(k, weekAgo, byId),
-        const SectionTitle('آخر النشاطات 🕐'),
-        SoftCard(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: feed.isEmpty
-              ? const Padding(padding: EdgeInsets.all(20), child: Text('ما فيه نشاط لين الحين', textAlign: TextAlign.center, style: TextStyle(color: C.soft, fontWeight: FontWeight.w700)))
-              : Column(children: [
-                  for (final (e, isLog) in feed.take(15))
-                    ListTile(
-                      dense: true,
-                      leading: Text(isLog ? '📖' : '🎮', style: const TextStyle(fontSize: 22)),
-                      title: Text(
-                        '${((e['k'] as List?) ?? []).map((id) => names[id] ?? '').where((n) => n.isNotEmpty).join(' و')}${((e['k'] as List?) ?? []).isEmpty ? '' : ': '}'
-                        '${isLog ? (byId[e['s']] != null ? 'قرأ «${fillTemplate(byId[e['s']]!.title, kids.first)}»' : 'قرأ قصة') : (_actName[e['a']] ?? e['a'].toString())}',
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        for (final k in f.kids) () {
+          final mine = logs.where((e) => ((e['k'] as List?) ?? []).contains(k.id)).toList();
+          final days = mine.map((e) => e['d'].toString()).toSet();
+          final last = mine.isNotEmpty ? mine.first : null;
+          final lastSt = last != null ? byId[last['s']] : null;
+          final a = acts.where((x) => ((x['k'] as List?) ?? []).contains(k.id)).toList();
+          int cnt(String t) => a.where((x) => x['a'] == t).length;
+          final kd = devs.where((d) => d['role'] == 'child' && ((d['kids'] as List?) ?? []).contains(k.id)).toList();
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SoftCard(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Row(children: [
+                  KidFace(kid: k, size: 56),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(k.name, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
+                      Text(last != null ? 'آخر قصة ${_ago((last['t'] as num?) ?? 0)}' : (k.isGirl ? 'ما قرأت بعد' : 'ما قرأ بعد'), style: const TextStyle(color: C.soft, fontWeight: FontWeight.w700)),
+                    ]),
+                  ),
+                ]),
+                const SizedBox(height: 12),
+                Row(children: [
+                  for (final s in [(Learn.ar(mine.map((e) => e['s']).toSet().length), 'قصة'), ('${Learn.ar(f.streakOf(k))} 🔥', 'أيام متتالية'), (Learn.ar(mine.length), 'مرة قراءة')])
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(color: const Color(0xFFF4F7FC), borderRadius: BorderRadius.circular(16)),
+                        child: Column(children: [
+                          Text(s.$1, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                          Text(s.$2, style: const TextStyle(fontSize: 12.5, color: C.soft, fontWeight: FontWeight.w700)),
+                        ]),
                       ),
-                      trailing: Text(_ago((e['t'] as num?) ?? 0), style: const TextStyle(color: C.soft, fontWeight: FontWeight.w700, fontSize: 12.5)),
+                    ),
+                ]),
+                const SizedBox(height: 10),
+                Row(children: [
+                  for (final d in week)
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        decoration: BoxDecoration(color: days.contains(d) ? const Color(0xFF2C2F5C) : const Color(0xFFF0F3F9), borderRadius: BorderRadius.circular(10)),
+                        child: Text(dn[DateTime.parse(d).weekday - 1], textAlign: TextAlign.center, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: days.contains(d) ? Colors.white : C.soft)),
+                      ),
+                    ),
+                ]),
+                if (lastSt != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text('آخر قصة: «${fillTemplate(lastSt.title, k, dad: f.dad, mom: f.mom)}»', style: const TextStyle(color: C.soft, fontWeight: FontWeight.w600))),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text('⭐ ${Learn.ar(f.monthNights(k))} نجمة هالشهر${a.isNotEmpty ? ' · 🤲 ${Learn.ar(cnt('adhkar'))} · 🔤 ${Learn.ar(cnt('en'))} · 🪐 ${Learn.ar(cnt('space'))} · ✈️ ${Learn.ar(cnt('trip'))}' : ''}',
+                      style: const TextStyle(color: C.soft, fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(color: kd.isNotEmpty ? const Color(0xFFE5FBEA) : const Color(0xFFF4F7FC), borderRadius: BorderRadius.circular(14)),
+                  child: Text(
+                    kd.isNotEmpty
+                        ? '📱 سراج مثبّت على ${kd.first['plat'] ?? 'جهاز'}${kd.length > 1 ? ' و${Learn.ar(kd.length - 1)} غيره' : ''} · آخر فتح ${_ago((kd.first['last'] as num?) ?? 0)}'
+                        : '⚪ ما فيه جهاز مربوط ل${k.isGirl ? 'ها' : 'ه'}',
+                    style: TextStyle(fontWeight: FontWeight.w700, color: kd.isNotEmpty ? const Color(0xFF1E8E4A) : C.soft, fontSize: 13.5),
+                  ),
+                ),
+              ]),
+            ),
+          );
+        }(),
+        const SectionTitle('الأجهزة المربوطة 📱'),
+        SoftCard(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+          child: devs.isEmpty
+              ? const Padding(padding: EdgeInsets.all(16), child: Text('ما فيه أجهزة مربوطة غير هذا الجوال.', textAlign: TextAlign.center, style: TextStyle(color: C.soft, fontWeight: FontWeight.w700)))
+              : Column(children: [
+                  for (final d in devs)
+                    ListTile(
+                      leading: Icon(Icons.circle, size: 12, color: DateTime.now().millisecondsSinceEpoch - ((d['last'] as num?) ?? 0) < 3 * 86400000 ? const Color(0xFF2FA36B) : const Color(0xFFC9D2E3)),
+                      title: Text(d['role'] == 'parent' ? 'وليّ أمر' : names((d['kids'] as List?) ?? []).isNotEmpty ? names(d['kids'] as List) : 'جهاز طفل (ما اختار اسمه بعد)', style: const TextStyle(fontWeight: FontWeight.w800)),
+                      subtitle: Text('${d['plat'] ?? 'جهاز'} · آخر فتح ${_ago((d['last'] as num?) ?? 0)}${d['ver'] != null ? ' · v${d['ver']}' : ''}', style: const TextStyle(fontSize: 12.5)),
+                      trailing: TextButton(
+                        onPressed: () => f.hideDevice(d['dev'].toString()),
+                        style: TextButton.styleFrom(foregroundColor: const Color(0xFFD33A3A)),
+                        child: const Text('إزالة'),
+                      ),
                     ),
                 ]),
         ),
-        const SectionTitle('الإعدادات ⚙️'),
+        const SectionTitle('آخر النشاط 🕐'),
         SoftCard(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('سرعة القراءة بالصوت', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
-            Row(children: [
-              const Text('🐢'),
-              Expanded(
-                child: Slider(
-                  value: Profile.rate.clamp(.25, .7),
-                  min: .25,
-                  max: .7,
-                  divisions: 9,
-                  activeColor: C.orange,
-                  onChanged: (v) => setState(() => Profile.rate = v),
-                  onChangeEnd: (v) {
-                    Profile.saveRate(v);
-                    Voice.stop().then((_) => Voice.speak('كان يا ما كان، في قديم الزمان', v));
-                  },
-                ),
-              ),
-              const Text('🐇'),
-            ]),
-            if (f.linked) Text('وقت النوم في العائلة: ${Learn.ar(f.bedtime)}', style: const TextStyle(color: C.soft, fontWeight: FontWeight.w700)),
-            const Divider(height: 22),
-            if (f.linked && f.kids.length > 1)
-              _row(Icons.groups_rounded, 'مين يستخدم هالجهاز؟', () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WhoScreen()))),
-            if (!f.linked) _row(Icons.edit_rounded, 'تعديل البطل', () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SetupScreen(editing: true))).then((_) => _r())),
-            _row(Icons.brush_rounded, 'تعديل الأطفال وأشكالهم (من الموقع)', () => launchUrl(Uri.parse('https://siraj.wamdarc.com/'), mode: LaunchMode.externalApplication)),
-            if (f.log.isNotEmpty || f.act.isNotEmpty) _row(Icons.cleaning_services_rounded, 'مسح قراءات هالجهاز', () => _confirm(context, 'تمسح قراءات وألعاب هالجهاز؟', 'لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.', f.clearMine)),
-            if (f.linked) _row(Icons.link_off_rounded, 'فك ربط هالجهاز', () => _confirm(context, 'تفك ربط الجهاز؟', 'تقدر تربطه مرة ثانية بنفس الرمز.', f.unlink), danger: true),
-          ]),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: logs.isEmpty && acts.isEmpty
+              ? const Padding(padding: EdgeInsets.all(20), child: Text('ما فيه نشاط بعد', textAlign: TextAlign.center, style: TextStyle(color: C.soft, fontWeight: FontWeight.w700)))
+              : Column(children: [
+                  for (final e in [...logs.take(12).map((e) => (e, true)), ...acts.take(8).map((e) => (e, false))]..sort((a, b) => ((b.$1['t'] as num?) ?? 0).compareTo((a.$1['t'] as num?) ?? 0)))
+                    () {
+                      final m = e.$1, ks = ((m['k'] as List?) ?? []).map((id) => f.kidById(id.toString())).whereType<Kid>().toList();
+                      final st = byId[m['s']];
+                      final what = e.$2
+                          ? (st != null ? (ks.isNotEmpty ? fillTemplate(st.title, ks.first, friends: ks.sublist(1), dad: f.dad, mom: f.mom) : st.title.replaceAll('{n}', '…')) : 'قصة')
+                          : (_actName[m['a']] ?? m['a'].toString());
+                      return ListTile(
+                        dense: true,
+                        leading: Text(e.$2 ? '📖' : (st == null ? '🎮' : '📖'), style: const TextStyle(fontSize: 22)),
+                        title: Text(what, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                        subtitle: Text('${ks.isEmpty ? '—' : ks.map((k) => k.name).join(' و')} · ${_ago((m['t'] as num?) ?? 0)} · ${m['role'] == 'child' ? 'جهاز الطفل' : 'جوال وليّ الأمر'}', style: const TextStyle(fontSize: 12.5)),
+                      );
+                    }(),
+                ]),
         ),
-        const SectionTitle('عن سراج 🌙'),
-        SoftCard(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-          child: Column(children: [
-            _row(Icons.privacy_tip_rounded, 'سياسة الخصوصية', () => launchUrl(Uri.parse('https://siraj.wamdarc.com/privacy.html'), mode: LaunchMode.externalApplication)),
-            _row(Icons.mail_rounded, 'تواصل معنا', () => launchUrl(Uri.parse('mailto:bsshfi@gmail.com?subject=${Uri.encodeComponent('سراج | Siraj')}'))),
-            const SizedBox(height: 6),
-            Text('سراج | Siraj $_ver\nمن WAMD ARC · بدون إعلانات وبدون تتبّع', textAlign: TextAlign.center, style: const TextStyle(color: C.soft, fontWeight: FontWeight.w600, height: 1.6)),
-          ]),
-        ),
-      ],
-    );
-  }
-
-  Widget _kidCard(Kid k, int weekAgo, Map<String, Story> byId) {
-    final f = Family.I;
-    final logs = f.logsOf(k), acts = f.actsOf(k);
-    final week = logs.where((e) => ((e['t'] as num?) ?? 0) >= weekAgo).map((e) => e['d']).toSet().length;
-    final last = logs.isNotEmpty ? logs.last : null;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: SoftCard(
-        padding: const EdgeInsets.all(14),
-        child: Row(children: [
-          KidFace(kid: k, size: 62),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(k.name, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-              Text('⭐ ${Learn.ar(logs.length)} قصة · 🌙 ${Learn.ar(week)}/٧ ليالي هالأسبوع · 🔥 ${Learn.ar(f.streakOf(k))}',
-                  style: const TextStyle(fontSize: 13.5, color: C.soft, fontWeight: FontWeight.w700)),
-              Text('🎮 ${Learn.ar(acts.length)} نشاط${last != null && byId[last['s']] != null ? ' · آخر قصة: ${fillTemplate(byId[last['s']]!.title, k)}' : ''}',
-                  maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13.5, color: C.soft, fontWeight: FontWeight.w600)),
+        if (f.log.isNotEmpty || f.act.isNotEmpty) ...[
+          const SectionTitle('قراءات هذا الجوال'),
+          SoftCard(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text('قصص وألعاب انحسبت من جوالك (${Learn.ar(f.log.length)} قصة · ${Learn.ar(f.act.length)} لعبة). لو كنت تتصفح بس، امسحها عشان ما تنحسب على العيال.',
+                  style: const TextStyle(color: C.soft, height: 1.5, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 10),
+              OutlinedButton(onPressed: f.clearMine, child: const Text('مسح قراءات هذا الجوال', style: TextStyle(fontWeight: FontWeight.w800))),
             ]),
-          ),
-        ]),
-      ),
-    );
-  }
-
-  Widget _row(IconData i, String t, VoidCallback onTap, {bool danger = false}) => ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: Icon(i, color: danger ? Colors.redAccent : C.sky),
-        title: Text(t, style: TextStyle(fontWeight: FontWeight.w700, color: danger ? Colors.redAccent : C.ink)),
-        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: C.soft),
-        onTap: onTap,
-      );
-
-  void _confirm(BuildContext context, String title, String body, Future<void> Function() action) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-        content: Text(body),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await action();
-            },
-            child: const Text('نعم'),
           ),
         ],
-      ),
+        const SizedBox(height: 4),
+        Text('تصنيفات القصص المقروءة: ${logs.map((e) => byId[e['s']]).whereType<Story>().map((s) => Tonight.catOf(s).$2).toSet().join(' ')}', textAlign: TextAlign.center, style: const TextStyle(color: C.soft, fontSize: 13)),
+      ],
     );
   }
 }

@@ -27,6 +27,18 @@ class Sync {
     return '${c.substring(0, 5)}-${c.substring(5)}';
   }
 
+  static String newCode() {
+    final r = Random.secure();
+    final s = List.generate(10, (_) => _alph[r.nextInt(_alph.length)]).join();
+    return '${s.substring(0, 5)}-${s.substring(5)}';
+  }
+
+  /// رفع بيانات العائلة (وليّ الأمر) — يرجع true لو انقبلت
+  static Future<bool> pushFamily(String code, Map<String, dynamic> fam, int rev) async {
+    final (_, j) = await _api('/family', {'id': await famId(code), 'blob': await seal(code, fam), 'rev': rev});
+    return j['ok'] == true;
+  }
+
   static Future<String> famId(String code) async {
     final h = await Sha256().hash(utf8.encode('siraj-id:$code'));
     return h.bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join().substring(0, 32);

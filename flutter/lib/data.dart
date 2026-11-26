@@ -10,8 +10,11 @@ class StoryPage {
   final String prop;
   final List<(String, int)> choices;
   final bool isEnd;
+  final bool kids; // في قصص الأنبياء: نرسم الأطفال بس في الصفحات اللي عليها k
 
-  StoryPage({required this.text, required this.scene, required this.prop, this.choices = const [], this.isEnd = false});
+  StoryPage({required this.text, required this.scene, required this.prop, this.choices = const [], this.isEnd = false, this.kids = false});
+
+  StoryPage withText(String t) => StoryPage(text: t, scene: scene, prop: prop, kids: kids);
 
   factory StoryPage.fromJson(Map<String, dynamic> j, String fallbackScene) {
     final ch = <(String, int)>[];
@@ -27,6 +30,7 @@ class StoryPage {
       prop: (j['p'] ?? '').toString(),
       choices: ch,
       isEnd: j['end'] != null && j['end'] != 0 && j['end'] != false,
+      kids: j['k'] != null && j['k'] != 0 && j['k'] != false,
     );
   }
 }
@@ -39,8 +43,30 @@ class Story {
   final String question;
   final String category;
   final List<StoryPage> pages;
+  final String cat2, ser, src;
+  final int part;
+  final Map<String, dynamic>? occ; // {cal: g|h, m, d: [..]}
+  final List<(int, String)> young; // نسخة قصيرة للصغار: (رقم الصفحة، نص)
+  final bool hidden;
 
-  Story({required this.id, required this.title, required this.value, required this.scene, required this.question, required this.category, required this.pages});
+  Story({required this.id, required this.title, required this.value, required this.scene, required this.question, required this.category, required this.pages,
+      this.cat2 = '', this.ser = '', this.src = '', this.part = 0, this.occ, this.young = const [], this.hidden = false});
+
+  bool get isPro => category == 'pro';
+  bool get isSah => category == 'sahaba';
+  bool get isQan => category == 'qanimal';
+  bool get isNarr => isPro || isSah || isQan;
+  bool get laterPart => ser.isNotEmpty && part > 1;
+  bool get hasChoices => pages.any((p) => p.choices.isNotEmpty);
+
+  /// صفحات النسخة القصيرة (٣-٥ سنوات) أو null
+  List<StoryPage>? get youngPages {
+    if (young.isNotEmpty) return [for (final (i, t) in young) if (i < pages.length) pages[i].withText(t)];
+    if (isNarr) return pages.where((p) => !p.kids).toList();
+    return null;
+  }
+
+  bool get canShort => !hasChoices && youngPages != null;
 
   factory Story.fromJson(Map<String, dynamic> j) {
     final scene = (j['scene'] ?? 'home').toString();
@@ -51,6 +77,13 @@ class Story {
       scene: scene,
       question: (j['q'] ?? '').toString(),
       category: (j['cat'] ?? '').toString(),
+      cat2: (j['cat2'] ?? '').toString(),
+      ser: (j['ser'] ?? '').toString(),
+      src: (j['src'] ?? '').toString(),
+      part: (j['part'] as num?)?.toInt() ?? 0,
+      occ: j['occ'] is Map ? Map<String, dynamic>.from(j['occ'] as Map) : null,
+      hidden: j['hidden'] == true,
+      young: [for (final y in (j['y'] as List?) ?? []) if (y is List && y.length >= 2) ((y[0] as num).toInt(), y[1].toString())],
       pages: ((j['pages'] as List?) ?? []).map((p) => StoryPage.fromJson(Map<String, dynamic>.from(p as Map), scene)).toList(),
     );
   }
@@ -131,6 +164,13 @@ class Profile {
     final p = await SharedPreferences.getInstance();
     await p.setString(_kName, h.name);
     await p.setString(_kGender, h.gender);
+  }
+
+  static Future<void> clearHero() async {
+    hero = null;
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_kName);
+    await p.remove(_kGender);
   }
 
   static Future<void> saveRate(double r) async {

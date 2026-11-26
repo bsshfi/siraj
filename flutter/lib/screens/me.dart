@@ -8,6 +8,7 @@ import '../learn.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/common.dart';
+import 'kid_editor.dart';
 
 /// تبويب "أنا": شخصية الطفل، نجومه، أسبوعه، شاراته، وأذكار النوم
 class MeScreen extends StatefulWidget {
@@ -37,7 +38,14 @@ class _MeScreenState extends State<MeScreen> {
 
   static final Map<String, Story> _byId = {for (final s in Library.stories) s.id: s};
 
-  List<Kid> get _kids => Family.I.linked && Family.I.kids.isNotEmpty ? Family.I.myKids : [Profile.hero ?? const Kid('بطلنا', 'm')];
+  List<Kid> get _kids => Family.I.kids.isNotEmpty ? Family.I.myKids : [Profile.hero ?? const Kid('بطلنا', 'm')];
+
+  /// نجوم الأسبوع (من الأحد) لمكافأة الأسبوع
+  int _weekStars(Kid k) {
+    final d = DateTime.now();
+    final ws = DateTime(d.year, d.month, d.day).subtract(Duration(days: d.weekday % 7)).millisecondsSinceEpoch;
+    return Family.I.logsOf(k).where((e) => ((e['t'] as num?) ?? 0) >= ws).map((e) => e['d']).toSet().length;
+  }
 
   static const _badges = [
     ('📖', '١٠ قصص'), ('📚', '٢٥ قصة'), ('🏅', '٥٠ قصة'), ('🏆', '١٠٠ قصة'),
@@ -87,6 +95,49 @@ class _MeScreenState extends State<MeScreen> {
             ),
           ]),
         ),
+        if (k.id.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: OutlinedButton.icon(
+              onPressed: () {
+                final m = Family.I.kidMaps.where((x) => x['id'] == k.id).toList();
+                if (m.isNotEmpty) Navigator.of(context).push(MaterialPageRoute(builder: (_) => KidEditor(kid: m.first, mode: EditMode.self)));
+              },
+              icon: const Text('✏️'),
+              label: Text(k.isGirl ? 'غيّري شكلك' : 'غيّر شكلك', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+              style: OutlinedButton.styleFrom(backgroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+            ),
+          ),
+        if (Family.I.fam['reward'] is Map) () {
+          final r = Family.I.fam['reward'] as Map;
+          final need = (r['stars'] as num?)?.toInt() ?? 5, got = _weekStars(k).clamp(0, need);
+          return Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFFFF6E0), Color(0xFFFFE9C2)]), borderRadius: BorderRadius.circular(24)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Text('🎁', style: TextStyle(fontSize: 34)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Text('مكافأة الأسبوع', style: TextStyle(fontSize: 13, color: Color(0xFFB76E00), fontWeight: FontWeight.w800)),
+                      Text(r['text'].toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                    ]),
+                  ),
+                ]),
+                const SizedBox(height: 8),
+                Row(children: [
+                  for (var i = 0; i < need; i++) Text('⭐', style: TextStyle(fontSize: 24, color: i < got ? null : const Color(0x33000000))),
+                  const Spacer(),
+                  Text(got >= need ? 'كسبتها! 🎉' : '${Learn.ar(got)}/${Learn.ar(need)}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                ]),
+                const Text('كل ليلة تقرأ فيها قصة = نجمة ⭐ (الأسبوع يبدأ من الأحد)', style: TextStyle(fontSize: 12.5, color: C.soft)),
+              ]),
+            ),
+          );
+        }(),
         const SectionTitle('أسبوعي 🌙'),
         SoftCard(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),

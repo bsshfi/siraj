@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 
 import '../family.dart';
 import '../learn.dart';
+import '../nav.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/common.dart';
 import '../widgets/scene.dart';
+import 'library.dart';
 
 /// تبويب "اكتشف": رحلات حول العالم + الفضاء
 class ExploreScreen extends StatefulWidget {
@@ -16,7 +18,7 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  int _sec = 0;
+  int get _sec => Nav.explore.value;
   String _region = 'all';
   String _q = '';
 
@@ -24,11 +26,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
   void initState() {
     super.initState();
     Family.I.addListener(_r);
+    Nav.explore.addListener(_r);
   }
 
   @override
   void dispose() {
     Family.I.removeListener(_r);
+    Nav.explore.removeListener(_r);
     super.dispose();
   }
 
@@ -40,12 +44,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
   Widget build(BuildContext context) {
     return TabPage(
       title: 'اكتشف',
-      subtitle: _sec == 0 ? 'سافر حول العالم ✈️' : 'رحلة إلى الفضاء 🚀',
+      subtitle: const ['سافر حول العالم ✈️', 'رحلة إلى الفضاء 🚀', 'قصصك المفضلة واللي قريتها 📚'][_sec],
       colors: _sec == 1 ? const [C.night1, Color(0xFF3A3F78), Color(0xFF6E6AAE)] : null,
       children: [
-        Pills(items: const ['✈️ رحلات حول العالم', '🪐 الفضاء'], index: _sec, onTap: (i) => setState(() => _sec = i)),
+        Pills(items: const ['✈️ رحلات حول العالم', '🪐 الكواكب والقمر', '📚 مكتبة القصص'], index: _sec, onTap: (i) => Nav.explore.value = i),
         const SizedBox(height: 14),
-        if (_sec == 0) ..._trips(context) else ..._space(context),
+        if (_sec == 0) ..._trips(context),
+        if (_sec == 1) ..._space(context),
+        if (_sec == 2) const MyLibrary(),
       ],
     );
   }

@@ -61,3 +61,29 @@ console.log(`✓ ${stories.length} قصة، ${n} مشهد`);
   console.log(`✓ تعلّم: ${out.letters.length} حرف، ${Object.keys(out.words).length} فئة كلمات، ${out.planets.length} كوكب، ${out.countries.length} دولة، ${out.adhkar.length} ذكر، ${out.mansions.length} منزلة`);
   if (!out.letters.length || !out.countries.length || !out.planets.length) { console.error('✗ محتوى التعلّم ناقص'); process.exit(1); }
 })();
+
+/* ---- خيارات محرّر الشخصيات + سياسة الخصوصية (عشان ما يطلع أي رابط ويب داخل التطبيق) ---- */
+(() => {
+  const pick = ['HEADS', 'STYLES', 'OUTFITS', 'SKIN', 'HAIR', 'SHIRT', 'HEADC', 'PANTS', 'LEAGUES', 'SHOES', 'SHOEC', 'DEFAULTS', 'CLUBS'];
+  const art = {}; pick.forEach((k) => (art[k] = ART[k]));
+  fs.writeFileSync(path.join(OUT, 'data', 'art.json'), JSON.stringify(art));
+  const html = fs.readFileSync(path.join(ROOT, 'privacy.html'), 'utf8');
+  const m = html.match(/<main id="ar"[\s\S]*?<\/main>/);
+  const strip = (s) => s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  const out = [];
+  if (m) {
+    const re = /<h2[^>]*>([\s\S]*?)<\/h2>|<li[^>]*>([\s\S]*?)<\/li>|<p[^>]*>([\s\S]*?)<\/p>/g;
+    let x, cur = null;
+    while ((x = re.exec(m[0]))) {
+      if (x[1] != null) { const e = (x[1].match(/<span>([\s\S]*?)<\/span>/) || [])[1] || ''; cur = { e: strip(e), h: strip(x[1].replace(/<span>[\s\S]*?<\/span>/, '')), b: [] }; out.push(cur); }
+      else if (cur) cur.b.push((x[2] != null ? '• ' : '') + strip(x[2] != null ? x[2] : x[3]));
+    }
+  }
+  const upd = (html.match(/آخر تحديث:\s*([^<]+)/) || [])[1] || '';
+  fs.writeFileSync(path.join(OUT, 'data', 'privacy.json'), JSON.stringify({ updated: upd.trim(), sections: out }));
+  console.log(`✓ محرّر الشخصيات: ${ART.CLUBS.length} نادي · الخصوصية: ${out.length} قسم`);
+  if (out.length < 5) { console.error('✗ ما قدرت أقرأ سياسة الخصوصية'); process.exit(1); }
+})();
+
+// شعار WAMD ARC لشاشة حول التطبيق
+for (const n of ['wamdarc-light.png', 'wamdarc-dark.png']) { try { fs.copyFileSync(path.join(ROOT, n), path.join(OUT, 'brand', n)); } catch (e) { console.error('تحذير: ما لقيت', n); } }
