@@ -12,5 +12,10 @@
       "smallIcon": "ic_stat_siraj",
       "iconColor": "#5B4BDB"
     }
+  },
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost",
+    "iosScheme": "capacitor"
   }
 }
