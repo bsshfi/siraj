@@ -88,6 +88,20 @@ class Sync {
     await _api('/progress', {'fam': await famId(code), 'dev': dev, 'blob': await seal(code, data)});
   }
 
+  /// تقدّم كل أجهزة العائلة (مفكوك التشفير)
+  static Future<List<Map<String, dynamic>>> pullProgress(String code) async {
+    final (_, j) = await _api('/progress/${await famId(code)}');
+    final out = <Map<String, dynamic>>[];
+    for (final it in (j['items'] as List?) ?? []) {
+      try {
+        final m = Map<String, dynamic>.from(it as Map);
+        final data = Map<String, dynamic>.from(await open(code, m['blob'] as String) as Map);
+        out.add({...data, 'dev': m['dev'], 'updated': m['updated']});
+      } catch (_) {}
+    }
+    return out;
+  }
+
   static Future<void> event(String code, String dev, List<String> kids, String story) async {
     await _api('/event', {'fam': await famId(code), 'dev': dev, 'kids': kids, 'story': story});
   }

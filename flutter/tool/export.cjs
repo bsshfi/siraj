@@ -35,3 +35,29 @@ for (const g of ['m', 'f']) {
 fs.mkdirSync(path.join(OUT, 'js'), { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'art.js'), path.join(OUT, 'js', 'art.js'));
 console.log(`✓ ${stories.length} قصة، ${n} مشهد`);
+
+/* ---- المرحلة ٣: محتوى أنا/اكتشف/العب وتعلّم ----
+   نقرأ الثوابت من داخل وحدات الويب (english/space/night/trips-data) ونكتبها assets/data/learn.json */
+(() => {
+  const ctx2 = Object.assign({}, ctx, { App: { ctx: () => ({}) }, ART });
+  ctx2.window = ctx2; vm.createContext(ctx2);
+  const grab = (file, mod) => {
+    let s = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    const i = s.lastIndexOf('\n  return {');
+    if (i > 0 && mod) s = s.slice(0, i) + `\n  globalThis.__EV_${mod} = (x) => { try { return eval(x); } catch (e) { return null; } };` + s.slice(i);
+    return s + '\n;\n';
+  };
+  let s2 = grab('trips-data.js') + grab('english.js', 'EN') + grab('english-3.js', 'EN2') + grab('space.js', 'SP') + grab('night.js', 'NI');
+  s2 += ';globalThis.__TRIPS = { COUNTRIES: typeof COUNTRIES !== "undefined" ? COUNTRIES : [], REGIONS: typeof REGIONS !== "undefined" ? REGIONS : [], INFO: typeof COUNTRY_INFO !== "undefined" ? COUNTRY_INFO : {} };';
+  try { vm.runInContext(s2, ctx2, { filename: 'siraj-learn.js' }); } catch (e) { console.error('تحذير (التعلّم):', e.message); }
+  const ev = (m, x) => (ctx2['__EV_' + m] ? ctx2['__EV_' + m](x) : null);
+  const out = {
+    letters: ev('EN', 'LETTERS') || [], words: ev('EN', 'WORDS') || {}, sentences: ev('EN', 'SENT') || [], sight: ev('EN2', 'SIGHT') || [],
+    phases: ev('SP', 'PHASES') || [], mansions: ev('SP', 'MAN') || [], planets: ev('SP', 'PL') || [], stars: ev('SP', 'STARS') || [], spaceQuiz: ev('SP', 'QUIZ') || [],
+    adhkar: ev('NI', 'ADHKAR') || [],
+    countries: ctx2.__TRIPS.COUNTRIES, regions: ctx2.__TRIPS.REGIONS, info: ctx2.__TRIPS.INFO
+  };
+  fs.writeFileSync(path.join(OUT, 'data', 'learn.json'), JSON.stringify(out));
+  console.log(`✓ تعلّم: ${out.letters.length} حرف، ${Object.keys(out.words).length} فئة كلمات، ${out.planets.length} كوكب، ${out.countries.length} دولة، ${out.adhkar.length} ذكر، ${out.mansions.length} منزلة`);
+  if (!out.letters.length || !out.countries.length || !out.planets.length) { console.error('✗ محتوى التعلّم ناقص'); process.exit(1); }
+})();

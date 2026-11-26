@@ -5,7 +5,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'avatars.dart';
 import 'data.dart';
 import 'family.dart';
+import 'learn.dart';
 import 'remote.dart';
+import 'screens/explore.dart';
+import 'screens/me.dart';
+import 'screens/parents.dart';
+import 'screens/play_learn.dart';
 import 'screens/setup.dart';
 import 'screens/tonight.dart';
 import 'theme.dart';
@@ -18,7 +23,7 @@ Future<void> main() async {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  await Future.wait([Library.load(), Profile.load(), Family.I.load()]);
+  await Future.wait([Library.load(), Profile.load(), Family.I.load(), Learn.load()]);
   runApp(const SirajApp());
 }
 
@@ -94,10 +99,10 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final pages = <Widget>[
       const TonightScreen(),
-      const _Soon(title: 'أنا', emoji: '⭐', note: 'غرفتك وشخصيتك ونجومك'),
-      const _Soon(title: 'اكتشف', emoji: '🌍', note: 'الرحلات حول العالم والفضاء'),
-      const _Soon(title: 'العب وتعلّم', emoji: '🧩', note: 'الإنجليزي والألعاب'),
-      const _Soon(title: 'للوالدين', emoji: '👨‍👩‍👧', note: 'ربط العائلة والإعدادات والتقارير'),
+      const MeScreen(),
+      const ExploreScreen(),
+      const PlayLearnScreen(),
+      const ParentsScreen(),
     ];
     return Scaffold(
       extendBody: true,
@@ -165,35 +170,6 @@ class _NavItem extends StatelessWidget {
               softWrap: false,
               style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: selected ? Colors.white : C.soft)),
         ]),
-      ),
-    );
-  }
-}
-
-class _Soon extends StatelessWidget {
-  final String title, emoji, note;
-  const _Soon({required this.title, required this.emoji, required this.note});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .35, .7]),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: SoftCard(
-            padding: const EdgeInsets.all(28),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text(emoji, style: const TextStyle(fontSize: 56)),
-              const SizedBox(height: 8),
-              Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 6),
-              Text('$note\nقريبًا في النسخة الجاية ✨', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: C.soft, height: 1.6)),
-            ]),
-          ),
-        ),
       ),
     );
   }

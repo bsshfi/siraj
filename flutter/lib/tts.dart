@@ -16,16 +16,24 @@ class Voice {
             (l) => l.toLowerCase().startsWith('ar'),
             orElse: () => 'ar',
           );
-      await _tts.setLanguage(langs.contains('ar-SA') ? 'ar-SA' : ar);
+      _arLang = langs.contains('ar-SA') ? 'ar-SA' : ar;
+      await _tts.setLanguage(_arLang);
       await _tts.setPitch(1.0);
     } catch (_) {}
   }
 
   /// يقرأ النص ويرجع لما يخلص (أو يتوقف)
-  static Future<void> speak(String text, double rate) async {
+  static String _arLang = 'ar';
+  static bool _isEn = false;
+
+  static Future<void> speak(String text, double rate, {bool en = false}) async {
     await _init();
     speaking = true;
     try {
+      if (en != _isEn) {
+        await _tts.setLanguage(en ? 'en-US' : _arLang);
+        _isEn = en;
+      }
       await _tts.setSpeechRate(rate);
       await _tts.speak(text.replaceAll(RegExp(r'[«»]'), ''));
     } catch (_) {}
