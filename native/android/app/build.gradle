@@ -19,6 +19,13 @@ android {
     }
     // التوقيع: المفتاح يجي من أسرار GitHub وقت البناء، وما ينحفظ في المستودع أبدًا
     signingConfigs {
+        // مفتاح تجريبي ثابت للنسخ التجريبية فقط (مو مفتاح المتجر) — عشان كل نسخة تجريبية تتثبت فوق اللي قبلها
+        debug {
+            storeFile file("siraj-test.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
         release {
             def ks = System.getenv("SIRAJ_KEYSTORE_PATH")
             if (ks) {
