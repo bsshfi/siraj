@@ -6,7 +6,7 @@
    المتغيرات المطلوبة: VAPID_PUBLIC, VAPID_PRIVATE, ADMIN_KEY  وقاعدة D1 باسم DB
 */
 
-const ORIGINS = ['https://siraj.wamdarc.com', 'https://admin.wamdarc.com', 'https://bsshfi.github.io'];
+const ORIGINS = ['https://siraj.wamdarc.com', 'https://admin.wamdarc.com', 'https://bsshfi.github.io', 'https://localhost', 'capacitor://localhost'];
 const MAX_BLOB = 300000;
 const PUSH_HOSTS = [/\.push\.apple\.com$/, /^fcm\.googleapis\.com$/, /^updates\.push\.services\.mozilla\.com$/, /^push\.services\.mozilla\.com$/, /\.notify\.windows\.com$/];
 const okPush = (u) => { try { const x = new URL(u); return x.protocol === 'https:' && PUSH_HOSTS.some((r) => r.test(x.hostname)); } catch (e) { return false; } };
