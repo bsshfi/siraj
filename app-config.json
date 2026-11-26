@@ -1,7 +1,7 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 104,
+    "latestBuild": 105,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
     "title": "تحديث سراج ✨",
     "message": "جديد: ربط العائلة برمزها، شخصيات أطفالك الحقيقية، واختيار أبطال الليلة.",
