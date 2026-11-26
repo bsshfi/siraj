@@ -1,0 +1,73 @@
+# سِراج — نشر تحديث فوري لتطبيق الأندرويد (بدون مراجعة المتجر)
+# يشتغل تلقائيًا مع كل رفع على فرع android (أو يدويًا من تبويب Actions).
+# ما يوصل لأي مستخدم إلا لما تحط المقطع في app-config.json — يعني أنت تتحكم متى ينزل.
+# يبني ملفات الواجهة من نسخة الويب الحالية، ويرفعها كـ Release في GitHub،
+# ويعطيك المقطع اللي تحطه في app-config.json على الموقع عشان توصل للمستخدمين.
+name: Live update
+
+on:
+  push:
+    branches: [android]
+  workflow_dispatch:
+    inputs:
+      min_build:
+        description: "أقل رقم بناء (build) يقدر يستقبل هذا التحديث — خلّه 0 إلا لو التحديث يحتاج ميزة أصلية جديدة"
+        default: "0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: بناء ملفات الواجهة
+        run: |
+          npm ci
+          node scripts/build-www.mjs
+
+      - name: تجهيز الحزمة
+        id: pack
+        run: |
+          WEB=$(sed -n "s/.*VERSION: *'\([^']*\)'.*/\1/p" www/config.js | head -1)
+          VER="${WEB}-${GITHUB_RUN_NUMBER}"
+          (cd www && zip -qr "../siraj-live-${VER}.zip" .)
+          SUM=$(sha256sum "siraj-live-${VER}.zip" | cut -d' ' -f1)
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+          echo "sum=$SUM" >> "$GITHUB_OUTPUT"
+
+      - name: رفع الحزمة كـ Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER="${{ steps.pack.outputs.ver }}"
+          gh release create "live-${VER}" "siraj-live-${VER}.zip" \
+            --target "${GITHUB_SHA}" --title "سِراج — تحديث فوري ${VER}" \
+            --notes "حزمة واجهة للتحديث الفوري لتطبيق الأندرويد." --prerelease
+
+      - name: المقطع اللي تحطه في app-config.json
+        run: |
+          VER="${{ steps.pack.outputs.ver }}"
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/live-${VER}/siraj-live-${VER}.zip"
+          {
+            echo "### انسخ هذا داخل \"android\" في app-config.json"
+            echo '```json'
+            echo "\"live\": {"
+            echo "  \"version\": \"${VER}\","
+            echo "  \"url\": \"${URL}\","
+            echo "  \"minBuild\": ${{ inputs.min_build || '0' }}"
+            echo "}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

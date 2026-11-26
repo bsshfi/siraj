@@ -11,6 +11,14 @@
     "LocalNotifications": {
       "smallIcon": "ic_stat_siraj",
       "iconColor": "#5B4BDB"
+    },
+    "CapacitorUpdater": {
+      "autoUpdate": false,
+      "updateUrl": "",
+      "channelUrl": "",
+      "statsUrl": "",
+      "resetWhenUpdate": true,
+      "appReadyTimeout": 10000
     }
   },
   "server": {

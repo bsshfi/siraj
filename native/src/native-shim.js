@@ -183,8 +183,36 @@
       .then(function (cfg) { if (t) clearTimeout(t); return cfg; });
   };
 
+  /* ٧) التحديثات الفورية (Live updates)
+     تبدّل ملفات الواجهة فقط، والهيكل الأصلي (الإشعارات، الصوت…) يبقى كما هو.
+     التحديث ينزل بالخلفية ويتطبّق في الفتحة الجاية. لو فشلت النسخة الجديدة بالتشغيل،
+     يرجع التطبيق تلقائيًا للنسخة اللي قبلها (notifyAppReady). ما يرسل أي بيانات لأي جهة. */
+  var UP = P.CapacitorUpdater;
+  if (UP) { try { UP.notifyAppReady(); } catch (e) {} }
+  var liveBusy = false;
+  var checkLive = function (cfg, build) {
+    var live = cfg && cfg.android && cfg.android.live;
+    if (!UP || liveBusy || !live || !live.version || !live.url) return;
+    if (live.minBuild && build < live.minBuild) return;           /* نسخة الواجهة تحتاج هيكل أحدث */
+    var fail = {}; try { fail = JSON.parse(localStorage.getItem('siraj-live-fail')) || {}; } catch (e) {}
+    if (fail.v === live.version && Date.now() - fail.t < 6 * 3600 * 1000) return;   /* فشل قريب: جرّب بعد 6 ساعات */
+    liveBusy = true;
+    UP.current().then(function (cur) {
+      var now = cur && cur.bundle && cur.bundle.version;
+      var pending = null; try { pending = localStorage.getItem('siraj-live-pending'); } catch (e) {}
+      if (now === live.version || pending === live.version) return;
+      return UP.download({ url: live.url, version: live.version, checksum: live.checksum || undefined })
+        .then(function (b) { return UP.next({ id: b.id }); })
+        .then(function () { try { localStorage.setItem('siraj-live-pending', live.version); } catch (e) {} });
+    }).catch(function () {
+      try { localStorage.setItem('siraj-live-fail', JSON.stringify({ v: live.version, t: Date.now() })); } catch (e) {}
+    }).then(function () { liveBusy = false; });
+  };
+
   var runConfig = function () {
-    Promise.all([refreshConfig(), getBuild()]).then(function (r) { cached = r[0] || cached; applyConfig(cached, r[1]); });
+    Promise.all([refreshConfig(), getBuild()]).then(function (r) {
+      cached = r[0] || cached; applyConfig(cached, r[1]); checkLive(cached, r[1]);
+    });
   };
   /* أول تشغيل: طبّق المحفوظ فورًا (يشتغل بدون نت)، ثم حدّث من السيرفر */
   getBuild().then(function (b) { if (cached) applyConfig(cached, b); });

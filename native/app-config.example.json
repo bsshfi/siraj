@@ -4,7 +4,12 @@
     "latestBuild": 0,
     "storeUrl": "https://play.google.com/store/apps/details?id=com.wamdarc.siraj",
     "title": "",
-    "message": ""
+    "message": "",
+    "live": {
+      "version": "",
+      "url": "",
+      "minBuild": 0
+    }
   },
   "flags": {
     "ads": false,
