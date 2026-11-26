@@ -33,7 +33,7 @@ jobs:
           java-version: 21
           cache: gradle
 
-      - uses: android-actions/setup-android@v3
+      # Android SDK مثبّت مسبقًا على أجهزة GitHub (ANDROID_HOME)
 
       - name: تجهيز ملفات التطبيق
         run: |
