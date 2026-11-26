@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 109,
+    "latestBuild": 110,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
-    "title": "سراج صار مثل القديم وأكثر ✨",
-    "message": "كل شيء من سراج القديم صار داخل التطبيق: الرئيسية كاملة، الإعدادات، محرر الشخصيات، رسالة للعيال، مكافأة الأسبوع، أصوات النوم، المكتبة، قفل وقت النوم، وحول التطبيق والخصوصية.",
+    "title": "تحديث سراج 🔔",
+    "message": "خطوط أرتب، دعم التابلت، وإشعار تذكير وقت القصة صار يشتغل.",
     "live": {
       "version": "5.1.2-6",
       "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-6/siraj-live-5.1.2-6.zip",
