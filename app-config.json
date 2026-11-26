@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 4,
-    "storeUrl": "https://github.com/bsshfi/siraj/actions/runs/45834509646",
+    "latestBuild": 5,
+    "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
     "title": "نسخة تجريبية جديدة",
-    "message": "فيه نسخة أحدث من سِراج فيها إصلاح لون الشريط العلوي."
+    "message": "فيه نسخة أحدث من سراج | Siraj فيها إصلاحات جديدة."
   },
   "flags": {
     "ads": false,
