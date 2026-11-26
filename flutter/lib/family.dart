@@ -123,6 +123,11 @@ class Family extends ChangeNotifier {
         _beat = (j['beat'] as num?)?.toInt() ?? 0;
         // النسخ السابقة من التطبيق كانت دايمًا جهاز طفل
         role = (j['role'] ?? (code.isNotEmpty ? 'child' : '')).toString();
+        // ترقية: النسخ السابقة كانت دايمًا جهاز طفل — اللي اختار «أنا ولي الأمر / جهاز للكل» يصير جوال وليّ الأمر
+        if (j['role'] == null && code.isNotEmpty && kids.length > 1 && kids.every((k) => devKids.contains(k.id))) {
+          role = 'parent';
+          devKids = [];
+        }
       } catch (_) {}
     }
     if (dev.isEmpty) {
