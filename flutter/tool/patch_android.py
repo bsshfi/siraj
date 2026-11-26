@@ -8,13 +8,16 @@ A = os.path.join(os.path.dirname(__file__), '..', 'android')
 man = os.path.join(A, 'app', 'src', 'main', 'AndroidManifest.xml')
 s = open(man, encoding='utf-8').read()
 s = re.sub(r'android:label="[^"]*"', 'android:label="سراج | Siraj"', s, count=1)
+if 'RecognitionService' not in s:
+    q2 = '<intent><action android:name="android.speech.RecognitionService"/></intent>'
+    s = s.replace('<queries>', '<queries>\n        ' + q2, 1) if '<queries>' in s else s.replace('</manifest>', '    <queries>' + q2 + '</queries>\n</manifest>')
 if 'TTS_SERVICE' not in s:
     q = '<intent><action android:name="android.intent.action.TTS_SERVICE"/></intent>'
     s = s.replace('<queries>', '<queries>\n        ' + q, 1) if '<queries>' in s else s.replace('</manifest>', '    <queries>' + q + '</queries>\n</manifest>')
 if 'android.permission.INTERNET' not in s:
     s = s.replace('<application', '<uses-permission android:name="android.permission.INTERNET"/>\n    <application', 1)
 # الإشعارات المجدولة (تذكير وقت القصة): الصلاحيات + مستقبلات flutter_local_notifications (تبقى بعد إعادة التشغيل)
-for perm in ['android.permission.POST_NOTIFICATIONS', 'android.permission.RECEIVE_BOOT_COMPLETED', 'android.permission.VIBRATE']:
+for perm in ['android.permission.POST_NOTIFICATIONS', 'android.permission.RECEIVE_BOOT_COMPLETED', 'android.permission.VIBRATE', 'android.permission.RECORD_AUDIO']:
     if perm not in s:
         s = s.replace('<application', f'<uses-permission android:name="{perm}"/>\n    <application', 1)
 if 'ScheduledNotificationReceiver' not in s:

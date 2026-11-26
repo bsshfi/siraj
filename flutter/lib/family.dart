@@ -31,6 +31,8 @@ class Family extends ChangeNotifier {
   List<String> fav = [];
   List<Map<String, dynamic>> remote = [];
   Set<String> passport = {};
+  List<Map<String, dynamic>> trips = []; // رحلات حول العالم (نفس صيغة الويب)
+  List<Map<String, dynamic>> tripPeople = []; // شخصيات مضافة للرحلات (جدّو، تيتة…)
   bool voice = true;
   Map<String, dynamic> kv = {}; // صوت كل طفل: {n, p, r}
   Map<String, dynamic>? resume; // {id, i, hist, at}
@@ -108,6 +110,8 @@ class Family extends ChangeNotifier {
         remote = maps('remote');
         fav = List<String>.from((j['fav'] as List?) ?? []);
         passport = Set<String>.from((j['passport'] as List?) ?? []);
+        trips = maps('trips');
+        tripPeople = maps('tripPeople');
         voice = j['voice'] != false;
         kv = Map<String, dynamic>.from((j['kv'] as Map?) ?? {});
         resume = j['resume'] is Map ? Map<String, dynamic>.from(j['resume'] as Map) : null;
@@ -145,7 +149,7 @@ class Family extends ChangeNotifier {
         _k,
         jsonEncode({
           'role': role, 'code': code, 'dev': dev, 'rev': rev, 'dirty': dirty, 'fam': fam, 'devKids': devKids, 'sel': sel, 'log': log, 'act': act,
-          'remote': remote, 'fav': fav, 'passport': passport.toList(), 'voice': voice, 'kv': kv, 'resume': resume, 'parentMode': parentMode,
+          'remote': remote, 'fav': fav, 'passport': passport.toList(), 'trips': trips, 'tripPeople': tripPeople, 'voice': voice, 'kv': kv, 'resume': resume, 'parentMode': parentMode,
           'adkDay': adkDay, 'unlockUntil': unlockUntil, 'forceSeen': forceSeen, 'tourDone': tourDone, 'msgSeen': msgSeen, 'msgFirstAt': msgFirstAt, 'msgFirstShown': msgFirstShown, 'progDirty': _progDirty, 'beat': _beat,
         }));
   }
@@ -313,6 +317,8 @@ class Family extends ChangeNotifier {
     fav = [];
     remote = [];
     passport = {};
+    trips = [];
+    tripPeople = [];
     resume = null;
     kv = {};
     dev = keepDev;
@@ -404,6 +410,42 @@ class Family extends ChangeNotifier {
 
   Future<void> stamp(String country) async {
     passport.add(country);
+    _touch();
+  }
+
+  /// كل الرحلات (هالجهاز + أجهزة العائلة) — الأحدث أول؛ جهاز الطفل يشوف رحلاته بس
+  List<Map<String, dynamic>> get allTrips {
+    final seen = <String>{}, out = <Map<String, dynamic>>[];
+    void add(Map t) {
+      if (seen.add(t['id'].toString())) out.add(Map<String, dynamic>.from(t));
+    }
+    for (final t in trips) {
+      add(t);
+    }
+    for (final p in remote) {
+      for (final t in (p['trips'] as List? ?? []).whereType<Map>()) {
+        add(t);
+      }
+    }
+    out.sort((a, b) => ((b['at'] as num?) ?? 0).compareTo((a['at'] as num?) ?? 0));
+    if (isChild) {
+      final mine = myKids.map((k) => k.id).toSet();
+      return out.where((t) => ((t['k'] as List?) ?? []).isEmpty || ((t['k'] as List).any(mine.contains))).toList();
+    }
+    return out;
+  }
+
+  void addTrip(Map<String, dynamic> t) {
+    trips = [...trips, t];
+    if (trips.length > 80) trips = trips.sublist(trips.length - 80);
+    passport.add(t['c'].toString());
+    _progDirty = true;
+    _touch();
+    syncNow();
+  }
+
+  void saveTripPeople(List<Map<String, dynamic>> ps) {
+    tripPeople = ps.length > 12 ? ps.sublist(ps.length - 12) : ps;
     _touch();
   }
 
@@ -521,7 +563,7 @@ class Family extends ChangeNotifier {
   /* ---------------- المزامنة ---------------- */
   Map<String, dynamic> _slim(Map<String, dynamic> p) => {
         'dev': p['dev'], 'role': p['role'], 'plat': p['plat'], 'ver': p['ver'], 'notif': p['notif'], 'seen': p['seen'], 'updated': p['updated'],
-        'kids': p['kids'] ?? [], 'log': p['log'] ?? [], 'act': p['act'] ?? [], 'fav': p['fav'] ?? [],
+        'kids': p['kids'] ?? [], 'log': p['log'] ?? [], 'act': p['act'] ?? [], 'fav': p['fav'] ?? [], 'trips': p['trips'] ?? [],
       };
 
   /// دمج العائلة لو جهازين عدّلوا بنفس الوقت: كل شخصية تاخذ آخر تعديل لها
@@ -582,7 +624,7 @@ class Family extends ChangeNotifier {
           'log': log.length > 500 ? log.sublist(log.length - 500) : log,
           'fav': fav,
           'act': act.length > 300 ? act.sublist(act.length - 300) : act,
-          'trips': <dynamic>[],
+          'trips': trips.length > 80 ? trips.sublist(trips.length - 80) : trips,
           'kids': devKids,
           'plat': 'تطبيق أندرويد',
           'ver': '2.3.0',

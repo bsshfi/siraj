@@ -47,7 +47,7 @@ console.log(`✓ ${stories.length} قصة، ${n} مشهد`);
     if (i > 0 && mod) s = s.slice(0, i) + `\n  globalThis.__EV_${mod} = (x) => { try { return eval(x); } catch (e) { return null; } };` + s.slice(i);
     return s + '\n;\n';
   };
-  let s2 = grab('trips-data.js') + grab('english.js', 'EN') + grab('english-3.js', 'EN2') + grab('space.js', 'SP') + grab('night.js', 'NI');
+  let s2 = grab('trips-data.js') + fs.readFileSync(path.join(ROOT, 'english-2.js'), 'utf8') + ';globalThis.__ADV = EN_ADV;\n' + grab('english.js', 'EN') + grab('english-3.js', 'EN2') + grab('space.js', 'SP') + grab('night.js', 'NI');
   s2 += ';globalThis.__TRIPS = { COUNTRIES: typeof COUNTRIES !== "undefined" ? COUNTRIES : [], REGIONS: typeof REGIONS !== "undefined" ? REGIONS : [], INFO: typeof COUNTRY_INFO !== "undefined" ? COUNTRY_INFO : {} };';
   try { vm.runInContext(s2, ctx2, { filename: 'siraj-learn.js' }); } catch (e) { console.error('تحذير (التعلّم):', e.message); }
   const ev = (m, x) => (ctx2['__EV_' + m] ? ctx2['__EV_' + m](x) : null);
@@ -55,6 +55,7 @@ console.log(`✓ ${stories.length} قصة، ${n} مشهد`);
     letters: ev('EN', 'LETTERS') || [], words: ev('EN', 'WORDS') || {}, sentences: ev('EN', 'SENT') || [], sight: ev('EN2', 'SIGHT') || [],
     phases: ev('SP', 'PHASES') || [], mansions: ev('SP', 'MAN') || [], planets: ev('SP', 'PL') || [], stars: ev('SP', 'STARS') || [], spaceQuiz: ev('SP', 'QUIZ') || [],
     adhkar: ev('NI', 'ADHKAR') || [],
+    adv: ctx2.__ADV || {}, snd: ev('EN2', 'SND') || {}, ex: ev('EN2', 'EX') || {}, fam: ev('EN2', 'FAM') || {},
     countries: ctx2.__TRIPS.COUNTRIES, regions: ctx2.__TRIPS.REGIONS, info: ctx2.__TRIPS.INFO
   };
   fs.writeFileSync(path.join(OUT, 'data', 'learn.json'), JSON.stringify(out));

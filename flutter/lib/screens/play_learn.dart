@@ -10,6 +10,7 @@ import '../nav.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/common.dart';
+import 'english.dart';
 import 'story_games.dart';
 
 /// تبويب "العب وتعلّم": الإنجليزي (حروف، كلمات، جمل) + ألعاب
@@ -56,12 +57,10 @@ class _PlayLearnScreenState extends State<PlayLearnScreen> {
       title: 'العب وتعلّم',
       subtitle: _sec == 0 ? 'ألعاب تفكير وذكاء 🎮' : 'Let\'s learn English! 🔤',
       children: [
-        Pills(items: const ['🎮 ألعاب', '🔤 حروف', '🧠 كلمات', '💬 جمل'], index: _sec, onTap: (i) => Nav.learn.value = i),
+        Pills(items: const ['🎮 ألعاب', '🔤 English'], index: _sec.clamp(0, 1), onTap: (i) => Nav.learn.value = i),
         const SizedBox(height: 14),
         if (_sec == 0) ..._games(context),
-        if (_sec == 1) _letters(),
-        if (_sec == 2) ..._words(),
-        if (_sec == 3) ..._sentences(),
+        if (_sec >= 1) const EnglishSection(),
       ],
     );
   }
