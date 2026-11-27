@@ -1,10 +1,10 @@
 {
   "android": {
     "minBuild": 0,
-    "latestBuild": 114,
+    "latestBuild": 117,
     "storeUrl": "https://github.com/bsshfi/siraj/releases/download/android-test/siraj-test.apk",
-    "title": "سراج اكتمل 🎉",
-    "message": "جديد: الإنجليزي كامل بكل مستوياته (أصوات الحروف، تتبّع الحرف، قراءة، قواعد، محادثات، إملاء، نطق) ومخطط الرحلات حول العالم بألبوم وجواز سفر.",
+    "title": "تحديث سراج 🌙",
+    "message": "القمر اللي يقرأ كتاب صار في الرئيسية مثل نسخة الويب.",
     "live": {
       "version": "5.1.2-6",
       "url": "https://github.com/bsshfi/siraj/releases/download/live-5.1.2-6/siraj-live-5.1.2-6.zip",
