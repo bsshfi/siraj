@@ -32,6 +32,11 @@ if 'ScheduledNotificationReceiver' not in s:
         </receiver>
 '''
     s = s.replace('</application>', rc + '    </application>', 1)
+# تطبيق أطفال بدون إعلانات: نشيل صلاحية معرّف الإعلانات لو أضافتها أي مكتبة
+if 'xmlns:tools' not in s:
+    s = s.replace('<manifest ', '<manifest xmlns:tools="http://schemas.android.com/tools" ', 1)
+if 'permission.AD_ID' not in s:
+    s = s.replace('<application', '<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>\n    <application', 1)
 open(man, 'w', encoding='utf-8').write(s)
 
 shutil.copy(os.path.join(os.path.dirname(__file__), 'siraj-test.keystore'), os.path.join(A, 'app', 'siraj-test.keystore'))
