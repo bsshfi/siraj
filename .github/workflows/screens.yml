@@ -12,6 +12,9 @@ concurrency:
   group: screens
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   shots:
     runs-on: ubuntu-latest
@@ -58,8 +61,11 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           working-directory: flutter
           script: bash tool/shots.sh
-      - uses: actions/upload-artifact@v4
+      - name: رفع اللقطات لفرع shots
         if: always()
-        with:
-          name: shots
-          path: flutter/shots/
+        working-directory: flutter/shots
+        run: |
+          git init -q -b shots
+          git -c user.name=ci -c user.email=ci@wamdarc.com add -A
+          git -c user.name=ci -c user.email=ci@wamdarc.com commit -qm "shots ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" shots
