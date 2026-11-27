@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import '../data.dart';
 import '../learn.dart';
 import '../theme.dart';
+import '../widgets/stk.dart';
 
 /// حول التطبيق، سياسة الخصوصية، المشاركة — كلها داخل التطبيق بدون صفحات ويب
 class Info {
@@ -50,7 +51,7 @@ class _InfoPage extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top, bottom = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .3, .6])),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: ListView(padding: EdgeInsets.fromLTRB(16, top + 8, 16, bottom + 30), children: [
           Align(
             alignment: AlignmentDirectional.centerStart,

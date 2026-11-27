@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../learn.dart';
 import '../theme.dart';
 import '../tts.dart';
+import 'stk.dart';
 
 /// صفحة تبويب: سماء متدرّجة + عنوان + محتوى قابل للتمرير
 class TabPage extends StatelessWidget {
@@ -21,7 +22,7 @@ class TabPage extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top, bottom = MediaQuery.of(context).padding.bottom;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: colors ?? const [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: const [0, .3, .62]),
+        gradient: colors == null ? SkyBg.gradient : LinearGradient(colors: colors!, begin: Alignment.topCenter, end: Alignment.bottomCenter),
       ),
       child: ListView(
         physics: const BouncingScrollPhysics(),

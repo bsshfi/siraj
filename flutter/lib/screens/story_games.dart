@@ -14,6 +14,7 @@ import '../theme.dart';
 import '../tonight_logic.dart';
 import '../widgets/common.dart';
 import '../widgets/scene.dart';
+import '../widgets/stk.dart';
 
 /// ألعاب القصة (play.js): تلوين المشهد، أحجية الصورة، سؤال وجواب + معرض رسوماتي
 class StoryGames {
@@ -290,7 +291,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final art = SceneArt(scene: page.scene, prop: page.prop, heroes: Tonight.artHeroes(widget.story, widget.heroes, page), radius: 0);
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: ListView(padding: EdgeInsets.fromLTRB(16, top + 8, 16, 30), children: [
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),

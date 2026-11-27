@@ -5,6 +5,7 @@ import '../avatars.dart';
 import '../family.dart';
 import '../sync.dart';
 import '../theme.dart';
+import '../widgets/stk.dart';
 
 /// خلفية سماء سراج
 class SkyBackground extends StatelessWidget {
@@ -13,7 +14,7 @@ class SkyBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .4, .8]),
+          gradient: SkyBg.gradient,
         ),
         child: child,
       );

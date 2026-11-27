@@ -16,6 +16,7 @@ import 'info.dart';
 import 'kid_editor.dart';
 import 'library.dart';
 import 'link.dart';
+import '../widgets/stk.dart';
 
 void toast(BuildContext context, String m) {
   ScaffoldMessenger.of(context)
@@ -275,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final ex = x is Map && x['d'] == f.nightKey ? ((x['n'] as num?)?.toInt() ?? 0) : 0;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .2, .45])),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: ListView(padding: EdgeInsets.fromLTRB(14, top + 8, 14, bottom + 40), children: [
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),

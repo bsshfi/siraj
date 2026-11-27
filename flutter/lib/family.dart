@@ -54,6 +54,8 @@ class Family extends ChangeNotifier {
         'perNight': 1, 'shortKids': true, 'lockOn': true, 'lock': '21:30', 'extra': null,
       };
 
+  /// نسخة عرض للقطات الشاشة في CI (بدون مزامنة)
+  static const demo = bool.fromEnvironment('DEMO');
   bool get linked => code.isNotEmpty;
   bool get isParent => role == 'parent';
   bool get isChild => role == 'child';
@@ -601,7 +603,7 @@ class Family extends ChangeNotifier {
 
   /// سحب تحديثات العائلة + رفع تعديلاتنا وسجل هالجهاز + سحب تقدّم الأجهزة الثانية
   Future<void> syncNow() async {
-    if (!linked || syncing) return;
+    if (!linked || syncing || demo) return;
     syncing = true;
     notifyListeners();
     try {

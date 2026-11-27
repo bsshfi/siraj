@@ -10,6 +10,7 @@ import '../learn.dart';
 import '../theme.dart';
 import '../tts.dart';
 import '../widgets/common.dart';
+import '../widgets/stk.dart';
 
 /// الإنجليزي كامل (english.js + english-2.js + english-3.js):
 /// حروف (٣-٥)، كلمات (٦-٨)، جمل (٦-٩)، متقدّم (٩-١٢): قراءة، نطق، مفردات، قواعد، محادثات، إملاء
@@ -49,7 +50,7 @@ class EnPage extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top, bottom = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .25, .5])),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: ListView(padding: EdgeInsets.fromLTRB(16, top + 8, 16, bottom + 30), children: [
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),

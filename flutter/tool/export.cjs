@@ -99,3 +99,33 @@ for (const n of ['wamdarc-light.png', 'wamdarc-dark.png']) { try { fs.copyFileSy
   fs.writeFileSync(path.join(OUT, 'data', 'room.json'), JSON.stringify(c3.__ROOM));
   console.log(`✓ غرفتي: ${c3.__ROOM.ITEMS.length} قطعة`);
 })();
+
+/* ---- أيقونات الملصقات (stickers.js) + أيقونات الشريط السفلي وزر الضبط (index.html): نفس رسومات الويب ---- */
+(() => {
+  let s = fs.readFileSync(path.join(ROOT, 'stickers.js'), 'utf8');
+  s = s.replace(/\n\s*let busy = false;[\s\S]*$/, '\n  globalThis.__STK = { I, moonReader, skyfx };\n})();');
+  const c4 = { console, Math, JSON, document: { readyState: 'complete', querySelectorAll: () => [] } }; vm.createContext(c4);
+  vm.runInContext(s, c4);
+  const out = {};
+  for (const [k, f] of Object.entries(c4.__STK.I)) { try { out[k] = String(f(k === 'cal' ? '§D§' : undefined)).replace(/ class="[^"]*"| aria-hidden="true"/g, '').replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '); } catch (e) {} }
+  // القمر اللي يقرأ: ثلاث طبقات (خلف · القمر نفسه اللي يتمايل · قدّام) عشان نحرّك القمر بس مثل الويب
+  const mr = c4.__STK.moonReader();
+  const defs = (mr.match(/<defs>[\s\S]*?<\/defs>/) || [''])[0];
+  const body = mr.replace(/^\s*<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '').replace(defs, '');
+  const st = body.indexOf('<g class="mrb">');
+  let i = st + 3, depth = 1;
+  while (depth > 0 && i < body.length) { const o = body.indexOf('<g', i), c = body.indexOf('</g>', i); if (o !== -1 && o < c) { depth++; i = o + 2; } else { depth--; i = c + 4; } }
+  const svg = (x) => ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 190">' + defs + x + '</svg>').replace(/ class="[^"]*"| aria-hidden="true"/g, '');
+  out.moonReader = svg(body);
+  out.moonBack = svg(body.slice(0, st));
+  out.moonFace = svg(body.slice(st, i));
+  out.moonFront = svg(body.slice(i));
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const nav = (html.match(/<nav class="tabs bnav">([\s\S]*?)<\/nav>/) || [])[1] || '';
+  const ids = { tabTonight: 'navTonight', tabMe: 'navMe', tabExplore: 'navExplore', tabLearn: 'navLearn', tabParents: 'navParents' };
+  for (const m of nav.matchAll(/<button id="(\w+)"[^>]*><span>(<svg[\s\S]*?<\/svg>)<\/span>/g)) if (ids[m[1]]) out[ids[m[1]]] = m[2].replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+  const g = html.match(/class="hxgear"[^>]*>(<svg[\s\S]*?<\/svg>)/);
+  if (g) out.tune = g[1].replace(/currentColor/g, '#3F4C6B').replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+  fs.writeFileSync(path.join(OUT, 'data', 'icons.json'), JSON.stringify(out));
+  console.log(`✓ الأيقونات: ${Object.keys(out).length}`);
+})();

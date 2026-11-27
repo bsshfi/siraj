@@ -30,67 +30,71 @@ ThemeData sirajTheme() {
   );
 }
 
-/// بطاقة بيضاء ناعمة (بديل "الزجاج" في الويب — بدون تمويه، أخف بكثير)
+/// بطاقة زجاجية مثل .card في الويب: أبيض ٧٤٪، حدّ أبيض، زوايا ٢٦، ظل ناعم
 class SoftCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
-  const SoftCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap});
+  final bool clip;
+  const SoftCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap, this.clip = false});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      elevation: 0,
-      shadowColor: const Color(0x2250628A),
-      borderRadius: BorderRadius.circular(26),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(26),
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(26),
-            boxShadow: const [BoxShadow(color: Color(0x1A50628A), blurRadius: 22, offset: Offset(0, 8))],
-          ),
-          padding: padding,
-          child: child,
-        ),
+    final r = BorderRadius.circular(26);
+    Widget inner = Padding(padding: padding, child: child);
+    if (onTap != null) inner = Material(color: Colors.transparent, child: InkWell(borderRadius: r, onTap: onTap, child: inner));
+    return Container(
+      clipBehavior: clip ? Clip.antiAlias : Clip.none,
+      decoration: BoxDecoration(
+        color: const Color(0xBDFFFFFF),
+        borderRadius: r,
+        border: Border.all(color: const Color(0xF2FFFFFF), width: 1),
+        boxShadow: const [BoxShadow(color: Color(0x1C50628A), blurRadius: 28, offset: Offset(0, 10))],
       ),
+      child: inner,
     );
   }
 }
 
-/// زر برتقالي كبير مثل الويب
+/// الزر البرتقالي الكبير مثل .btn في الويب (تدرّج، ظل تحته، وحافة سفلية أغمق)
 class BigButton extends StatelessWidget {
   final String label;
   final IconData? icon;
   final VoidCallback onTap;
-  const BigButton({super.key, required this.label, required this.onTap, this.icon});
+  final double fontSize;
+  const BigButton({super.key, required this.label, required this.onTap, this.icon, this.fontSize = 20});
 
   @override
   Widget build(BuildContext context) {
+    final r = BorderRadius.circular(20);
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [C.orange2, C.orange], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: const [BoxShadow(color: Color(0x55F2851E), blurRadius: 14, offset: Offset(0, 6))],
+        borderRadius: r,
+        boxShadow: const [BoxShadow(color: Color(0x4DF2851E), blurRadius: 16, offset: Offset(0, 7))],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              if (icon != null) ...[Icon(icon, color: Colors.white, size: 24), const SizedBox(width: 8)],
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(label, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-                ),
+      child: ClipRRect(
+        borderRadius: r,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: r,
+            onTap: onTap,
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [Color(0x1A000000), Color(0x1A000000), Color(0x00000000), Color(0x00000000)], stops: [0, .07, .07, 1]),
               ),
-            ]),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                if (icon != null) ...[Icon(icon, color: Colors.white, size: 24), const SizedBox(width: 8)],
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(label, maxLines: 1, style: TextStyle(color: Colors.white, fontSize: fontSize, fontWeight: FontWeight.w800, height: 1.4)),
+                  ),
+                ),
+              ]),
+            ),
           ),
         ),
       ),

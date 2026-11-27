@@ -11,6 +11,7 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/scene.dart';
 import 'kid_editor.dart';
+import '../widgets/stk.dart';
 
 /// رحلات حول العالم (trips.js): كل الرحلات تطلع من مطار الملك خالد الدولي بالرياض وترجع له
 class Trips {
@@ -715,7 +716,7 @@ class _TripWizardState extends State<TripWizard> {
     final top = MediaQuery.of(context).padding.top, bottom = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4FA3EC), C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: ListView(padding: EdgeInsets.fromLTRB(16, top + 8, 16, bottom + 30), children: [
           Row(children: [
             IconButton.filledTonal(
@@ -754,7 +755,7 @@ class AlbumScreen extends StatelessWidget {
     final picks = ((t['picks'] as List?) ?? []).map((p) => (p as List).map((x) => x.toString()).toList()).toList();
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: ListView(padding: EdgeInsets.fromLTRB(16, top + 8, 16, 30), children: [
           Row(children: [
             IconButton.filledTonal(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded), style: IconButton.styleFrom(backgroundColor: Colors.white70)),

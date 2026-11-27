@@ -86,7 +86,8 @@ class KidAvatar extends StatelessWidget {
 class KidFace extends StatelessWidget {
   final Kid kid;
   final double size;
-  const KidFace({super.key, required this.kid, this.size = 64});
+  final Color bg;
+  const KidFace({super.key, required this.kid, this.size = 64, this.bg = const Color(0xFFEFF5FF)});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,7 @@ class KidFace extends StatelessWidget {
       height: size,
       child: ClipOval(
         child: ColoredBox(
-          color: const Color(0xFFEFF5FF),
+          color: bg,
           child: OverflowBox(
             maxHeight: size * 1.9,
             alignment: Alignment.topCenter,

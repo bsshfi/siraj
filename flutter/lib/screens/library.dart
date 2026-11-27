@@ -7,6 +7,7 @@ import '../theme.dart';
 import '../tonight_logic.dart';
 import '../widgets/scene.dart';
 import 'reader.dart';
+import '../widgets/stk.dart';
 
 /// بطاقة قصة (رسمة + عنوان + تصنيف)
 class StoryTile extends StatelessWidget {
@@ -105,7 +106,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     }).toList();
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [C.sky, C.skyLight, C.skyPale], begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: [0, .2, .45])),
+        decoration: const BoxDecoration(gradient: SkyBg.gradient),
         child: CustomScrollView(slivers: [
           SliverToBoxAdapter(
             child: Padding(
