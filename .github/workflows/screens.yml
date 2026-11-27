@@ -1,9 +1,16 @@
 # سراج | Siraj — لقطات شاشة آلية من محاكي أندرويد (للمقارنة مع نسخة الويب)
-# يدوي فقط: Actions → Screens → Run workflow
+# يشتغل مع كل تعديل على واجهة التطبيق في فرع flutter
 name: Screens
 
 on:
+  push:
+    branches: [flutter]
+    paths: ['flutter/lib/**', 'flutter/tool/**', '.github/workflows/screens.yml']
   workflow_dispatch:
+
+concurrency:
+  group: screens
+  cancel-in-progress: true
 
 jobs:
   shots:
