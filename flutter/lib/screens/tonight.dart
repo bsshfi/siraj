@@ -11,6 +11,7 @@ import '../nav.dart';
 import '../theme.dart';
 import '../tonight_logic.dart';
 import '../widgets/common.dart';
+import '../widgets/moon_reader.dart';
 import '../widgets/pin.dart';
 import '../widgets/scene.dart';
 import 'me.dart';
@@ -155,7 +156,7 @@ class _TonightScreenState extends State<TonightScreen> {
               ),
               GestureDetector(
                 onTap: () => Nav.go(2, explore: 1),
-                child: SizedBox(width: 66, height: 66, child: CustomPaint(painter: MoonPainter(Learn.moonAge()))),
+                child: const MoonReader(size: 96),
               ),
               const SizedBox(width: 6),
               IconButton.filledTonal(
